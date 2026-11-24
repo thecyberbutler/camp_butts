@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block content %}
+<p class="eyebrow">Find your place</p><h1>Explore campsites</h1>
+<p><a href="{% url 'campground_map' %}">View campground map</a></p>
+{% if show_availability %}
+<form method="get" class="search-form" hx-get="{% url 'campsites' %}" hx-target="#results" hx-indicator="#search-status">
+{{ form.as_p }}<button class="btn btn-primary" type="submit">Check availability</button>
+<span id="search-status" class="htmx-indicator" role="status">Checking dates…</span></form>
+{% else %}<p><a href="{% url 'account_login' %}">Sign in</a> to check availability.</p>{% endif %}
+<div id="results" aria-live="polite">{% include 'campsites/results.html' %}</div>
+{% endblock %}

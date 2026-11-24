@@ -1,0 +1,30 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="htmx-config" content='{"allowEval":false,"allowScriptTags":false,"includeIndicatorStyles":false,"selfRequestsOnly":true,"historyCacheSize":0}'>
+  <title>{% block title %}{{ campground.name }}{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'vendor/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+  <script src="{% static 'vendor/htmx.min.js' %}" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><nav class="container d-flex flex-wrap gap-3 align-items-center py-3" aria-label="Main navigation">
+    <a class="brand" href="{% url 'home' %}">{{ campground.name }}</a>
+    <a href="{% url 'campsites' %}">Find a campsite</a>
+    {% if user.is_authenticated %}
+      <a href="{% url 'dashboard' %}">My reservations</a><a href="{% url 'notifications' %}">Notifications</a>
+      <a href="{% url 'mfa_index' %}">Account security</a><a href="{% url 'account_logout' %}">Sign out</a>
+      {% if perms.reservations.operate_reservations %}<a href="{% url 'operations' %}">Operations</a>{% endif %}
+    {% else %}<a href="{% url 'account_login' %}">Sign in</a><a href="{% url 'account_signup' %}">Create account</a>{% endif %}
+  </nav></header>
+  <main id="main" class="container py-5">
+    {% for message in messages %}<p role="status" class="alert alert-info">{{ message }}</p>{% endfor %}
+    {% block content %}{% endblock %}
+  </main>
+  <footer class="container py-4 border-top">{{ campground.name }} · Make room for the outdoors.</footer>
+</body>
+</html>

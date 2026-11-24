@@ -1,0 +1,6 @@
+{% extends 'base.html' %}
+{% block content %}<p class="eyebrow">{{ site.site_type }}</p><h1>{{ site.name }}</h1>
+<p class="lead">{{ site.description }}</p><dl><dt>Guest capacity</dt><dd>{{ site.max_occupancy }}</dd><dt>Maximum RV length</dt><dd>{{ site.max_rv_length }} feet</dd>
+<dt>Accessibility</dt><dd>{{ site.accessibility|default:"Contact the campground for details." }}</dd></dl>
+<h2>Amenities</h2><ul>{% for amenity in site.amenities.all %}<li>{{ amenity }}</li>{% empty %}<li>Contact the campground for details.</li>{% endfor %}</ul>
+<a class="btn btn-primary" href="{% url 'book' site.pk %}">Choose dates</a>{% endblock %}

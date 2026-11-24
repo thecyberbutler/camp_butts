@@ -1,0 +1,31 @@
+:root { --forest: #174c3c; --ink: #182c27; }
+body { color: var(--ink); background: #f7faf8; font-size: 1rem; }
+a { color: #185d46; text-underline-offset: .2em; }
+.site-header { background: #fff; border-bottom: 1px solid #d8e4dd; }
+.brand { font-weight: 800; font-size: 1.35rem; margin-right: auto; text-decoration: none; }
+.hero { padding: clamp(2rem, 6vw, 5rem); border-radius: 1rem; background: #e1eee6; }
+h1 { font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 750; letter-spacing: -.035em; }
+.eyebrow { font-size: .9rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.btn-primary { --bs-btn-bg: #174c3c; --bs-btn-border-color: #174c3c; --bs-btn-hover-bg: #0d3528; --bs-btn-hover-border-color: #0d3528; }
+.btn-outline-primary { --bs-btn-color: #174c3c; --bs-btn-border-color: #174c3c; --bs-btn-hover-bg: #174c3c; --bs-btn-hover-border-color: #174c3c; }
+.site-card { background: #fff; border: 1px solid #d8e4dd; border-radius: .75rem; padding: 1.5rem; }
+.plain-text { white-space: pre-wrap; }
+.bounded-form { max-width: 42rem; }
+form label { display: block; font-weight: 600; margin-bottom: .4rem; }
+input:not([type=checkbox]):not([type=hidden]), select, textarea { padding: .65rem; border: 1px solid #6a7d72; border-radius: .35rem; width: 100%; max-width: 42rem; background: #fff; }
+input[type=checkbox] { width: 1.2rem; height: 1.2rem; }
+.search-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; align-items: end; padding: 1.5rem; background: #eaf1ed; border-radius: .75rem; }
+.errorlist { color: #9a2020; }
+.helptext { display: block; font-size: .9rem; }
+.htmx-indicator { display: none; }
+.htmx-request.htmx-indicator { display: inline; }
+.skip-link { position: absolute; left: -10000px; }
+.skip-link:focus { position: static; display: block; padding: 1rem; }
+:focus-visible { outline: 3px solid #926300; outline-offset: 3px; }
+.campground-map { max-width: 850px; width: 100%; background: #fff; border: 1px solid #d8e4dd; }
+.campground-map text { fill: #fff; font-size: 16px; }
+.map-available { fill: #236242; }
+.map-reserved { fill: #9a3030; }
+.map-maintenance { fill: #8b5305; }
+.map-unavailable { fill: #56625b; }
+.campground-map a:focus rect { stroke: #1558a6; stroke-width: 6px; }

@@ -1,0 +1,25 @@
+{
+    admin off
+    http_port 8080
+    https_port 8443
+    log default {
+        exclude http.log.access http.log.error
+    }
+}
+localhost {
+    tls internal
+    request_body {
+        max_size 64KB
+    }
+    handle /static/* {
+        root * /srv
+        file_server
+    }
+    handle {
+        reverse_proxy web:8000 {
+            header_up X-Real-IP {remote_host}
+            header_up X-Forwarded-Proto https
+            header_up -Forwarded
+        }
+    }
+}

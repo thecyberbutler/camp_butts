@@ -1,0 +1,15 @@
+services:
+  web:
+    environment:
+      DJANGO_SETTINGS_MODULE: config.settings.development
+    entrypoint: [python, manage.py, runserver, "0.0.0.0:8000", --nothreading]
+    volumes:
+      - ./apps:/app/apps:ro
+      - ./config:/app/config:ro
+      - ./templates:/app/templates:ro
+      - ./static:/app/static:ro
+  proxy:
+    ports: !override ["127.0.0.1:80:8080", "127.0.0.1:443:8443"]
+    volumes:
+      - ./Caddyfile.dev:/etc/caddy/Caddyfile:ro
+      - ./static:/srv/static:ro

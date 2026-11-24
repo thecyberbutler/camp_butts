@@ -1,0 +1,14 @@
+**
+!pyproject.toml
+!poetry.lock
+!manage.py
+!config/**
+!apps/**
+!templates/**
+!static/**
+!scripts/entrypoint.sh
+!scripts/provision_database.py
+!scripts/runtime_grants.sql
+!gunicorn.conf.py
+**/__pycache__/**
+**/*.pyc

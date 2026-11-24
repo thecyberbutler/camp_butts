@@ -1,0 +1,43 @@
+[tool.poetry]
+name = "campground"
+version = "0.1.0"
+description = "Self-hosted campground reservations"
+authors = []
+package-mode = false
+
+[tool.poetry.dependencies]
+python = ">=3.13,<3.14"
+django = ">=5.2.19,<5.3"
+django-allauth = {version = ">=65.22.1,<66", extras = ["mfa"]}
+django-axes = ">=9,<10"
+psycopg = {version = ">=3.2,<4", extras = ["binary"]}
+argon2-cffi = ">=25.1,<26"
+cryptography = ">=50.0.2,<51"
+gunicorn = ">=27.0.1,<28"
+
+[tool.poetry.group.dev.dependencies]
+pytest = ">=8,<10"
+pytest-django = ">=4.11,<5"
+pytest-cov = ">=6,<8"
+ruff = ">=0.12,<1"
+bandit = ">=1.8,<2"
+pip-audit = ">=2.9,<3"
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings.testing"
+python_files = ["test_*.py"]
+addopts = "--tb=short --strict-markers"
+testpaths = ["tests"]
+markers = ["concurrency: independent-connection PostgreSQL race tests"]
+
+[tool.ruff]
+target-version = "py313"
+line-length = 100
+exclude = [".venv"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.coverage.run]
+source = ["apps", "config"]
+omit = ["*/migrations/*", "*/settings/*", "*/wsgi.py", "*/asgi.py"]

@@ -1,0 +1,6 @@
+{% extends 'base.html' %}
+{% block content %}<h1>Campground map</h1><form method="get" class="search-form">{{ form.as_p }}<button type="submit" class="btn btn-primary">Show availability</button></form>
+<p class="mt-3">Green: available · Red: reserved · Orange: maintenance · Gray: unavailable or no dates selected.</p>
+<svg viewBox="0 0 1100 1100" class="campground-map" role="img" aria-labelledby="map-title"><title id="map-title">Campsites and availability for your selected dates</title>
+{% for site in sites %}<a href="{% url 'campsite_detail' site.pk %}" aria-label="{{ site.name }}: {{ site.map_status }}"><rect x="{{ site.map_x }}" y="{{ site.map_y }}" width="120" height="80" rx="8" class="map-{{ site.map_status }}"/><text x="{{ site.map_x|add:8 }}" y="{{ site.map_y|add:45 }}">{{ site.name }}</text></a>{% endfor %}</svg>
+<h2>Accessible campsite list</h2><ul>{% for site in sites %}<li><a href="{% url 'campsite_detail' site.pk %}">{{ site.name }}</a>: {{ site.map_status }}</li>{% endfor %}</ul>{% endblock %}

@@ -1,0 +1,163 @@
+name: campground
+x-app: &app
+  build:
+    context: .
+    args:
+      APP_UID: ${APP_UID:-10001}
+      APP_GID: ${APP_GID:-10001}
+  image: campground-web:local
+  user: "${APP_UID:-10001}:${APP_GID:-10001}"
+  read_only: true
+  cap_drop: [ALL]
+  security_opt: [no-new-privileges:true]
+  tmpfs:
+    - /tmp:rw,noexec,nosuid,size=32m,mode=1777
+    - /run/gunicorn:rw,noexec,nosuid,size=16m,mode=0700,uid=${APP_UID:-10001},gid=${APP_GID:-10001}
+  pids_limit: 128
+  mem_limit: 1g
+  cpus: 2
+  environment: &environment
+    DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS:?Set explicit allowed hosts}
+    APP_TIME_ZONE: ${APP_TIME_ZONE:-America/New_York}
+    DJANGO_SECRET_KEY_FILE: /run/secrets/django_key
+    MFA_KEY_FILE: /run/secrets/mfa_key
+    SESSION_KEY_FILE: /run/secrets/session_key
+    DATABASE_PASSWORD_FILE: /run/secrets/database_password
+    DATABASE_NAME: campground
+    DATABASE_USER: campground_app
+    DATABASE_HOST: db
+    TRUSTED_PROXY_IPS: 172.30.10.2
+    EMAIL_ENABLED: "false"
+  secrets: [django_key, mfa_key, session_key, database_password]
+
+services:
+  provision:
+    image: campground-web:local
+    profiles: [tools]
+    user: "${APP_UID:-10001}:${APP_GID:-10001}"
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    networks: [database]
+    secrets: [admin_password, migration_password, database_password]
+    entrypoint: [python, /app/scripts/provision_database.py]
+    restart: "no"
+  web:
+    <<: *app
+    restart: unless-stopped
+    networks:
+      application:
+        ipv4_address: 172.30.10.3
+      database: {}
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: [CMD, python, manage.py, check, --deploy, --fail-level, WARNING]
+      interval: 60s
+      timeout: 15s
+      retries: 3
+    volumes:
+      - static:/app/staticfiles:ro
+  migrate:
+    <<: *app
+    profiles: [tools]
+    restart: "no"
+    networks: [database]
+    entrypoint: [python, manage.py]
+    command: [migrate, --noinput]
+    environment:
+      <<: *environment
+      DJANGO_SETTINGS_MODULE: config.settings.migration
+      DATABASE_USER: campground_migrator
+      DATABASE_PASSWORD_FILE: /run/secrets/migration_password
+    secrets: [django_key, mfa_key, session_key, migration_password]
+    volumes:
+      - static:/app/staticfiles
+  db:
+    image: postgres:17.12-bookworm@sha256:1eff563f6c868b9b433566e9f3cf6e5c79fbd3b95bf70ec7277d376cdbfc50d7
+    restart: unless-stopped
+    read_only: true
+    cap_drop: [ALL]
+    # Official entrypoint initializes volume ownership then drops to postgres.
+    cap_add: [CHOWN, DAC_OVERRIDE, FOWNER, SETGID, SETUID]
+    security_opt: [no-new-privileges:true]
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=32m
+      - /var/run/postgresql:rw,noexec,nosuid,size=16m
+    pids_limit: 128
+    mem_limit: 1g
+    cpus: 2
+    networks: [database]
+    environment:
+      POSTGRES_DB: campground
+      POSTGRES_PASSWORD_FILE: /run/secrets/admin_password
+      POSTGRES_INITDB_ARGS: --auth-host=scram-sha-256 --auth-local=scram-sha-256
+    secrets: [admin_password]
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    command: [postgres, -c, password_encryption=scram-sha-256, -c, log_statement=none, -c, log_min_error_statement=panic, -c, log_error_verbosity=terse]
+    healthcheck:
+      test: [CMD, pg_isready, -U, postgres, -d, campground]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  proxy:
+    build:
+      context: .
+      dockerfile: Dockerfile.proxy
+      args:
+        APP_UID: ${APP_UID:-10001}
+        APP_GID: ${APP_GID:-10001}
+    image: campground-proxy:local
+    restart: unless-stopped
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    tmpfs: ["/tmp:rw,noexec,nosuid,size=16m"]
+    pids_limit: 128
+    mem_limit: 256m
+    cpus: 1
+    ports: ["80:8080", "443:8443"]
+    environment:
+      APP_DOMAIN: ${APP_DOMAIN:?Set the HTTPS hostname}
+    networks:
+      edge: {}
+      application:
+        ipv4_address: 172.30.10.2
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - static:/srv/static:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on: [web]
+
+networks:
+  edge: {}
+  application:
+    internal: true
+    ipam:
+      config:
+        - subnet: 172.30.10.0/28
+  database:
+    internal: true
+
+volumes:
+  postgres: {}
+  static: {}
+  caddy_data: {}
+  caddy_config: {}
+
+secrets:
+  django_key:
+    file: ${SECRETS_DIR:-./.secrets}/django_key
+  mfa_key:
+    file: ${SECRETS_DIR:-./.secrets}/mfa_key
+  session_key:
+    file: ${SECRETS_DIR:-./.secrets}/session_key
+  database_password:
+    file: ${SECRETS_DIR:-./.secrets}/database_password
+  migration_password:
+    file: ${SECRETS_DIR:-./.secrets}/migration_password
+  admin_password:
+    file: ${SECRETS_DIR:-./.secrets}/admin_password

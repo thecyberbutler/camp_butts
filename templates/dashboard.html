@@ -1,0 +1,6 @@
+{% extends 'base.html' %}
+{% block content %}<h1>My reservations</h1>
+{% if not user.approved %}<p role="status" class="alert alert-info">Your account is awaiting campground approval. Booking becomes available after approval.</p>{% endif %}
+{% for reservation in page_obj %}<article class="site-card mb-3"><h2 class="h4"><a href="{% url 'reservation_detail' reservation.pk %}">{{ reservation.campsite.name }}</a></h2><p>{{ reservation.check_in }} – {{ reservation.check_out }} · {{ reservation.get_status_display }}</p></article>
+{% empty %}<p>You have no reservations yet.</p><a class="btn btn-primary" href="{% url 'campsites' %}">Find a campsite</a>{% endfor %}
+{% include 'pagination.html' %}<h2 class="mt-5">Recent notifications</h2>{% for item in notifications %}<p>{{ item.message }}</p>{% empty %}<p>No notifications.</p>{% endfor %}{% endblock %}

@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="hero"><p class="eyebrow">Your next stay, a little closer to nature</p><h1>Welcome to {{ campground.name }}</h1>
+<p class="lead">{{ campground.welcome|default:"Find your campsite, plan your stay, and enjoy time outside." }}</p>
+<a class="btn btn-primary btn-lg" href="{% url 'campsites' %}">Explore campsites</a></section>
+<div class="row g-5 mt-4"><section class="col-md-6"><h2>Campground rules</h2><div class="plain-text">{{ campground.rules|default:"Contact the campground for current rules before booking." }}</div></section>
+<section class="col-md-6"><h2>Reservation policies</h2><div class="plain-text">{{ campground.reservation_policy }}</div>
+<p>Stays of {{ campground.min_nights }}–{{ campground.max_nights }} nights. Book up to {{ campground.advance_days }} days ahead, with {{ campground.notice_days }} days' notice.</p>
+<p>Cancellations require {{ campground.cancellation_days }} days' notice.</p></section></div>
+{% endblock %}
