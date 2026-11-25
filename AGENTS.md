@@ -2,7 +2,9 @@
 
 ## 1. Project Overview
 
-This repository contains a fully self-hosted campground reservation web application.
+This repository contains a fully self-hosted multi-campground reservation SaaS application.
+The owner selected a shared application/database with separate accounts per campground
+on 2026-11-24. All security requirements continue to apply to each campground and the platform.
 
 The complete application requirements are defined in PROJECT_SPEC.md.
 
@@ -177,7 +179,7 @@ Use:
 - Vanilla JavaScript.
 - Docker Compose.
 - Gunicorn.
-- Caddy.
+- Traefik (owner-approved replacement for Caddy, 2026-11-24).
 - Django authentication.
 - django-allauth.
 - Argon2id.

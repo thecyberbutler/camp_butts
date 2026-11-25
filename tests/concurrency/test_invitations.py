@@ -31,7 +31,7 @@ def test_last_invitation_use_cannot_be_redeemed_twice(staff, policy, password):
         try:
             barrier.wait(timeout=10)
             response = Client().post(
-                "/accounts/signup/",
+                "/c/default/accounts/signup/",
                 {
                     "username": f"invited{n}",
                     "email": f"invited{n}@example.test",

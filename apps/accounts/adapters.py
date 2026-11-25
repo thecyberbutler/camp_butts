@@ -19,6 +19,16 @@ from .security import client_ip, privileged
 
 
 class AccountAdapter(DefaultAccountAdapter):
+    def get_login_redirect_url(self, request):
+        from django.urls import reverse
+
+        return reverse("dashboard")
+
+    def get_logout_redirect_url(self, request):
+        from django.urls import reverse
+
+        return reverse("home")
+
     def get_client_ip(self, request):
         return client_ip(request)
 

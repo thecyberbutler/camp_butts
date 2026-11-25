@@ -4,6 +4,8 @@ from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
+from .validators import public_https_url
+
 
 class Campground(models.Model):
     class Registration(models.TextChoices):
@@ -17,6 +19,13 @@ class Campground(models.Model):
     welcome = models.TextField(max_length=3000, blank=True)
     rules = models.TextField(max_length=10000, blank=True)
     reservation_policy = models.TextField(max_length=10000, blank=True)
+    address = models.CharField(max_length=500, blank=True)
+    contact_phone = models.CharField(max_length=40, blank=True)
+    website_url = models.URLField(max_length=500, blank=True, validators=[public_https_url])
+    map_url = models.URLField(max_length=500, blank=True, validators=[public_https_url])
+    rate_information = models.TextField(max_length=5000, blank=True)
+    booking_enabled = models.BooleanField(default=True)
+    source_import_digest = models.CharField(max_length=64, blank=True, editable=False)
     policy_version = models.CharField(max_length=40, default="1")
     timezone = models.CharField(max_length=64, default="America/New_York")
     registration_mode = models.CharField(
@@ -76,5 +85,8 @@ class Campground(models.Model):
 
     @classmethod
     def current(cls, *, lock=False):
+        from apps.tenancy.context import current_tenant
+
+        current_tenant()
         query = cls.objects.select_for_update() if lock else cls.objects
         return query.get(pk=1)

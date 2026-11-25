@@ -17,7 +17,7 @@ pytestmark = pytest.mark.django_db
 
 def test_full_camper_workflow_with_csrf(browser, camper, site, dates):
     browser.defaults["HTTP_ORIGIN"] = "https://testserver"
-    response = browser.get(f"/campsites/{site.pk}/reserve/", secure=True)
+    response = browser.get(f"/c/default/campsites/{site.pk}/reserve/", secure=True)
     token = re.search(r'name="csrfmiddlewaretoken" value="([^"]+)"', response.content.decode())[1]
     form = {
         "csrfmiddlewaretoken": token,
@@ -30,16 +30,16 @@ def test_full_camper_workflow_with_csrf(browser, camper, site, dates):
         "notes": "Looking forward to our stay",
         "submission_key": uuid.uuid4(),
     }
-    response = browser.post(f"/campsites/{site.pk}/reserve/", form, secure=True)
+    response = browser.post(f"/c/default/campsites/{site.pk}/reserve/", form, secure=True)
     assert response.status_code == 302
     item = Occupancy.objects.get(camper=camper)
     assert browser.get(response.url, secure=True).status_code == 200
     search = {"start": dates[0], "end": dates[1], "adults": 1, "rv_length": 0, "electric_amps": 0}
-    response = browser.get("/campsites/", search, secure=True, HTTP_HX_REQUEST="true")
+    response = browser.get("/c/default/campsites/", search, secure=True, HTTP_HX_REQUEST="true")
     assert response.status_code == 200
     assert site.name.encode() not in response.content
     response = browser.post(
-        f"/reservations/{item.pk}/modify/",
+        f"/c/default/reservations/{item.pk}/modify/",
         {
             "csrfmiddlewaretoken": token,
             "start": dates[0] + timedelta(days=1),
@@ -49,22 +49,22 @@ def test_full_camper_workflow_with_csrf(browser, camper, site, dates):
     )
     assert response.status_code == 302
     response = browser.post(
-        f"/reservations/{item.pk}/cancel/",
+        f"/c/default/reservations/{item.pk}/cancel/",
         {"csrfmiddlewaretoken": token, "confirm": "on"},
         secure=True,
     )
     assert response.status_code == 302
-    response = browser.get("/campsites/", search, secure=True)
+    response = browser.get("/c/default/campsites/", search, secure=True)
     assert site.name.encode() in response.content
 
 
 def test_map_does_not_expose_private_data(browser, booking, dates):
-    response = browser.get("/map/", {"start": dates[0], "end": dates[1]}, secure=True)
+    response = browser.get("/c/default/map/", {"start": dates[0], "end": dates[1]}, secure=True)
     assert response.status_code == 200
     assert b"map-reserved" in response.content
     assert booking.camper.email.encode() not in response.content
     assert str(booking.pk).encode() not in response.content
-    assert Client().get("/map/", secure=True).status_code == 302
+    assert Client().get("/c/default/map/", secure=True).status_code == 302
 
 
 def test_signup_duplicate_generic_response(client, camper, password):
@@ -78,12 +78,12 @@ def test_signup_duplicate_generic_response(client, camper, password):
         "username": "fresh",
         "email": "fresh@example.test",
     }
-    first = client.post("/accounts/signup/", payload, secure=True)
+    first = client.post("/c/default/accounts/signup/", payload, secure=True)
     duplicate_username = client.post(
-        "/accounts/signup/", {**payload, "email": "second@example.test"}, secure=True
+        "/c/default/accounts/signup/", {**payload, "email": "second@example.test"}, secure=True
     )
     duplicate_email = client.post(
-        "/accounts/signup/", {**payload, "username": "second"}, secure=True
+        "/c/default/accounts/signup/", {**payload, "username": "second"}, secure=True
     )
     assert first.status_code == duplicate_username.status_code == duplicate_email.status_code == 302
     assert first.url == duplicate_username.url == duplicate_email.url
@@ -145,7 +145,7 @@ def test_expiry_command_and_notification_mark_read(browser, booking):
     client.force_login(
         booking.camper, backend="allauth.account.auth_backends.AuthenticationBackend"
     )
-    assert client.post(f"/notifications/{item.pk}/read/", secure=True).status_code == 302
+    assert client.post(f"/c/default/notifications/{item.pk}/read/", secure=True).status_code == 302
     item.refresh_from_db()
     assert item.read_at is not None
     call_command("expire_reservations", stdout=StringIO())

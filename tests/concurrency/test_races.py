@@ -23,13 +23,17 @@ pytestmark = [pytest.mark.django_db(transaction=True), pytest.mark.concurrency]
 
 
 def race(*functions):
+    from apps.tenancy.context import current_tenant, tenant_scope
+
+    tenant = current_tenant()
     barrier = Barrier(len(functions))
 
     def run(function):
         close_old_connections()
         try:
             barrier.wait(timeout=10)
-            return function()
+            with tenant_scope(tenant):
+                return function()
         except (BookingError, IntegrityError):
             return "rejected"
         except OperationalError as error:

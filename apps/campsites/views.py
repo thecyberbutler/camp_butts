@@ -26,7 +26,7 @@ def campground_map(request):
     if not ratelimit.consume(request, action="availability"):
         return HttpResponse("Too many requests. Please try again later.", status=429)
     form = DatesForm(request.GET or None)
-    sites = list(Campsite.objects.all()[:100])
+    sites = list(Campsite.objects.all()[:100]) if policy.booking_enabled else []
     entries = []
     if form.is_valid():
         entries = list(

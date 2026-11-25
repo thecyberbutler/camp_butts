@@ -1,6 +1,7 @@
 # Campground reservations
 
-A self-hosted Django application for approximately 100 campers. **Development version:
+A self-hosted Django SaaS application for multiple campgrounds, initially approximately
+100 campers per campground. **Development version:
 not production-ready.** See [implementation progress](docs/implementation-progress.md)
 for verified functionality and outstanding release gates.
 
@@ -8,13 +9,28 @@ Implemented: approval-first registration, optional invitation/open/disabled mode
 allauth password/TOTP authentication, encrypted sessions/MFA storage, camper search,
 transactional reservations and maintenance blocks, modification/cancellation, local
 notifications, controlled SVG availability map, staff operations/calendar and limited CSV
-exports. PostgreSQL exclusion constraints are authoritative for occupancy. No payments,
+exports, camper deactivation/reactivation, campsite classification management and an
+audited read-only audit viewer. PostgreSQL exclusion constraints are authoritative for occupancy. No payments,
 external authentication, CDN assets or managed services.
+
+## Multiple campgrounds
+
+Open `/?campground=pine-grove` to select a registered campground; the application redirects
+to `/c/pine-grove/`. The root directory lists active campgrounds. Accounts are separate:
+the same email/username can belong to different campground accounts. Campground staff
+permissions never grant platform provisioning rights. The first implementation supports
+one active campground login per browser cookie jar; sign in again when switching.
+
+The existing stack remains suitable. Shared application/database infrastructure contains
+separate PostgreSQL schemas, with forced row security and tenant-bound sessions and
+confirmation/recovery tokens. See [architecture assessment](docs/saas-architecture.md).
+Upgrading invalidates existing sessions and pending confirmation/reset links. Provision
+and activate tenants using the explicit steps in [deployment](docs/deployment.md).
 
 ## Stack and organization
 
 Python 3.13; Django 5.2 LTS; Poetry; Psycopg 3; PostgreSQL 17; allauth; Axes;
-Argon2id; Gunicorn; Caddy; Django templates; local Bootstrap 5 and HTMX.
+Argon2id; Gunicorn; Traefik; WhiteNoise; Django templates; local Bootstrap 5 and HTMX.
 `apps/` contains domain modules; `config/` holds security settings; services own
 reservation policies and transactions. Read AGENTS.md and PROJECT_SPEC.md before changes.
 
@@ -32,17 +48,29 @@ The generator writes mode-0600 files in a mode-0700 directory and refuses overwr
 It never displays credentials. `.gitignore` and the Docker context exclude secret material.
 If TLS validation fails, configure the correct trusted CA bundle; never turn verification off.
 
-For the isolated PostgreSQL suite:
+For the isolated PostgreSQL suite (build `campground-proxy:local` with `docker compose build proxy`
+first; container boundary tests require it):
 
 ```sh
+# Match the protected secret-file owner; select a dedicated unused group ID.
+TEST_UID="$(id -u)"
+TEST_GID=10001
+docker build -f Dockerfile.db --build-arg APP_UID="$TEST_UID" \
+  --build-arg APP_GID="$TEST_GID" -t campground-test-postgres:local .
 docker run -d --name campground-test-db \
+  --user "$TEST_UID:$TEST_GID" --read-only --cap-drop ALL \
+  --tmpfs /tmp:rw,noexec,nosuid,size=32m \
+  --tmpfs /var/run/postgresql:rw,noexec,nosuid,size=16m,mode=0700,uid="$TEST_UID",gid="$TEST_GID" \
   -p 127.0.0.1:55432:5432 \
   --mount type=bind,src="$PWD/.secrets/admin_password",dst=/run/secrets/admin_password,readonly \
   -e POSTGRES_PASSWORD_FILE=/run/secrets/admin_password \
   -e POSTGRES_DB=campground_test \
-  -e POSTGRES_INITDB_ARGS=--auth-host=scram-sha-256 \
+  -e 'POSTGRES_INITDB_ARGS=--auth-host=scram-sha-256 --auth-local=scram-sha-256' \
   --security-opt no-new-privileges:true --memory 512m --cpus 2 \
-  postgres:17.12-bookworm@sha256:1eff563f6c868b9b433566e9f3cf6e5c79fbd3b95bf70ec7277d376cdbfc50d7
+  campground-test-postgres:local postgres -c log_statement=none \
+  -c log_min_error_statement=panic -c log_error_verbosity=terse
+# Wait for pg_isready before provisioning; never disable authentication.
+docker exec campground-test-db pg_isready -U postgres -d campground_test
 .venv/bin/python scripts/provision_test_db.py
 sh scripts/test.sh -q --cov --cov-report=term-missing
 ```
@@ -74,12 +102,19 @@ sh scripts/test.sh -q --cov --cov-fail-under=85
 docker compose config --quiet
 docker compose build
 docker compose exec web python manage.py check --deploy --fail-level WARNING
-docker compose run --rm migrate makemigrations --check --dry-run
+docker compose run --rm migrate tenant_command --campground pine-grove makemigrations --check --dry-run
 ```
 
 `scripts/security-check.sh` adds Gitleaks and Trivy when those tools are installed.
-Scan tracked source and complete Git history before release; this initial directory
-did not contain Git metadata. Scan all three deployment images, including OS packages.
+Scan tracked source and complete Git history before release. Git is now initialized and
+the current history scan passed. Scan all three deployment images, including OS packages.
+The current application/database and replacement Traefik image HIGH/CRITICAL gates passed.
+Historical Caddy findings are retained with their removal disposition.
+See [security findings](docs/security-findings.md).
+Use `TEST_DATABASE_PORT=55433` with provisioning and `scripts/test.sh` when using the
+existing hardened test container from this development session. Do not reuse production
+volumes for test initialization.
+
 No source is sent to external scanning services. Package audits query package/version
 advisories; scanners download advisory databases.
 

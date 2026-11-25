@@ -14,6 +14,7 @@ psycopg = {version = ">=3.2,<4", extras = ["binary"]}
 argon2-cffi = ">=25.1,<26"
 cryptography = ">=50.0.2,<51"
 gunicorn = ">=27.0.1,<28"
+whitenoise = "6.12.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = ">=8,<10"
@@ -22,6 +23,7 @@ pytest-cov = ">=6,<8"
 ruff = ">=0.12,<1"
 bandit = ">=1.8,<2"
 pip-audit = ">=2.9,<3"
+mutmut = "3.8.1"
 
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "config.settings.testing"
@@ -41,3 +43,16 @@ select = ["E", "F", "I", "UP", "B"]
 [tool.coverage.run]
 source = ["apps", "config"]
 omit = ["*/migrations/*", "*/settings/*", "*/wsgi.py", "*/asgi.py"]
+
+[tool.mutmut]
+source_paths = ["apps/"]
+only_mutate = ["apps/reservations/services.py"]
+also_copy = ["config/", "templates/", "static/", "scripts/", "infra/", "data/", "manage.py", "gunicorn.conf.py"]
+pytest_add_cli_args = ["--assert=plain", "--tb=no", "--show-capture=no"]
+pytest_add_cli_args_test_selection = ["tests/"]
+process_isolation = "forkserver"
+forkserver_warmup = "none"
+use_setproctitle = false
+mutate_only_covered_lines = false
+max_stack_depth = -1
+debug = false

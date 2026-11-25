@@ -32,7 +32,7 @@ def registration(password, **overrides):
 
 def test_signup_cannot_escalate(client, password):
     response = client.post(
-        "/accounts/signup/",
+        "/c/default/accounts/signup/",
         registration(password, is_staff="true", is_superuser="true", approved="true"),
         secure=True,
     )
@@ -47,12 +47,15 @@ def test_signup_cannot_escalate(client, password):
 def test_registration_modes(client, password, policy):
     policy.registration_mode = "disabled"
     policy.save()
-    response = client.post("/accounts/signup/", registration(password), secure=True)
+    response = client.post("/c/default/accounts/signup/", registration(password), secure=True)
     assert response.status_code == 200
     assert not User.objects.filter(username="newcamper").exists()
     policy.registration_mode = "open"
     policy.save()
-    assert client.post("/accounts/signup/", registration(password), secure=True).status_code == 302
+    assert (
+        client.post("/c/default/accounts/signup/", registration(password), secure=True).status_code
+        == 302
+    )
     assert User.objects.get(username="newcamper").approved
 
 
@@ -66,28 +69,30 @@ def test_case_insensitive_uniqueness(camper):
 def test_login_logout_and_secure_session(client, camper, password):
     assert (
         client.post(
-            "/accounts/login/", {"login": camper.username, "password": password}, secure=True
+            "/c/default/accounts/login/",
+            {"login": camper.username, "password": password},
+            secure=True,
         ).status_code
         == 302
     )
-    assert client.get("/dashboard/", secure=True).status_code == 200
+    assert client.get("/c/default/dashboard/", secure=True).status_code == 200
     from django.conf import settings
 
     assert client.cookies[settings.SESSION_COOKIE_NAME]["secure"]
     assert client.cookies[settings.SESSION_COOKIE_NAME]["httponly"]
-    assert client.post("/accounts/logout/", secure=True).status_code == 302
-    assert client.get("/dashboard/", secure=True).status_code == 302
+    assert client.post("/c/default/accounts/logout/", secure=True).status_code == 302
+    assert client.get("/c/default/dashboard/", secure=True).status_code == 302
 
 
 def test_login_rate_limiting_and_case_normalization(client, camper, password):
     for _ in range(5):
         client.post(
-            "/accounts/login/",
+            "/c/default/accounts/login/",
             {"login": camper.username.upper(), "password": secrets.token_urlsafe(24)},
             secure=True,
         )
     response = client.post(
-        "/accounts/login/", {"login": camper.username, "password": password}, secure=True
+        "/c/default/accounts/login/", {"login": camper.username, "password": password}, secure=True
     )
     assert response.status_code == 200
     assert response.context["form"].non_field_errors()
@@ -97,8 +102,10 @@ def test_login_rate_limiting_and_case_normalization(client, camper, password):
 def test_encrypted_totp_and_single_use_recovery(camper):
     secret = generate_totp_secret()
     authenticator = TOTP.activate(camper, secret)
-    assert secret not in str(authenticator.instance.data)
-    assert MFAAdapter().decrypt(authenticator.instance.data["secret"]) == secret
+    stored_encrypted = secret not in str(authenticator.instance.data)
+    round_trip_matches = MFAAdapter().decrypt(authenticator.instance.data["secret"]) == secret
+    assert stored_encrypted
+    assert round_trip_matches
     codes = RecoveryCodes.activate(camper)
     code = codes.get_unused_codes()[0]
     assert code not in str(codes.instance.data)
@@ -112,19 +119,21 @@ def test_actual_staff_login_requires_totp(staff, password):
     EmailAddress.objects.create(user=staff, email=staff.email, verified=True, primary=True)
     client = Client()
     response = client.post(
-        "/accounts/login/", {"login": staff.username, "password": password}, secure=True
+        "/c/default/accounts/login/", {"login": staff.username, "password": password}, secure=True
     )
     assert response.status_code == 302
     assert "_auth_user_id" not in client.session
     assert (
-        client.post("/accounts/2fa/authenticate/", {"code": "invalid"}, secure=True).status_code
+        client.post(
+            "/c/default/accounts/2fa/authenticate/", {"code": "invalid"}, secure=True
+        ).status_code
         == 200
     )
     assert "_auth_user_id" not in client.session
     code = format_hotp_value(hotp_value(secret, int(time.time()) // 30))
-    response = client.post("/accounts/2fa/authenticate/", {"code": code}, secure=True)
+    response = client.post("/c/default/accounts/2fa/authenticate/", {"code": code}, secure=True)
     assert response.status_code == 302
-    assert client.get("/dashboard/", secure=True).status_code == 200
+    assert client.get("/c/default/dashboard/", secure=True).status_code == 200
     assert not MFAAdapter().can_delete_authenticator(
         Authenticator.objects.get(user=staff, type="totp")
     )

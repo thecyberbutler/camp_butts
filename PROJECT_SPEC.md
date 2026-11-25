@@ -7,7 +7,22 @@
 
 Develop a complete, production-ready, fully self-hosted campground reservation web application that allows campers to create accounts, view campsite availability, and reserve campsites for specified date ranges.
 
-The application will initially support approximately 100 registered campers but should accommodate future growth without requiring significant architectural changes.
+The owner requested multi-campground SaaS operation on 2026-11-24, with a shared
+application and PostgreSQL database and separate accounts per campground. Initially
+support approximately 100 registered campers per campground. Aggregate capacity must be
+measured before production commitments. All mandatory security requirements remain in force.
+
+Campground selection initially uses a URL parameter (`?campground=slug`) that resolves
+through a protected directory to canonical `/c/slug/` routes. Selection does not grant
+access. Each campground must have independent accounts, MFA, sessions, roles, policies,
+inventory, reservations, notifications and audit history. Unknown, disabled or conflicting
+selections must fail closed. Cross-campground access must be prevented server-side and
+covered by PostgreSQL, HTTP, authentication-token and concurrency regression tests.
+
+Use a modular monolith with one PostgreSQL schema per campground, transaction-local
+context and forced row-security defenses. Platform provisioning remains a protected
+operator action. Managed external SaaS dependencies and subscription billing remain out
+of scope. See docs/saas-architecture.md for the architecture review and residual risks.
 
 The application must be:
 
@@ -264,7 +279,7 @@ Multi-factor authentication should also be available to campers.
 
 - Docker.
 - Docker Compose.
-- Caddy reverse proxy.
+- Traefik reverse proxy (owner-approved substitution, 2026-11-24).
 - Gunicorn.
 - Linux-compatible deployment.
 - Persistent Docker volumes.
@@ -299,12 +314,12 @@ The initial production deployment should consist of three primary containers.
 
 Responsible for:
 
-- Caddy.
+- Traefik.
 - HTTPS termination.
 - HTTP-to-HTTPS redirects.
 - Reverse proxying application requests.
 - Security-related HTTP headers.
-- Serving approved static files.
+- Routing approved static files to WhiteNoise in the web container.
 - Request size restrictions.
 - Appropriate connection and request timeouts.
 
@@ -322,6 +337,7 @@ Responsible for:
 - Administrative functionality.
 - Application business logic.
 - Frontend rendering.
+- Serving only collected, read-only static assets using WhiteNoise.
 - Notifications.
 - Audit logging.
 
@@ -439,7 +455,7 @@ campground/
 ├── AGENTS.md
 ├── PROJECT_SPEC.md
 ├── SECURITY.md
-├── Caddyfile
+├── infra/traefik/
 ├── Dockerfile
 ├── compose.yaml
 ├── compose.dev.yaml
@@ -1777,7 +1793,7 @@ Configure appropriate headers, including:
 - Permissions-Policy.
 - Frame restrictions through CSP and appropriate compatibility headers.
 
-Ensure Caddy and Django header configuration do not conflict.
+Ensure Traefik and Django header configuration do not conflict.
 
 Do not enable unnecessary browser permissions.
 
@@ -1785,7 +1801,7 @@ Do not enable unnecessary browser permissions.
 
 Require HTTPS for production.
 
-Use modern supported TLS versions and secure Caddy defaults.
+Use modern supported TLS versions and explicit secure Traefik TLS settings.
 
 Do not disable certificate validation.
 
@@ -2263,7 +2279,7 @@ Provide persistent storage for:
 
 - PostgreSQL data.
 - Uploaded media.
-- Caddy certificate data.
+- Traefik ACME certificate data.
 - Approved collected static files.
 - Necessary protected application data.
 
@@ -2359,7 +2375,7 @@ Document a secure deployment procedure covering:
 
 Provide separate documentation for public-domain and private-network deployment.
 
-Caddy may use a public certificate authority for trusted HTTPS certificates.
+Traefik may use a public certificate authority for trusted HTTPS certificates.
 
 An internal certificate authority may be used for isolated deployments when properly configured and trusted.
 
@@ -2953,7 +2969,6 @@ Do not implement the following unless explicitly requested:
 - SMS notification providers.
 - Kubernetes.
 - Microservices.
-- Multi-campground tenancy.
 - AI-powered application features.
 - Third-party analytics.
 - Public application APIs without an approved requirement.
@@ -2993,7 +3008,7 @@ Do not proceed with a security-reducing decision without approval.
 - Configure environment-specific settings.
 - Implement secrets management.
 - Create Docker configurations.
-- Configure Caddy.
+- Configure Traefik.
 - Establish testing infrastructure.
 - Establish linting.
 - Establish CI security scanning.
@@ -3302,6 +3317,6 @@ At the conclusion of each development session, provide:
 15. Remaining implementation work.
 16. Recommended next steps.
 
-The final product must be a secure, reliable, maintainable, fully self-hosted campground reservation system suitable for real-world use by approximately 100 campers.
+The final product must be a secure, reliable, maintainable, fully self-hosted campground reservation system suitable for real-world use by approximately 100 campers per campground, with verified tenant isolation and measured aggregate capacity.
 
 Security is not an optional feature. Security is a mandatory requirement of every feature.

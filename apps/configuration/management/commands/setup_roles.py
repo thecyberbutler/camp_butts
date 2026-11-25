@@ -2,12 +2,15 @@ from django.contrib.auth.models import Group, Permission
 from django.core.management.base import BaseCommand
 from django.db import transaction
 
+from apps.configuration.models import Campground
+
 
 class Command(BaseCommand):
     help = "Create explicit least-privileged operational groups after migrations."
 
     @transaction.atomic
     def handle(self, *args, **options):
+        Campground.current(lock=True)
         assignments = {
             "Camper": [],
             "Staff": ["reservations.operate_reservations", "reservations.block_campsite"],
@@ -16,8 +19,11 @@ class Command(BaseCommand):
                 "reservations.block_campsite",
                 "reservations.view_occupancy",
                 "accounts.approve_camper",
+                "accounts.manage_camper",
                 "campsites.add_campsite",
                 "campsites.change_campsite",
+                "campsites.add_campsitetype",
+                "campsites.add_amenity",
                 "configuration.change_campground",
                 "audit.view_event",
             ],

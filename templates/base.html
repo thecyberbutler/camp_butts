@@ -13,6 +13,7 @@
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
   <header class="site-header"><nav class="container d-flex flex-wrap gap-3 align-items-center py-3" aria-label="Main navigation">
+    <a href="/">Campgrounds</a>
     <a class="brand" href="{% url 'home' %}">{{ campground.name }}</a>
     <a href="{% url 'campsites' %}">Find a campsite</a>
     {% if user.is_authenticated %}

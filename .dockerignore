@@ -8,7 +8,11 @@
 !static/**
 !scripts/entrypoint.sh
 !scripts/provision_database.py
+!scripts/tenant_database.py
 !scripts/runtime_grants.sql
 !gunicorn.conf.py
+!infra/traefik/**
 **/__pycache__/**
 **/*.pyc
+
+!data/campgrounds/*.json

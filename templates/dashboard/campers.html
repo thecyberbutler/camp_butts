@@ -1,0 +1,3 @@
+{% extends 'base.html' %}
+{% block content %}<h1>Camper accounts</h1><p>Deactivation revokes access. Reactivation never restores an old session.</p>
+{% for account in page_obj %}<article class="site-card mb-3"><h2 class="h4">{{ account.first_name }} {{ account.last_name }}</h2><p>{{ account.username }} · {% if account.is_active %}Active{% else %}Inactive{% endif %} · {% if account.approved %}Approved{% else %}Pending approval{% endif %}</p><a href="{% url 'account_state' account.pk %}">Manage account status</a></article>{% empty %}<p>No camper accounts.</p>{% endfor %}{% include 'pagination.html' %}{% endblock %}

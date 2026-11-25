@@ -10,7 +10,9 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_http_methods, require_POST
 
 from apps.accounts.models import User
-from apps.accounts.security import require_staff
+from apps.accounts.security import lock_staff, require_staff
+from apps.accounts.services import has_privileged_assignments, set_camper_active
+from apps.audit.models import Event
 from apps.audit.services import record
 from apps.campsites.models import Campsite
 from apps.configuration.models import Campground
@@ -19,7 +21,15 @@ from apps.reservations.forms import DatesForm
 from apps.reservations.models import ACTIVE, Occupancy
 from apps.reservations.services import BookingError, block, date_range, today, transition
 
-from .forms import BlockForm, CampsiteForm, PolicyForm, TransitionForm
+from .forms import (
+    AccountStateForm,
+    AmenityForm,
+    BlockForm,
+    CampsiteForm,
+    CampsiteTypeForm,
+    PolicyForm,
+    TransitionForm,
+)
 
 
 @login_required
@@ -52,9 +62,10 @@ def change_status(request, reservation_id):
     form = TransitionForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
         try:
-            transition(
-                actor=request.user, reservation_id=item.pk, status=form.cleaned_data["status"]
-            )
+            with transaction.atomic():
+                Campground.current(lock=True)
+                actor = lock_staff(request, "reservations.operate_reservations")
+                transition(actor=actor, reservation_id=item.pk, status=form.cleaned_data["status"])
             return redirect("operations")
         except BookingError as error:
             form.add_error(None, error)
@@ -74,7 +85,10 @@ def maintenance(request):
         data = form.cleaned_data.copy()
         data["campsite_id"] = data.pop("campsite").pk
         try:
-            block(actor=request.user, **data)
+            with transaction.atomic():
+                Campground.current(lock=True)
+                actor = lock_staff(request, "reservations.block_campsite")
+                block(actor=actor, **data)
             return redirect("operations")
         except BookingError as error:
             form.add_error(None, error)
@@ -95,24 +109,85 @@ def accounts(request):
 
 
 @login_required
+def camper_accounts(request):
+    require_staff(request, "accounts.manage_camper")
+    campers = User.objects.filter(is_staff=False, is_superuser=False, user_permissions__isnull=True)
+    campers = campers.exclude(groups__permissions__isnull=False).distinct().order_by("username")
+    page = Paginator(campers, 30).get_page(request.GET.get("page"))
+    return render(request, "dashboard/campers.html", {"page_obj": page})
+
+
+@login_required
+@require_http_methods(["GET", "POST"])
+def account_state(request, user_id):
+    require_staff(request, "accounts.manage_camper")
+    target = get_object_or_404(User, pk=user_id)
+    if has_privileged_assignments(target):
+        from django.core.exceptions import PermissionDenied
+
+        raise PermissionDenied
+    form = AccountStateForm(
+        request.POST or None, initial={"active": "false" if target.is_active else "true"}
+    )
+    if request.method == "POST" and form.is_valid():
+        set_camper_active(request=request, user_id=user_id, active=form.cleaned_data["active"])
+        return redirect("camper_accounts")
+    return render(
+        request,
+        "reservations/form.html",
+        {
+            "form": form,
+            "title": f"Manage account: {target.username}",
+            "submit": "Confirm account change",
+        },
+    )
+
+
+@login_required
+@require_http_methods(["GET", "POST"])
+def classification_create(request, category):
+    form_class, permission, title = {
+        "type": (CampsiteTypeForm, "campsites.add_campsitetype", "Add campsite type"),
+        "amenity": (AmenityForm, "campsites.add_amenity", "Add amenity"),
+    }[category]
+    require_staff(request, permission)
+    form = form_class(request.POST or None)
+    if request.method == "POST":
+        with transaction.atomic():
+            Campground.current(lock=True)
+            actor = lock_staff(request, permission)
+            if form.is_valid():
+                item = form.save()
+                record(actor=actor, action="campsite.classification_created", obj=item)
+                return redirect("operations")
+    return render(
+        request, "reservations/form.html", {"form": form, "title": title, "submit": "Save"}
+    )
+
+
+@login_required
+def audit_log(request):
+    require_staff(request, "audit.view_event")
+    with transaction.atomic():
+        policy = Campground.current(lock=True)
+        actor = lock_staff(request, "audit.view_event")
+        record(actor=actor, action="audit.viewed", obj=policy)
+        page = Paginator(Event.objects.select_related("actor"), 50).get_page(
+            request.GET.get("page")
+        )
+        page.object_list = list(page.object_list)
+    return render(request, "dashboard/audit.html", {"page_obj": page})
+
+
+@login_required
 @require_POST
 def approve(request, user_id):
     require_staff(request, "accounts.approve_camper")
     with transaction.atomic():
         Campground.current(lock=True)
-        users = {
-            u.pk: u
-            for u in User.objects.select_for_update()
-            .filter(pk__in=[request.user.pk, user_id])
-            .order_by("pk")
-        }
-        actor = users[request.user.pk]
-        if not actor.is_active or not actor.has_perm("accounts.approve_camper"):
-            from django.core.exceptions import PermissionDenied
-
-            raise PermissionDenied
-        user = users.get(user_id)
-        if user is None or not user.is_active or user.is_staff or user.is_superuser:
+        actor = lock_staff(request, "accounts.approve_camper")
+        user = get_object_or_404(User.objects.select_for_update(), pk=user_id)
+        if not user.is_active or has_privileged_assignments(user):
             from django.http import Http404
 
             raise Http404
@@ -133,6 +208,7 @@ def campsite_edit(request, site_id=None):
     require_staff(request, "campsites.change_campsite" if site_id else "campsites.add_campsite")
     with transaction.atomic():
         Campground.current(lock=True)
+        lock_staff(request, "campsites.change_campsite" if site_id else "campsites.add_campsite")
         item = (
             get_object_or_404(Campsite.objects.select_for_update(), pk=site_id) if site_id else None
         )
@@ -154,6 +230,7 @@ def configuration(request):
     require_staff(request, "configuration.change_campground")
     with transaction.atomic():
         policy = Campground.current(lock=True)
+        lock_staff(request, "configuration.change_campground")
         form = PolicyForm(request.POST or None, instance=policy)
         if request.method == "POST" and form.is_valid():
             form.save()
@@ -226,7 +303,10 @@ def export(request):
         )
     ).select_related("campsite")[:2000]
     with transaction.atomic():
-        record(actor=request.user, action="report.exported", obj=Campground.current())
+        policy = Campground.current(lock=True)
+        lock_staff(request, "reservations.view_occupancy")
+        rows = list(rows)
+        record(actor=request.user, action="report.exported", obj=policy)
     response = HttpResponse(content_type="text/csv; charset=utf-8")
     response["Content-Disposition"] = 'attachment; filename="occupancy.csv"'
     writer = csv.writer(response)

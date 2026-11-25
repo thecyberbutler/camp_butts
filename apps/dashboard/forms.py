@@ -1,6 +1,6 @@
 from django import forms
 
-from apps.campsites.models import Campsite
+from apps.campsites.models import Amenity, Campsite, CampsiteType
 from apps.configuration.models import Campground
 from apps.reservations.forms import DatesForm
 
@@ -18,6 +18,26 @@ class TransitionForm(forms.Form):
             for v in ("confirmed", "rejected", "cancelled", "checked_in", "checked_out", "no_show")
         ]
     )
+
+
+class AccountStateForm(forms.Form):
+    active = forms.TypedChoiceField(
+        choices=[("false", "Deactivate account"), ("true", "Reactivate account")],
+        coerce=lambda value: value == "true",
+    )
+    confirm = forms.BooleanField(label="I confirm this account status change")
+
+
+class CampsiteTypeForm(forms.ModelForm):
+    class Meta:
+        model = CampsiteType
+        fields = ["name"]
+
+
+class AmenityForm(forms.ModelForm):
+    class Meta:
+        model = Amenity
+        fields = ["name"]
 
 
 class CampsiteForm(forms.ModelForm):
@@ -45,11 +65,19 @@ class CampsiteForm(forms.ModelForm):
 
 
 class PolicyForm(forms.ModelForm):
+    website_url = forms.URLField(required=False, max_length=500, assume_scheme="https")
+    map_url = forms.URLField(required=False, max_length=500, assume_scheme="https")
+
     class Meta:
         model = Campground
         fields = [
             "name",
             "welcome",
+            "address",
+            "contact_phone",
+            "website_url",
+            "map_url",
+            "rate_information",
             "rules",
             "reservation_policy",
             "policy_version",

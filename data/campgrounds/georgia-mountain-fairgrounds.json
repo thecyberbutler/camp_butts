@@ -1,0 +1,1114 @@
+{
+  "format_version": 1,
+  "slug": "georgia-mountain-fairgrounds",
+  "name": "Georgia Mountain Fairgrounds",
+  "reviewed_on": "2026-11-24",
+  "sources": [
+    "https://georgiamountainfairgrounds.com/pageserver/campgrounds",
+    "https://georgiamountainfairgrounds.com/pageserver/campground-map",
+    "https://georgiamountainfairgrounds.com/pageserver/campground-rates",
+    "https://georgiamountainfairgrounds.com/pageserver/campground-rules"
+  ],
+  "configuration": {
+    "name": "Georgia Mountain Fairgrounds",
+    "welcome": "Camp beside Lake Chatuge in Hiawassee, Georgia. Area I supports tents and RVs seasonally, April through October; Area II has paved RV sites and operates year-round. Facilities include water, 20/30/50-amp service, Wi-Fi subject to availability, a boat ramp, playground, recreation courts, picnic tables, gardens and on-site security. Area I has no sewer hookups; Area II lists 118 sewer connections, with B1 excluded. Contact the office to confirm site suitability and current availability.",
+    "address": "1311 Music Hall Road, Hiawassee, GA 30546\nMail: PO Box 444, Hiawassee, GA 30546",
+    "contact_phone": "(706) 896-4191",
+    "website_url": "https://georgiamountainfairgrounds.com/pageserver/campgrounds",
+    "map_url": "https://georgiamountainfairgrounds.com/pageserver/campground-map",
+    "rate_information": "Published reference rates in USD; confirm with the office before reserving. Daily / weekly / monthly:\nArea I tents: $35 / $225 / $575\nArea I lakeside RV: $50 / $300 / $775\nArea I inland RV: $45 / $250 / $675\nArea II B1 (no sewer): $50 / $325 / $775\nArea II lakeside RV: $60 / $400 / $1,000\nArea II inland RV: $55 / $350 / $875\nThe linked 2026 PDF instead lists $975 monthly for Area II lakeside RV sites; this remains unresolved.\nOverflow without hookups: $25 daily, only when the campground is full and the office permits it. Non-camper trailer parking: $5 daily, up to two weeks. These reference rates are not automated quotes or payment collection.",
+    "rules": "Keep pets leashed, clean up after them, and limit them to two per site; pet pens are prohibited. Supervise children. Observe quiet hours, 10 p.m.\u20137 a.m. Firearms and fireworks are prohibited; alcohol is prohibited in public-use areas. Use fire rings only. Protect plants and wildlife. Bag rubbish for dumpsters and leave sites clean. Do not wash vehicles or dishes at shared drinking-water or comfort facilities. Dispose of wastewater at designated dump stations. Unauthorized structures and docks are prohibited. Golf carts are restricted to the stated accessibility exception. Register vehicles and display office-issued tags; keep roads and neighboring sites clear. Extra vehicles need office registration. Tents are restricted to Area I. Use designated sites and follow office instructions for overflow. Do not sublet, occupy someone else\u2019s site, or cut through neighboring sites. Register boats with the office and observe mooring restrictions. Campers are responsible for damage and must cooperate with security. Consult the official rules for full terms. For emergencies call 911; contact the campground office for routine assistance.",
+    "reservation_policy": "Minimum stay: two nights. Check-in is 3 p.m.; checkout is 1 p.m. Late departures require office arrangements and may incur another day\u2019s charge. The office publishes a 50% deposit due within seven days; unpaid reservations may be released. Refund requests require at least 48 hours\u2019 notice. Cancellation charges are one daily rental, $75 weekly, or $150 monthly. Monthly reservations open on the first working day of November for the following year; shorter stays open on the first working day of January. Opening-day reservations are by phone, one site per call, without phone passing. Site assignments may change. Contact the office for monthly stays, deposits, refunds, seasonal restrictions and final terms. This application does not collect card data or process payments.\nOnline booking is not yet open here. Imported map entries are inactive drafts pending verification of identifiers, capacities, hookups, seasonal dates and map positions. The website reports 207 total sites but its area figures total 212; the older map also needs reconciliation.",
+    "policy_version": "gmf-reference-2026-11-24",
+    "min_nights": 2
+  },
+  "draft_sites": [
+    {
+      "name": "Area I 1",
+      "area": "Area I",
+      "map_label": "1"
+    },
+    {
+      "name": "Area I 2",
+      "area": "Area I",
+      "map_label": "2"
+    },
+    {
+      "name": "Area I 3",
+      "area": "Area I",
+      "map_label": "3"
+    },
+    {
+      "name": "Area I 4",
+      "area": "Area I",
+      "map_label": "4"
+    },
+    {
+      "name": "Area I 5",
+      "area": "Area I",
+      "map_label": "5"
+    },
+    {
+      "name": "Area I 6",
+      "area": "Area I",
+      "map_label": "6"
+    },
+    {
+      "name": "Area I 7",
+      "area": "Area I",
+      "map_label": "7"
+    },
+    {
+      "name": "Area I 8",
+      "area": "Area I",
+      "map_label": "8"
+    },
+    {
+      "name": "Area I 9",
+      "area": "Area I",
+      "map_label": "9"
+    },
+    {
+      "name": "Area I 10",
+      "area": "Area I",
+      "map_label": "10"
+    },
+    {
+      "name": "Area I 11",
+      "area": "Area I",
+      "map_label": "11"
+    },
+    {
+      "name": "Area I 12",
+      "area": "Area I",
+      "map_label": "12"
+    },
+    {
+      "name": "Area I 13",
+      "area": "Area I",
+      "map_label": "13"
+    },
+    {
+      "name": "Area I 14",
+      "area": "Area I",
+      "map_label": "14"
+    },
+    {
+      "name": "Area I 15",
+      "area": "Area I",
+      "map_label": "15"
+    },
+    {
+      "name": "Area I 16",
+      "area": "Area I",
+      "map_label": "16"
+    },
+    {
+      "name": "Area I 17",
+      "area": "Area I",
+      "map_label": "17"
+    },
+    {
+      "name": "Area I 18",
+      "area": "Area I",
+      "map_label": "18"
+    },
+    {
+      "name": "Area I 19",
+      "area": "Area I",
+      "map_label": "19"
+    },
+    {
+      "name": "Area I 20",
+      "area": "Area I",
+      "map_label": "20"
+    },
+    {
+      "name": "Area I 21",
+      "area": "Area I",
+      "map_label": "21"
+    },
+    {
+      "name": "Area I 22",
+      "area": "Area I",
+      "map_label": "22"
+    },
+    {
+      "name": "Area I 23",
+      "area": "Area I",
+      "map_label": "23"
+    },
+    {
+      "name": "Area I 24",
+      "area": "Area I",
+      "map_label": "24"
+    },
+    {
+      "name": "Area I 25",
+      "area": "Area I",
+      "map_label": "25"
+    },
+    {
+      "name": "Area I 25A",
+      "area": "Area I",
+      "map_label": "25A"
+    },
+    {
+      "name": "Area I 26",
+      "area": "Area I",
+      "map_label": "26"
+    },
+    {
+      "name": "Area I 27",
+      "area": "Area I",
+      "map_label": "27"
+    },
+    {
+      "name": "Area I 28",
+      "area": "Area I",
+      "map_label": "28"
+    },
+    {
+      "name": "Area I 29",
+      "area": "Area I",
+      "map_label": "29"
+    },
+    {
+      "name": "Area I 30",
+      "area": "Area I",
+      "map_label": "30"
+    },
+    {
+      "name": "Area I 31",
+      "area": "Area I",
+      "map_label": "31"
+    },
+    {
+      "name": "Area I 32",
+      "area": "Area I",
+      "map_label": "32"
+    },
+    {
+      "name": "Area I 33",
+      "area": "Area I",
+      "map_label": "33"
+    },
+    {
+      "name": "Area I 34",
+      "area": "Area I",
+      "map_label": "34"
+    },
+    {
+      "name": "Area I 35",
+      "area": "Area I",
+      "map_label": "35"
+    },
+    {
+      "name": "Area I 36",
+      "area": "Area I",
+      "map_label": "36"
+    },
+    {
+      "name": "Area I 37",
+      "area": "Area I",
+      "map_label": "37"
+    },
+    {
+      "name": "Area I 38",
+      "area": "Area I",
+      "map_label": "38"
+    },
+    {
+      "name": "Area I 39",
+      "area": "Area I",
+      "map_label": "39"
+    },
+    {
+      "name": "Area I 40",
+      "area": "Area I",
+      "map_label": "40"
+    },
+    {
+      "name": "Area I 41",
+      "area": "Area I",
+      "map_label": "41"
+    },
+    {
+      "name": "Area I 42",
+      "area": "Area I",
+      "map_label": "42"
+    },
+    {
+      "name": "Area I 43",
+      "area": "Area I",
+      "map_label": "43"
+    },
+    {
+      "name": "Area I 44",
+      "area": "Area I",
+      "map_label": "44"
+    },
+    {
+      "name": "Area I 45",
+      "area": "Area I",
+      "map_label": "45"
+    },
+    {
+      "name": "Area I 46",
+      "area": "Area I",
+      "map_label": "46"
+    },
+    {
+      "name": "Area I 47",
+      "area": "Area I",
+      "map_label": "47"
+    },
+    {
+      "name": "Area I 48",
+      "area": "Area I",
+      "map_label": "48"
+    },
+    {
+      "name": "Area I 49",
+      "area": "Area I",
+      "map_label": "49"
+    },
+    {
+      "name": "Area I 50",
+      "area": "Area I",
+      "map_label": "50"
+    },
+    {
+      "name": "Area I 51",
+      "area": "Area I",
+      "map_label": "51"
+    },
+    {
+      "name": "Area I 52",
+      "area": "Area I",
+      "map_label": "52"
+    },
+    {
+      "name": "Area I 53",
+      "area": "Area I",
+      "map_label": "53"
+    },
+    {
+      "name": "Area I 54",
+      "area": "Area I",
+      "map_label": "54"
+    },
+    {
+      "name": "Area I 55",
+      "area": "Area I",
+      "map_label": "55"
+    },
+    {
+      "name": "Area I 56",
+      "area": "Area I",
+      "map_label": "56"
+    },
+    {
+      "name": "Area I 56A",
+      "area": "Area I",
+      "map_label": "56A"
+    },
+    {
+      "name": "Area I 57",
+      "area": "Area I",
+      "map_label": "57"
+    },
+    {
+      "name": "Area I 58",
+      "area": "Area I",
+      "map_label": "58"
+    },
+    {
+      "name": "Area I 59",
+      "area": "Area I",
+      "map_label": "59"
+    },
+    {
+      "name": "Area I 60",
+      "area": "Area I",
+      "map_label": "60"
+    },
+    {
+      "name": "Area I 61",
+      "area": "Area I",
+      "map_label": "61"
+    },
+    {
+      "name": "Area I 62",
+      "area": "Area I",
+      "map_label": "62"
+    },
+    {
+      "name": "Area I 63",
+      "area": "Area I",
+      "map_label": "63"
+    },
+    {
+      "name": "Area I 64",
+      "area": "Area I",
+      "map_label": "64"
+    },
+    {
+      "name": "Area I 65",
+      "area": "Area I",
+      "map_label": "65"
+    },
+    {
+      "name": "Area I 66",
+      "area": "Area I",
+      "map_label": "66"
+    },
+    {
+      "name": "Area I 67",
+      "area": "Area I",
+      "map_label": "67"
+    },
+    {
+      "name": "Area I 68",
+      "area": "Area I",
+      "map_label": "68"
+    },
+    {
+      "name": "Area I 69",
+      "area": "Area I",
+      "map_label": "69"
+    },
+    {
+      "name": "Area I 70",
+      "area": "Area I",
+      "map_label": "70"
+    },
+    {
+      "name": "Area I 71",
+      "area": "Area I",
+      "map_label": "71"
+    },
+    {
+      "name": "Area I 72",
+      "area": "Area I",
+      "map_label": "72"
+    },
+    {
+      "name": "Area I 73",
+      "area": "Area I",
+      "map_label": "73"
+    },
+    {
+      "name": "Area I 74",
+      "area": "Area I",
+      "map_label": "74"
+    },
+    {
+      "name": "Area I 75",
+      "area": "Area I",
+      "map_label": "75"
+    },
+    {
+      "name": "Area I 76",
+      "area": "Area I",
+      "map_label": "76"
+    },
+    {
+      "name": "Area I 77",
+      "area": "Area I",
+      "map_label": "77"
+    },
+    {
+      "name": "Area I 78",
+      "area": "Area I",
+      "map_label": "78"
+    },
+    {
+      "name": "Area I 79",
+      "area": "Area I",
+      "map_label": "79"
+    },
+    {
+      "name": "Area I 80",
+      "area": "Area I",
+      "map_label": "80"
+    },
+    {
+      "name": "Area I 81",
+      "area": "Area I",
+      "map_label": "81"
+    },
+    {
+      "name": "Area I 82",
+      "area": "Area I",
+      "map_label": "82"
+    },
+    {
+      "name": "Area I 83",
+      "area": "Area I",
+      "map_label": "83"
+    },
+    {
+      "name": "Area I 84",
+      "area": "Area I",
+      "map_label": "84"
+    },
+    {
+      "name": "Area I 85",
+      "area": "Area I",
+      "map_label": "85"
+    },
+    {
+      "name": "Area I 86",
+      "area": "Area I",
+      "map_label": "86"
+    },
+    {
+      "name": "Area I 87",
+      "area": "Area I",
+      "map_label": "87"
+    },
+    {
+      "name": "Area I 88",
+      "area": "Area I",
+      "map_label": "88"
+    },
+    {
+      "name": "Area I 89",
+      "area": "Area I",
+      "map_label": "89"
+    },
+    {
+      "name": "Area I 90",
+      "area": "Area I",
+      "map_label": "90"
+    },
+    {
+      "name": "Area I 91",
+      "area": "Area I",
+      "map_label": "91"
+    },
+    {
+      "name": "Area II A1",
+      "area": "Area II",
+      "map_label": "A1"
+    },
+    {
+      "name": "Area II A2",
+      "area": "Area II",
+      "map_label": "A2"
+    },
+    {
+      "name": "Area II A3",
+      "area": "Area II",
+      "map_label": "A3"
+    },
+    {
+      "name": "Area II A4",
+      "area": "Area II",
+      "map_label": "A4"
+    },
+    {
+      "name": "Area II A5",
+      "area": "Area II",
+      "map_label": "A5"
+    },
+    {
+      "name": "Area II A6",
+      "area": "Area II",
+      "map_label": "A6"
+    },
+    {
+      "name": "Area II A7",
+      "area": "Area II",
+      "map_label": "A7"
+    },
+    {
+      "name": "Area II A8",
+      "area": "Area II",
+      "map_label": "A8"
+    },
+    {
+      "name": "Area II A9",
+      "area": "Area II",
+      "map_label": "A9"
+    },
+    {
+      "name": "Area II A10",
+      "area": "Area II",
+      "map_label": "A10"
+    },
+    {
+      "name": "Area II A11",
+      "area": "Area II",
+      "map_label": "A11"
+    },
+    {
+      "name": "Area II A12",
+      "area": "Area II",
+      "map_label": "A12"
+    },
+    {
+      "name": "Area II A13",
+      "area": "Area II",
+      "map_label": "A13"
+    },
+    {
+      "name": "Area II A14",
+      "area": "Area II",
+      "map_label": "A14"
+    },
+    {
+      "name": "Area II A15",
+      "area": "Area II",
+      "map_label": "A15"
+    },
+    {
+      "name": "Area II A16",
+      "area": "Area II",
+      "map_label": "A16"
+    },
+    {
+      "name": "Area II A17",
+      "area": "Area II",
+      "map_label": "A17"
+    },
+    {
+      "name": "Area II A18",
+      "area": "Area II",
+      "map_label": "A18"
+    },
+    {
+      "name": "Area II A19",
+      "area": "Area II",
+      "map_label": "A19"
+    },
+    {
+      "name": "Area II A20",
+      "area": "Area II",
+      "map_label": "A20"
+    },
+    {
+      "name": "Area II A21",
+      "area": "Area II",
+      "map_label": "A21"
+    },
+    {
+      "name": "Area II A22",
+      "area": "Area II",
+      "map_label": "A22"
+    },
+    {
+      "name": "Area II A23",
+      "area": "Area II",
+      "map_label": "A23"
+    },
+    {
+      "name": "Area II A24",
+      "area": "Area II",
+      "map_label": "A24"
+    },
+    {
+      "name": "Area II A25",
+      "area": "Area II",
+      "map_label": "A25"
+    },
+    {
+      "name": "Area II A26",
+      "area": "Area II",
+      "map_label": "A26"
+    },
+    {
+      "name": "Area II A27",
+      "area": "Area II",
+      "map_label": "A27"
+    },
+    {
+      "name": "Area II A28",
+      "area": "Area II",
+      "map_label": "A28"
+    },
+    {
+      "name": "Area II A29",
+      "area": "Area II",
+      "map_label": "A29"
+    },
+    {
+      "name": "Area II A30",
+      "area": "Area II",
+      "map_label": "A30"
+    },
+    {
+      "name": "Area II A31",
+      "area": "Area II",
+      "map_label": "A31"
+    },
+    {
+      "name": "Area II A32",
+      "area": "Area II",
+      "map_label": "A32"
+    },
+    {
+      "name": "Area II A33",
+      "area": "Area II",
+      "map_label": "A33"
+    },
+    {
+      "name": "Area II A34",
+      "area": "Area II",
+      "map_label": "A34"
+    },
+    {
+      "name": "Area II A35",
+      "area": "Area II",
+      "map_label": "A35"
+    },
+    {
+      "name": "Area II A36",
+      "area": "Area II",
+      "map_label": "A36"
+    },
+    {
+      "name": "Area II A37",
+      "area": "Area II",
+      "map_label": "A37"
+    },
+    {
+      "name": "Area II A38",
+      "area": "Area II",
+      "map_label": "A38"
+    },
+    {
+      "name": "Area II A39",
+      "area": "Area II",
+      "map_label": "A39"
+    },
+    {
+      "name": "Area II A40",
+      "area": "Area II",
+      "map_label": "A40"
+    },
+    {
+      "name": "Area II A41",
+      "area": "Area II",
+      "map_label": "A41"
+    },
+    {
+      "name": "Area II A42",
+      "area": "Area II",
+      "map_label": "A42"
+    },
+    {
+      "name": "Area II A43",
+      "area": "Area II",
+      "map_label": "A43"
+    },
+    {
+      "name": "Area II A44",
+      "area": "Area II",
+      "map_label": "A44"
+    },
+    {
+      "name": "Area II A45",
+      "area": "Area II",
+      "map_label": "A45"
+    },
+    {
+      "name": "Area II A47",
+      "area": "Area II",
+      "map_label": "A47"
+    },
+    {
+      "name": "Area II B1",
+      "area": "Area II",
+      "map_label": "B1"
+    },
+    {
+      "name": "Area II B2",
+      "area": "Area II",
+      "map_label": "B2"
+    },
+    {
+      "name": "Area II B3",
+      "area": "Area II",
+      "map_label": "B3"
+    },
+    {
+      "name": "Area II B4",
+      "area": "Area II",
+      "map_label": "B4"
+    },
+    {
+      "name": "Area II B5",
+      "area": "Area II",
+      "map_label": "B5"
+    },
+    {
+      "name": "Area II B6",
+      "area": "Area II",
+      "map_label": "B6"
+    },
+    {
+      "name": "Area II B7",
+      "area": "Area II",
+      "map_label": "B7"
+    },
+    {
+      "name": "Area II B8",
+      "area": "Area II",
+      "map_label": "B8"
+    },
+    {
+      "name": "Area II B9",
+      "area": "Area II",
+      "map_label": "B9"
+    },
+    {
+      "name": "Area II B10",
+      "area": "Area II",
+      "map_label": "B10"
+    },
+    {
+      "name": "Area II B11",
+      "area": "Area II",
+      "map_label": "B11"
+    },
+    {
+      "name": "Area II B12",
+      "area": "Area II",
+      "map_label": "B12"
+    },
+    {
+      "name": "Area II B13",
+      "area": "Area II",
+      "map_label": "B13"
+    },
+    {
+      "name": "Area II B14",
+      "area": "Area II",
+      "map_label": "B14"
+    },
+    {
+      "name": "Area II B15",
+      "area": "Area II",
+      "map_label": "B15"
+    },
+    {
+      "name": "Area II B16",
+      "area": "Area II",
+      "map_label": "B16"
+    },
+    {
+      "name": "Area II B17",
+      "area": "Area II",
+      "map_label": "B17"
+    },
+    {
+      "name": "Area II C1",
+      "area": "Area II",
+      "map_label": "C1"
+    },
+    {
+      "name": "Area II C2",
+      "area": "Area II",
+      "map_label": "C2"
+    },
+    {
+      "name": "Area II C3",
+      "area": "Area II",
+      "map_label": "C3"
+    },
+    {
+      "name": "Area II C4",
+      "area": "Area II",
+      "map_label": "C4"
+    },
+    {
+      "name": "Area II C5",
+      "area": "Area II",
+      "map_label": "C5"
+    },
+    {
+      "name": "Area II C6",
+      "area": "Area II",
+      "map_label": "C6"
+    },
+    {
+      "name": "Area II C7",
+      "area": "Area II",
+      "map_label": "C7"
+    },
+    {
+      "name": "Area II C8",
+      "area": "Area II",
+      "map_label": "C8"
+    },
+    {
+      "name": "Area II C9",
+      "area": "Area II",
+      "map_label": "C9"
+    },
+    {
+      "name": "Area II C10",
+      "area": "Area II",
+      "map_label": "C10"
+    },
+    {
+      "name": "Area II D1",
+      "area": "Area II",
+      "map_label": "D1"
+    },
+    {
+      "name": "Area II D3",
+      "area": "Area II",
+      "map_label": "D3"
+    },
+    {
+      "name": "Area II D5",
+      "area": "Area II",
+      "map_label": "D5"
+    },
+    {
+      "name": "Area II D7",
+      "area": "Area II",
+      "map_label": "D7"
+    },
+    {
+      "name": "Area II D9",
+      "area": "Area II",
+      "map_label": "D9"
+    },
+    {
+      "name": "Area II D11",
+      "area": "Area II",
+      "map_label": "D11"
+    },
+    {
+      "name": "Area II D13",
+      "area": "Area II",
+      "map_label": "D13"
+    },
+    {
+      "name": "Area II D15",
+      "area": "Area II",
+      "map_label": "D15"
+    },
+    {
+      "name": "Area II D17",
+      "area": "Area II",
+      "map_label": "D17"
+    },
+    {
+      "name": "Area II D19",
+      "area": "Area II",
+      "map_label": "D19"
+    },
+    {
+      "name": "Area II E1",
+      "area": "Area II",
+      "map_label": "E1"
+    },
+    {
+      "name": "Area II E2",
+      "area": "Area II",
+      "map_label": "E2"
+    },
+    {
+      "name": "Area II E3",
+      "area": "Area II",
+      "map_label": "E3"
+    },
+    {
+      "name": "Area II E4",
+      "area": "Area II",
+      "map_label": "E4"
+    },
+    {
+      "name": "Area II E5",
+      "area": "Area II",
+      "map_label": "E5"
+    },
+    {
+      "name": "Area II E6",
+      "area": "Area II",
+      "map_label": "E6"
+    },
+    {
+      "name": "Area II E7",
+      "area": "Area II",
+      "map_label": "E7"
+    },
+    {
+      "name": "Area II F1",
+      "area": "Area II",
+      "map_label": "F1"
+    },
+    {
+      "name": "Area II F2",
+      "area": "Area II",
+      "map_label": "F2"
+    },
+    {
+      "name": "Area II F3",
+      "area": "Area II",
+      "map_label": "F3"
+    },
+    {
+      "name": "Area II F4",
+      "area": "Area II",
+      "map_label": "F4"
+    },
+    {
+      "name": "Area II F5",
+      "area": "Area II",
+      "map_label": "F5"
+    },
+    {
+      "name": "Area II F6",
+      "area": "Area II",
+      "map_label": "F6"
+    },
+    {
+      "name": "Area II F7",
+      "area": "Area II",
+      "map_label": "F7"
+    },
+    {
+      "name": "Area II F8",
+      "area": "Area II",
+      "map_label": "F8"
+    },
+    {
+      "name": "Area II F9",
+      "area": "Area II",
+      "map_label": "F9"
+    },
+    {
+      "name": "Area II F10",
+      "area": "Area II",
+      "map_label": "F10"
+    },
+    {
+      "name": "Area II G1",
+      "area": "Area II",
+      "map_label": "G1"
+    },
+    {
+      "name": "Area II G2",
+      "area": "Area II",
+      "map_label": "G2"
+    },
+    {
+      "name": "Area II G3",
+      "area": "Area II",
+      "map_label": "G3"
+    },
+    {
+      "name": "Area II G4",
+      "area": "Area II",
+      "map_label": "G4"
+    },
+    {
+      "name": "Area II G5",
+      "area": "Area II",
+      "map_label": "G5"
+    },
+    {
+      "name": "Area II H1",
+      "area": "Area II",
+      "map_label": "H1"
+    },
+    {
+      "name": "Area II H2",
+      "area": "Area II",
+      "map_label": "H2"
+    },
+    {
+      "name": "Area II H3",
+      "area": "Area II",
+      "map_label": "H3"
+    },
+    {
+      "name": "Area II H4",
+      "area": "Area II",
+      "map_label": "H4"
+    },
+    {
+      "name": "Area II H5",
+      "area": "Area II",
+      "map_label": "H5"
+    },
+    {
+      "name": "Area II H6",
+      "area": "Area II",
+      "map_label": "H6"
+    },
+    {
+      "name": "Area II H7",
+      "area": "Area II",
+      "map_label": "H7"
+    },
+    {
+      "name": "Area II H8",
+      "area": "Area II",
+      "map_label": "H8"
+    },
+    {
+      "name": "Area II H9",
+      "area": "Area II",
+      "map_label": "H9"
+    },
+    {
+      "name": "Area II H10",
+      "area": "Area II",
+      "map_label": "H10"
+    },
+    {
+      "name": "Area II H11",
+      "area": "Area II",
+      "map_label": "H11"
+    },
+    {
+      "name": "Area II H12",
+      "area": "Area II",
+      "map_label": "H12"
+    },
+    {
+      "name": "Area II H13",
+      "area": "Area II",
+      "map_label": "H13"
+    },
+    {
+      "name": "Area II H14",
+      "area": "Area II",
+      "map_label": "H14"
+    },
+    {
+      "name": "Area II H15",
+      "area": "Area II",
+      "map_label": "H15"
+    },
+    {
+      "name": "Area II H17",
+      "area": "Area II",
+      "map_label": "H17"
+    },
+    {
+      "name": "Area II H19",
+      "area": "Area II",
+      "map_label": "H19"
+    },
+    {
+      "name": "Area II H21",
+      "area": "Area II",
+      "map_label": "H21"
+    }
+  ],
+  "notes": [
+    "Draft map transcription is not a verified roster or a claim of bookable capacity.",
+    "Ambiguous or unseen labels, including A46 and unshown even-numbered D/H entries, were not inferred.",
+    "Capacities, RV lengths, individual hookups, shoreline pricing and exact map coordinates require operator verification.",
+    "The 2025 map link displays an illustration with a 2021 copyright notice; do not assume it is a current inventory.",
+    "Public source credentials and original PDF/map assets are deliberately not imported."
+  ]
+}

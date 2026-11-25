@@ -1,7 +1,5 @@
+-- Runtime grants are now applied per campground by tenant_database.protect_schema.
+-- Use provision --grant-runtime --campground SLUG; never grant across every schema.
 REVOKE CREATE ON SCHEMA public FROM PUBLIC;
-GRANT USAGE ON SCHEMA public TO campground_app;
-GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO campground_app;
-GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO campground_app;
-REVOKE ALL ON django_migrations FROM campground_app;
-REVOKE UPDATE, DELETE, TRUNCATE ON audit_event FROM campground_app;
-REVOKE TRUNCATE, REFERENCES, TRIGGER ON ALL TABLES IN SCHEMA public FROM campground_app;
+REVOKE ALL ON public.campground_tenants FROM campground_app;
+GRANT SELECT ON public.campground_tenants TO campground_app;

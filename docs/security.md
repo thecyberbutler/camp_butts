@@ -26,6 +26,9 @@ authentication record. No stock Django Admin is mounted.
 
 Owner-filtered queries protect camper reservations and notifications. Service methods
 recheck active/approved account state and appropriate permissions inside transactions.
+Staff mutations revalidate the session security stamp and MFA after taking their locks.
+Deactivation/reactivation always increments the account security version; old sessions
+cannot revive. Ordinary account management excludes all privileged assignments.
 There are no staff overrides of database constraints or policy bypass flags.
 
 ## Session and secret protection
@@ -50,7 +53,7 @@ deliberately limited; use synthetic reproduction and audit IDs, never credential
 
 ## Network, database and browser boundaries
 
-Caddy is the only public service. It overwrites scheme/client-IP headers; Django
+Traefik is the only public service. It overwrites scheme/client-IP headers; Django
 accepts these only from explicitly configured proxy IPs. PostgreSQL is on a separate
 internal network inaccessible to the proxy. Runtime cannot administer schema or roles.
 Audit rows allow runtime INSERT/SELECT only. Migrations use separate credentials.
@@ -72,3 +75,24 @@ scans, deployment checks, runtime permission tests, backup restoration, manual a
 control/MFA review, accessibility, resource-limit tests and the specification's remaining
 acceptance cases. Monitor local audit events, Axes failures, health, disk/memory, scheduled
 job exit codes and TLS renewal. Do not send application data to external monitoring.
+
+## SaaS identity, secret and database boundaries
+
+Account/email uniqueness, groups, MFA, recovery records, security caches, reservations and
+audit are per campground schema. The URL selects the realm before authentication; unknown,
+disabled or conflicting selections fail closed. All existing authorization/MFA/reauth and
+occupancy constraints remain in force. FORCE RLS and a restrictive tenant guard apply to
+every tenant table; ordinary runtime and migrator roles have no BYPASSRLS. Runtime has
+SELECT only on the directory and no privileges on platform operator events or their sequence.
+
+Secrets remain environment-specific protected file mounts. No keys are stored in the tenant
+directory or URLs. Encryption keys are shared within the trusted application runtime;
+this is not cryptographic isolation against a compromised process. Signed/encrypted sessions
+include tenant UUID; allauth email-confirmation signing salts and reset tokens include tenant
+context using the framework's existing cryptography. TOTP issuer labels identify the campground.
+Old sessions and pending confirmation/reset links are invalidated; no legacy-token fallback.
+
+The existing __Host Secure/HttpOnly/Lax, Path=/ cookies remain unchanged. Only one campground
+login is active per browser cookie jar. Separate paths share a browser origin; no untrusted
+executable branding/customization is supported. Jobs and commands require explicit tenant
+scope. See the threat model for shared infrastructure blast-radius/resource limitations.

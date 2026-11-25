@@ -19,7 +19,10 @@ class User(AbstractUser):
             models.UniqueConstraint(Lower("username"), name="username_case_unique"),
             models.UniqueConstraint(Lower("email"), name="email_case_unique"),
         ]
-        permissions = [("approve_camper", "Approve camper accounts")]
+        permissions = [
+            ("approve_camper", "Approve camper accounts"),
+            ("manage_camper", "Deactivate and reactivate non-privileged camper accounts"),
+        ]
 
 
 class Invitation(models.Model):

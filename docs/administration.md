@@ -2,12 +2,12 @@
 
 ## First administrator and MFA
 
-Use the normal registration form with a unique password. Registration creates an
+Select the intended campground at `/c/SLUG/` and use its registration form with a unique password. Registration creates an
 unprivileged pending account. On the protected host, after independently verifying
-identity, run `setup_roles`, then:
+identity, run `tenant_command --campground SLUG setup_roles`, then:
 
 ```sh
-docker compose exec web python manage.py authorize_account USERNAME \
+docker compose exec web python manage.py tenant_command --campground SLUG authorize_account USERNAME \
   --role Administrator --attest-identity-checked
 ```
 
@@ -30,8 +30,11 @@ minutes; use the account reauthentication page when denied for expired assurance
 
 The operations page supports approval/rejection, cancellation, check-in/out and no-show
 transitions. Early check-in is rejected. Maintenance cannot displace existing occupancy.
-Policy overrides, arbitrary reservation edits, user deactivation UI, invitation management
-UI and a complete audit viewer remain backlog items. CSV currently exports occupancy
+Administrators can manage ordinary camper activation, create campsite types/amenities,
+and view the paginated audit log. Deactivation and reactivation both revoke old sessions;
+accounts with privileged assignments are excluded even when inactive. Audit viewing is
+itself audited. Policy overrides, arbitrary reservation edits and invitation-management
+UI remain backlog items. CSV currently exports occupancy
 without camper contact data; formula-like site names are escaped.
 
 ## Configuration and invitations
@@ -44,7 +47,7 @@ occupy inventory until resolved or expired. Registration mode defaults to approv
 model/service support open, invitation and disabled modes, but a dedicated mode-management
 interface is still required. Do not change security settings through incidental forms.
 
-`create_invitation --actor USERNAME --output /protected/new-file --uses 1 --days 7`
+`tenant_command --campground SLUG create_invitation --actor USERNAME --output /protected/new-file --uses 1 --days 7`
 writes a generated invitation to a new 0600 file in a 0700 directory. Store only its
 digest in the database. Deliver the secret through an approved private channel. The
 application does not log or display it. Expiry and use counts are enforced transactionally.
@@ -54,10 +57,11 @@ application does not log or display it. Expiry and use counts are enforced trans
 Run every five minutes using a dedicated host timer:
 
 ```sh
-docker compose exec -T web python manage.py expire_reservations
+docker compose exec -T web python manage.py tenant_command --campground SLUG expire_reservations
 ```
 
-Run `clearsessions` daily. Review Axes records and establish bounded retention for IPs
+Run `tenant_command --campground SLUG clearsessions` daily. Repeat these jobs for every
+registered campground from a protected operator-maintained schedule; never infer a default. Review Axes records and establish bounded retention for IPs
 and login-attempt records before production. Audit/contact/reservation retention and
 anonymization policy require owner decisions; automated retention is not implemented.
 Alert locally on job failures, repeated failed logins, privilege changes, backup failures,
@@ -66,12 +70,27 @@ disk exhaustion and certificate renewal failures. Do not dump request bodies for
 ## Recovery
 
 Without SMTP, self-service reset is denied. A protected operator may use Django's
-interactive `changepassword USERNAME` only after independent identity verification;
+interactive `tenant_command --campground SLUG changepassword USERNAME` only after independent identity verification;
 the password is entered without echo and never sent by email. For privileged users,
 password recovery does not remove TOTP. Lost MFA requires an owner-controlled, audited
 recovery procedure; there is no web bypass or universal recovery credential. The complete
 dual-control lost-MFA recovery procedure remains a production prerequisite.
 
-`seed_demo_data` creates 30 synthetic campsites/types/amenities/map positions only in
+`tenant_command --campground SLUG seed_demo_data` creates 30 synthetic campsites/types/amenities/map positions only in
 development/testing. It does not create passwords. Rich sample reservation/account data
 is still pending. Never enable that command in production to simplify setup.
+
+
+## Campground and platform roles
+
+Every account belongs to exactly one campground schema. The same username/email at two
+campgrounds represents two independent accounts, passwords, MFA enrollments and approvals.
+TOTP issuer labels include the campground slug. Signing into another campground replaces
+the active browser session cookie; separate browser profiles can maintain independent logins.
+Existing browser cookie protections have not been weakened for per-path sessions.
+
+Campground Administrators cannot create/activate tenants, access another campground's data,
+or modify platform operator events. Only the protected host provisioning workflow controls
+the directory. See deployment.md for registration/adoption and deactivation. Directory names
+are public; tenant staff branding remains plain escaped text. A directory rename is currently
+an operator-only maintenance task, not a staff UI feature.

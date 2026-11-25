@@ -1,0 +1,38 @@
+global:
+  checkNewVersion: false
+  sendAnonymousUsage: false
+# No access logs: request paths can contain recovery/verification secrets.
+log:
+  level: ERROR
+  format: json
+api:
+  dashboard: false
+  insecure: false
+entryPoints:
+  web:
+    address: ":8080"
+    forwardedHeaders:
+      insecure: false
+    transport:
+      respondingTimeouts:
+        readTimeout: 10s
+        writeTimeout: 30s
+        idleTimeout: 60s
+  websecure:
+    address: ":8443"
+    forwardedHeaders:
+      insecure: false
+    transport:
+      respondingTimeouts:
+        readTimeout: 10s
+        writeTimeout: 30s
+        idleTimeout: 60s
+providers:
+  file:
+    filename: /etc/traefik/dynamic.yaml
+    watch: false
+serversTransport:
+  forwardingTimeouts:
+    dialTimeout: 5s
+    responseHeaderTimeout: 30s
+    idleConnTimeout: 60s

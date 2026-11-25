@@ -1,0 +1,13 @@
+FROM postgres:17.12-alpine@sha256:f9cf3e1f0066f0eb0c48707d864f0ac5941e9ff454a072077d97a4d278d07d73
+ARG APP_UID=10001
+ARG APP_GID=10001
+RUN test ${APP_UID} -gt 0 && test ${APP_GID} -gt 0 \
+    && apk upgrade --no-cache libxml2 \
+    && addgroup -g ${APP_GID} campground \
+    && adduser -D -H -u ${APP_UID} -G campground campground \
+    && mkdir -p /var/lib/postgresql/data /var/run/postgresql \
+    && chown -R ${APP_UID}:${APP_GID} /var/lib/postgresql /var/run/postgresql \
+    && chmod 700 /var/lib/postgresql/data \
+    && rm /usr/local/bin/gosu
+# No root initialization or privilege-drop helper is required at runtime.
+USER ${APP_UID}:${APP_GID}

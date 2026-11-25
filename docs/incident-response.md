@@ -30,3 +30,19 @@
 
 Production prerequisites: named incident owner, private reporting channel, tested contact
 tree, offline recovery credentials and a rehearsed recovery procedure.
+
+For proxy compromise, isolate the edge, rotate/revoke affected TLS and ACME account
+credentials, and rebuild Traefik from the reviewed digest/configuration. Treat both the
+current Traefik volume and retained legacy Caddy certificate volumes as sensitive evidence.
+Do not enable the dashboard, Docker provider, debug/access logs or TLS bypass for diagnosis.
+
+
+For a campground-specific incident, disable routing with the protected provisioning command
+`docker compose run --rm provision --deactivate --campground SLUG`, preserve its schema,
+audit and encrypted backups, and revoke affected account sessions within that campground.
+Deactivation denies subsequent tenant resolution; in-flight transactions may finish. Quiesce
+web/workers when immediate containment is required. Review other campgrounds if the exploit
+could cross schema or application boundaries. Shared runtime/signing/MFA/DB/host compromise
+requires platform-wide containment and review; do not assume schema isolation contains it.
+Never restore another campground's schema under a new identity without an explicit reviewed
+migration and token/key/session revocation procedure.

@@ -1,0 +1,21 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Choose a campground</title>
+  <link rel="stylesheet" href="{% static 'vendor/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+</head>
+<body><main class="container py-5">
+  <h1>Choose a campground</h1>
+  <p>Find your campground to view its reservation site. Accounts are separate for each campground.</p>
+  <form method="get" action="/" class="mb-4">
+    <label for="campground">Campground address name</label>
+    <input class="form-control" id="campground" name="campground" maxlength="63" required pattern="[a-z0-9]+(-[a-z0-9]+)*" autocomplete="off">
+    <button class="btn btn-primary mt-2" type="submit">Continue</button>
+  </form>
+  <ul>{% for slug, name in campgrounds %}<li><a href="/c/{{ slug }}/">{{ name }}</a></li>{% empty %}<li>No campgrounds are currently available.</li>{% endfor %}</ul>
+</main></body>
+</html>

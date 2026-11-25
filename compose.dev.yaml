@@ -10,6 +10,11 @@ services:
       - ./static:/app/static:ro
   proxy:
     ports: !override ["127.0.0.1:80:8080", "127.0.0.1:443:8443"]
-    volumes:
-      - ./Caddyfile.dev:/etc/caddy/Caddyfile:ro
-      - ./static:/srv/static:ro
+    environment:
+      TLS_MODE: development
+    secrets: [dev_tls_cert, dev_tls_key]
+secrets:
+  dev_tls_cert:
+    file: ${SECRETS_DIR:-./.secrets}/dev-tls/localhost.crt
+  dev_tls_key:
+    file: ${SECRETS_DIR:-./.secrets}/dev-tls/localhost.key

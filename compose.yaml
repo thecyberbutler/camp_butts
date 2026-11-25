@@ -65,7 +65,7 @@ services:
     restart: "no"
     networks: [database]
     entrypoint: [python, manage.py]
-    command: [migrate, --noinput]
+    command: [tenant_command]
     environment:
       <<: *environment
       DJANGO_SETTINGS_MODULE: config.settings.migration
@@ -75,16 +75,21 @@ services:
     volumes:
       - static:/app/staticfiles
   db:
-    image: postgres:17.12-bookworm@sha256:1eff563f6c868b9b433566e9f3cf6e5c79fbd3b95bf70ec7277d376cdbfc50d7
+    build:
+      context: .
+      dockerfile: Dockerfile.db
+      args:
+        APP_UID: ${APP_UID:-10001}
+        APP_GID: ${APP_GID:-10001}
+    image: campground-db:local
+    user: "${APP_UID:-10001}:${APP_GID:-10001}"
     restart: unless-stopped
     read_only: true
     cap_drop: [ALL]
-    # Official entrypoint initializes volume ownership then drops to postgres.
-    cap_add: [CHOWN, DAC_OVERRIDE, FOWNER, SETGID, SETUID]
     security_opt: [no-new-privileges:true]
     tmpfs:
       - /tmp:rw,noexec,nosuid,size=32m
-      - /var/run/postgresql:rw,noexec,nosuid,size=16m
+      - /var/run/postgresql:rw,noexec,nosuid,size=16m,mode=0700,uid=${APP_UID:-10001},gid=${APP_GID:-10001}
     pids_limit: 128
     mem_limit: 1g
     cpus: 2
@@ -121,15 +126,14 @@ services:
     ports: ["80:8080", "443:8443"]
     environment:
       APP_DOMAIN: ${APP_DOMAIN:?Set the HTTPS hostname}
+      TLS_MODE: acme
+      HTTPS_PORT: "443"
     networks:
       edge: {}
       application:
         ipv4_address: 172.30.10.2
     volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile:ro
-      - static:/srv/static:ro
-      - caddy_data:/data
-      - caddy_config:/config
+      - traefik_data:/data
     depends_on: [web]
 
 networks:
@@ -145,8 +149,7 @@ networks:
 volumes:
   postgres: {}
   static: {}
-  caddy_data: {}
-  caddy_config: {}
+  traefik_data: {}
 
 secrets:
   django_key:

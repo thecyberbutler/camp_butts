@@ -23,3 +23,10 @@ from .base import *  # noqa: E402,F403
 
 if not DATABASES["default"]["NAME"].startswith("campground_test"):  # noqa: F405
     raise RuntimeError("Tests require a dedicated campground_test database")
+
+# Django creates the disposable test schema before tenant policies are installed.
+DATABASES["default"]["OPTIONS"]["options"] += (  # noqa: F405
+    " -c search_path=public,campground_extensions,pg_catalog"
+)
+
+DATABASES["default"]["TEST"] = {"TEMPLATE": "campground_test_template"}  # noqa: F405

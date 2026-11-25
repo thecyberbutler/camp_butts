@@ -22,6 +22,7 @@ if not all(ALLOWED_HOSTS) or any("*" in h or "/" in h or ":" in h for h in ALLOW
     raise ImproperlyConfigured("Explicit DNS allowed hosts required")
 CSRF_TRUSTED_ORIGINS = [f"https://{host}" for host in ALLOWED_HOSTS]
 INSTALLED_APPS = [
+    "apps.tenancy.apps.TenancyConfig",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
@@ -44,6 +45,8 @@ MIDDLEWARE = [
     "config.middleware.ProxyBoundaryMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "config.middleware.ResponseSecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
+    "apps.tenancy.middleware.TenantMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -82,7 +85,9 @@ DATABASES = {
         "HOST": os.environ.get("DATABASE_HOST", "db"),
         "PORT": os.environ.get("DATABASE_PORT", "5432"),
         "CONN_MAX_AGE": 60,
-        "OPTIONS": {"options": "-c statement_timeout=10000 -c lock_timeout=5000"},
+        "OPTIONS": {
+            "options": "-c statement_timeout=10000 -c lock_timeout=5000 -c search_path=pg_catalog"
+        },
     }
 }
 AUTH_USER_MODEL = "accounts.User"
@@ -101,7 +106,10 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "apps.accounts.validators.MaximumPasswordLengthValidator"},
 ]
 LOGIN_URL = "account_login"
-LOGIN_REDIRECT_URL = "/dashboard/"
+LOGIN_REDIRECT_URL = "dashboard"
+ALLAUTH_SETTING_GETTER = "apps.tenancy.allauth.setting"
+# Bandit B105 reviewed: this is allauth's import path, never a password/token value.
+ACCOUNT_PASSWORD_RESET_TOKEN_GENERATOR = "apps.accounts.tokens.TenantPasswordResetTokenGenerator"  # nosec B105
 ACCOUNT_ADAPTER = "apps.accounts.adapters.AccountAdapter"
 ACCOUNT_FORMS = {"signup": "apps.accounts.forms.SignupForm"}
 ACCOUNT_LOGIN_METHODS = {"username"}
@@ -179,6 +187,12 @@ LANGUAGE_CODE = "en-us"
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [BASE_DIR / "static"]
+# Only the deployment-collected, read-only asset directory is served. No media,
+# automatic filesystem refresh, source finders or cross-origin wildcard access.
+WHITENOISE_AUTOREFRESH = False
+WHITENOISE_USE_FINDERS = False
+WHITENOISE_ALLOW_ALL_ORIGINS = False
+WHITENOISE_ROOT = None
 EMAIL_ENABLED = os.environ.get("EMAIL_ENABLED") == "true"
 EMAIL_BACKEND = (
     "django.core.mail.backends.smtp.EmailBackend"

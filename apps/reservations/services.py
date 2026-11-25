@@ -83,6 +83,8 @@ def existing_submission(actor, key, fingerprint):
 def validate_policy(
     policy, camper, site, dates, *, adults, children, pets, rv_length, exclude=None
 ):
+    if not policy.booking_enabled:
+        raise BookingError("Online reservations are currently closed. Contact the campground.")
     local_today = today(policy)
     if not site.active:
         raise BookingError("This campsite is unavailable.")
@@ -202,6 +204,8 @@ def available(
     *, start, end, adults=1, site_type=None, amenities=(), rv_length=0, pets=False, electric_amps=0
 ):
     dates = date_range(start, end)
+    if not Campground.current().booking_enabled:
+        return Campsite.objects.none()
     sites = Campsite.objects.filter(
         active=True,
         max_occupancy__gte=adults,
