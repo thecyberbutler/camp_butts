@@ -223,6 +223,9 @@ Serve frontend dependencies locally.
 - Use Python type hints where practical.
 - Avoid unrelated changes.
 - Do not collect unnecessary personal information.
+- Create one focused Git commit per completed feature implementation after its required validation.
+- Include the feature's tests and documentation in its commit; keep unrelated changes separate for clear tracking.
+- Never include secrets, local configuration, or known security regressions in a commit.
 
 Do not implement custom cryptography when established framework or library functionality exists.
 

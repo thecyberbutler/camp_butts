@@ -953,3 +953,10 @@ local settings were preserved. Git index/ignore checks and whitespace validation
 No runtime, dependency, database, security-control or deployment change. No vulnerability
 or security exception introduced; no approval pending. This maintenance change is kept in
 a focused commit, separate from the requested workflow instruction and visual redesign.
+
+## Feature commit workflow — 2026-11-25
+
+Recorded the owner's request in AGENTS.md: commit each completed, validated feature with
+its tests/documentation and keep unrelated work separate. Secret exclusions and security
+gates remain mandatory. Reviewed the instruction diff and Git whitespace; no runtime change,
+dependency, migration, vulnerability or pending approval. No remote push is part of this task.
