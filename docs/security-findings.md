@@ -289,3 +289,49 @@ The SaaS source Gitleaks scan and application image HIGH/CRITICAL scan passed. E
 shared-process/host/key compromise and same-origin risks remain; no claim of isolation
 against those actors is made. Backups/platform metadata recovery, aggregate load and the
 remaining release acceptance gates are still open. Scans do not prove absence of vulnerabilities.
+
+## Public-source import and mutation review — 2026-11-24
+
+- The official linked `CAMPGROUND_RULES_2026.pdf`, page 1 Wi-Fi section, contains a network
+  credential. Location: `https://georgiamountainfairgrounds.com/images/site/pageserver/image/otherevents/CAMPGROUND_RULES_2026.pdf`.
+  Its value was excluded from fixtures, application assets, documentation, logs and summaries.
+  No PDF asset was imported. Upstream publication/credential rotation remains the source
+  owner's responsibility and is **unresolved externally**; no claim of upstream remediation.
+- Conflicting published site totals and monthly lakeside rates are data-quality findings,
+  not evidence of an application exploit. Inactive drafts, explicit reference-rate labels
+  and server-side closed booking prevent them becoming unverified online inventory/charges.
+- Mutation testing exposed coverage gaps in date types and stay boundaries, not an observed
+  flaw in existing production date validation. Added meaningful regression cases. The first
+  campaign killed 13/23; the second killed 19/23 with four reviewed survivors (three cosmetic
+  message changes and one equivalent default range bound). No mutant was applied or excluded.
+- Bandit subprocess findings were reviewed narrowly as documented in SD-024. No broad scan
+  suppression or security-control bypass was introduced.
+
+Release gates remain in force. No new application vulnerability is known from this review;
+that statement does not imply exhaustive verification or production readiness.
+
+## Image publishing review — 2026-11-24
+
+The first local release snapshot inherited mode 0600/0700 from its private working directory.
+Docker copied those modes into root-owned application files, preventing the non-root user
+from reading source. Both-architecture execution checks caught the packaging failure before
+any image was pushed. The snapshot now preserves ordinary readable source modes under an
+unchanged 0700 parent workspace; secret files are excluded entirely. Added a regression test
+for private workspace boundaries and image-readable source modes. Runtime privileges, secret
+permissions and read-only filesystems were not relaxed. The failed candidates were not published.
+
+The existing host Docker token could create repositories/push images but could not administer
+repository visibility. After the owner's follow-up, all three repositories verified public. No broader token
+permissions were requested by this task. Public source visibility is
+an explicitly accepted confidentiality impact (SD-025), not an undisclosed regression. Current
+per-architecture scans found no high/critical vulnerabilities or detected secrets; production
+readiness and previously recorded external-source/release limitations remain unchanged.
+
+## Public test banner/deployment review — 2026-11-24
+
+No new application vulnerability was identified by the 196-test release run or current
+source/image scans. The missing non-production visual identification and early error-path
+coverage were addressed without changing authorization, TLS, DEBUG or other protections.
+These are labeling/coverage improvements, not a claim that a prior exploitable vulnerability
+was resolved. Host storage encryption, AWS firewall posture, recovery, renewal and production
+release gates remain unverified until separately recorded. The test banner is not access control.

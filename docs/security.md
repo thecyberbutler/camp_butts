@@ -96,3 +96,27 @@ The existing __Host Secure/HttpOnly/Lax, Path=/ cookies remain unchanged. Only o
 login is active per browser cookie jar. Separate paths share a browser origin; no untrusted
 executable branding/customization is supported. Jobs and commands require explicit tenant
 scope. See the threat model for shared infrastructure blast-radius/resource limitations.
+
+## Import and mutation-testing controls
+
+Reviewed public-source JSON crosses an operator-to-tenant boundary only through strict
+field/type/size validation and the migration DB identity. It cannot import users, roles,
+security options, active inventory or credentials. Public links require HTTPS without URL
+credentials; templates retain autoescaping and no remote content is embedded or fetched.
+See SD-023/024 and `mutation-testing.md` for isolated mutation execution, sanitized reports
+and explicit survivor review. Existing auth, RLS, container and secret boundaries remain.
+
+## Registry distribution boundary
+
+Docker Hub public source visibility is specifically approved in SD-025. Credentials are
+retrieved only through the host's Docker credential helper and used in memory over verified
+HTTPS; raw child/API diagnostics are not logged. No registry credential is supplied to
+application containers or Docker build arguments. Snapshot/source/image scans precede pushes;
+publish refuses changed digests or conflicting tags. Deployments use the verified digest
+lock, not mutable aliases. Registry/maintainer compromise and public source retention are
+residual risks; this does not waive any production release requirement.
+
+Public test identification (SD-026) uses a server-validated environment label and shared
+HTML banner/error layout. It does not change DEBUG, TLS, cookies, CSRF, MFA or authorization.
+The AWS test deployment uses fresh host-only secrets and digest-locked non-root images;
+no workstation credentials or real camper data are transferred.

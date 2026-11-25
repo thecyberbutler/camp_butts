@@ -101,3 +101,44 @@ operators and the shared runtime remain separate, broader trust roots.
 Separate runtimes/databases would reduce compromise blast radius; the owner explicitly
 selected shared infrastructure. No exemption from existing controls or approval for a
 security-reducing workaround is inferred from that selection.
+
+## Added assets and boundaries: source import and test mutations
+
+Assets include reviewed source provenance, draft inventory, the booking-closure switch and
+mutation result integrity. Untrusted public source text crosses a bounded offline import
+into the explicitly scoped tenant database, then escaped templates. Threats include source
+credential leakage, malicious links/HTML, duplicate/oversized JSON, cross-tenant writes,
+accidental activation and destructive retries. HTTPS-only noncredentialed links, strict
+allowlists, no fetch/rendered HTML, migration-only identity, inactive/empty tenant checks,
+atomic audit, idempotence and independently closed booking mitigate them. Source accuracy
+remains an operator responsibility; conflicts are visible and block online booking.
+
+Mutation execution crosses from a trusted developer tool into disposable source/database
+state. Never use real camper data. Only synthetic DB identities and generated database
+names are accepted; raw output is discarded and secrets use temporary protected files.
+Forkserver/one worker/time limit reduce inherited-state and resource risks. This is not an
+OS sandbox for arbitrary hostile code. Preserve survivor/error results; a score cannot
+replace security review. Third-party Wi-Fi credential publication is tracked without its
+value in `security-findings.md`.
+
+## Image publishing boundary
+
+New assets: publishing credential, build snapshot hash, multi-platform image indexes,
+registry repository visibility and deployment digest locks. A trusted host publisher sends
+only scanned distributable image layers/minimal provenance to Docker Hub, as explicitly
+authorized by the owner (SD-025). Attacks include leaked build context, token/log exposure,
+wrong namespace, tag substitution, malicious image changes and accidental stable promotion.
+An allowlisted private snapshot, credential-helper-only access, verified TLS/no redirects,
+strict manifest/name checks, per-platform scans, explicit public approval mode, non-root
+smoke tests and digest-locked deployment mitigate them. Release tags are prereleases only.
+Public source/dependency details can be retained forever; source confidentiality is the
+accepted impact. No data volumes or runtime secrets cross this boundary. Registry/account/
+builder compromise and trusted delivery of digest locks remain residual risks; provenance
+is not claimed as an independently verified cryptographic publisher signature.
+
+Public development deployment adds an Internet-accessible prerelease target. The prominent
+red banner reduces accidental use as a live booking service but is not an access control.
+Keep drafts inactive/booking closed, use synthetic data, retain production request/security
+controls, and verify host/network/recovery requirements before accepting real data. SSH host
+trust currently relies on the existing local known-host entry. Distribution trust includes
+Amazon's signed repositories and the pinned, SHA-256-verified official Compose binary.

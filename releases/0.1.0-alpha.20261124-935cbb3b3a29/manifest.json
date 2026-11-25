@@ -1,0 +1,24 @@
+{
+  "namespace": "thecyberbutler",
+  "version": "0.1.0-alpha.20261124",
+  "tag": "0.1.0-alpha.20261124-935cbb3b3a29",
+  "source_sha256": "935cbb3b3a290fc7c2327babce0c94c8533fafe9ce04420178c0525b97615ae1",
+  "platforms": [
+    "linux/amd64",
+    "linux/arm64"
+  ],
+  "images": {
+    "web": {
+      "tag": "docker.io/thecyberbutler/campground-web:0.1.0-alpha.20261124-935cbb3b3a29",
+      "digest": "sha256:403cb21fa55d8a3968bdf55480506e1552b4de46c9d137e0ad1b3e824dd07845"
+    },
+    "db": {
+      "tag": "docker.io/thecyberbutler/campground-db:0.1.0-alpha.20261124-935cbb3b3a29",
+      "digest": "sha256:1462cd37db5951265dc8a6f071a69e059151037454b31c6d866970cdd0a57a05"
+    },
+    "proxy": {
+      "tag": "docker.io/thecyberbutler/campground-proxy:0.1.0-alpha.20261124-935cbb3b3a29",
+      "digest": "sha256:c2258e9c88972ed99c604104d792be12d7753e6000d47410136596cc4314f578"
+    }
+  }
+}

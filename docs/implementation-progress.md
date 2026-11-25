@@ -2,9 +2,9 @@
 
 Updated: 2026-11-24. Status: development; **not approved for production**.
 
-Latest milestone: SaaS isolation implemented; 112 PostgreSQL tests passed (92.51% coverage).
-See **SaaS implementation** below for current changes, findings, commands and remaining gates.
-Earlier sections preserve the prior application/proxy validation history.
+Latest milestone: three public Docker Hub prerelease images published and digest-verified
+for Linux AMD64/ARM64. See **Docker Hub distribution** below for current evidence and gates.
+Earlier sections preserve application, proxy, SaaS and campground-onboarding history.
 
 ## Repository assessment
 
@@ -363,3 +363,410 @@ image HIGH/CRITICAL checks passed with zero findings at those severities; final 
 Gitleaks passed. All planned automated checks above completed. The isolated HTTPS validation
 stack is stopped with volumes retained; the hardened PostgreSQL test service remains available
 on loopback port 55433. No production readiness or release approval is implied.
+
+## Georgia Mountain Fairgrounds onboarding and mutation testing — 2026-11-24
+
+Current phase: real campground reference/profile onboarding and test adequacy hardening.
+The existing required stack remains appropriate; no runtime technology replacement is needed.
+Earlier SaaS/Traefik work and owner editor files were preserved. No public deployment,
+production-data migration, commit or push was performed.
+
+### Completed functionality and architecture
+
+- Provisioned `georgia-mountain-fairgrounds` in the local `campground-hardened-validation`
+  PostgreSQL deployment, with independent schema/account namespace, forced RLS and existing
+  least-privileged runtime grants. Prior synthetic tenants/data are retained.
+- Imported official public contact/address, overview, rules, policy and reference rates;
+  safe HTTPS links point to the official overview/map. No source PDF/map artwork or credential
+  is copied to application assets. All displayed text is escaped.
+- Created **216 inactive map drafts**, explicitly authorized by the owner: 93 Area I and
+  123 Area II. They are unverified identifiers, not a verified count of available campsites.
+  Published 207 vs 212 totals and $1,000 vs $975 monthly lakeside rates remain unresolved.
+- Added bounded, strict-schema, offline migration-identity import with duplicate-key/file
+  validation, tenant/name matching, inactive/empty tenant checks, atomic audit and no-op
+  digest retries. Existing data and later edits cannot be overwritten by another import.
+- Added server-side booking closure and availability closure; imported drafts stay inactive.
+  Tenant directory activation publishes the profile but does not open booking. No users,
+  default credentials, privilege grants or security setting changes are imported.
+- Added exact **mutmut 3.8.1** development dependency and eight reviewed transitive packages.
+  Runtime dependencies/images contain no mutmut. The wrapper uses private source copies,
+  disposable synthetic PostgreSQL databases, forkserver, one worker, bounded execution,
+  discarded raw output and sanitized status-only reports. No application mutant was applied.
+- Added import security/atomicity/idempotence/booking tests and reservation date-boundary,
+  invalid-type and inclusive-arrival/exclusive-departure tests.
+
+### Security decisions, findings and approvals
+
+SD-023 and SD-024 document import and mutation boundaries. Existing TLS, MFA, authorization,
+CSRF, CSP, session lifetimes, password hashing, rate limits, tenant RLS, occupancy constraints
+and container isolation remain. No new runtime permissions or publicly exposed service.
+No pending security approval and no security exception requested/granted/inferred.
+Development tooling adds dependency surface; pins, audits, runtime exclusion and isolated
+synthetic-data execution mitigate it. This wrapper is not an OS sandbox for hostile code.
+
+A Wi-Fi credential in the official linked PDF was excluded from imports and all repository
+artifacts; only type/location is recorded in `security-findings.md`. Upstream publication
+remains unresolved externally. Mutation findings were **testing gaps**, not observed defects
+in the existing date validator; six additional mutants are now rejected by meaningful tests.
+No new application vulnerability is known, and no exhaustive security claim is made.
+
+### Validation actually executed
+
+- Full PostgreSQL suite: **144 passed**, **92.35%** coverage; includes existing security,
+  tenancy and independent-connection concurrency tests. Final run had no warnings.
+- First date-range mutation campaign: **23 executed, 13 killed, 10 survived**.
+  After boundary/type tests: **23 executed, 19 killed, 4 survived**, no runner errors or
+  timeouts. Three survivors alter message presentation; one removes the explicit `[)`
+  argument whose Psycopg default is identical. All remain visible; wrapper correctly exits
+  nonzero requiring review. Neither 100% mutation success nor whole-application coverage
+  is claimed. Reports are ignored/private `.runtime/mutation/run-*/summary.json`.
+- Configuration migration 0003 applied to all three preexisting local tenants and the new
+  campground. Runtime grants reapplied; initial import/activation and identical retry passed.
+- Live restricted runtime checks: 216 inactive sites, booking closed, approval registration,
+  private availability, zero accounts, exactly one import audit; runtime import denied;
+  mutmut absent. Cross-schema reads/writes and protected DB operations denied.
+- Verified-CA HTTPS proxy check passed for the new tenant: assets, security headers,
+  host/SNI rejection, body-size limits and CSRF enforcement.
+- Ruff checks/format, Bandit and Poetry lock consistency passed. Poetry reports existing
+  legacy metadata deprecation notices; no lock inconsistency. Two narrow reviewed subprocess
+  Bandit annotations are explained in SD-024, with no broad rule suppression.
+- Candidate and final installed dependency pip-audit: no known vulnerabilities.
+- Final rebuilt image/source scans and final deployment/migration checks are recorded below
+  after completion; earlier scan results are not substituted for current evidence.
+
+### Migration, dependencies and files changed in this task
+
+Migration: `apps/configuration/migrations/0003_campground_address_campground_booking_enabled_and_more.py`.
+Adds seven profile/booking/import fields; does not remove constraints or permissions.
+New development packages: mutmut, click, libcst, setproctitle, textual, linkify-it-py,
+mdit-py-plugins, pyyaml-ft and typing-extensions. Exact versions/licenses in dependency inventory.
+
+- `.dockerignore`, `.gitignore`, `Dockerfile`, `pyproject.toml`, `poetry.lock`.
+- `apps/configuration/models.py`, `apps/configuration/validators.py`,
+  `apps/configuration/importing.py`,
+  `apps/configuration/management/commands/import_campground.py`, configuration migration above.
+- `apps/tenancy/management/commands/tenant_command.py`, `apps/reservations/services.py`,
+  `apps/campsites/views.py`, `apps/dashboard/forms.py`, `templates/home.html`.
+- `data/campgrounds/georgia-mountain-fairgrounds.json`, `scripts/mutation_test.py`,
+  `tests/integration/test_campground_import.py`, `tests/integration/test_date_ranges.py`.
+- `README.md`, `PROJECT_SPEC.md`, `SECURITY.md`, `docs/georgia-mountain-fairgrounds.md`,
+  `docs/mutation-testing.md`, `docs/architecture.md`, `docs/security.md`, `docs/threat-model.md`,
+  `docs/security-decisions.md`, `docs/security-findings.md`, `docs/administration.md`,
+  `docs/deployment.md`, `docs/backup-and-restore.md`, `docs/incident-response.md`,
+  `docs/dependency-inventory.md`, `docs/implementation-progress.md`.
+
+### Remaining work, recommended next steps and unexecuted checks
+
+1. Obtain authoritative site roster/capacities/hookups/seasonal dates/map positions and
+   reconcile source counts/monthly price. Review drafts before activation; do not equate
+   placeholder values with specifications.
+2. Implement/validate monthly stays, seasonal windows and campground-specific deposit,
+   cancellation and rate-category behavior before opening online reservations. No pricing
+   engine/payment processing or booking-opening web control was added.
+3. Expand mutation campaigns to reservation authorization, idempotence and policy logic,
+   then authentication/tenant boundaries under separately reviewed targeting. The documented
+   broad reservation-service mutation command has **not** been executed.
+4. Complete outstanding encrypted backup/restore, SMTP, public ACME renewal, load, frontend
+   advisory/manual browser/accessibility and release acceptance work. Earlier unexecuted
+   release commands remain unverified. This application is **not production-ready**.
+
+Commands from the repository root after protected local test provisioning:
+
+```sh
+TEST_DATABASE_PORT=55433 sh scripts/test.sh -q --assert=plain --tb=no --show-capture=no --cov --cov-fail-under=85
+.venv/bin/python scripts/mutation_test.py --port 55433 --timeout 900
+.venv/bin/ruff check apps config scripts tests manage.py gunicorn.conf.py
+.venv/bin/ruff format --check apps config scripts tests manage.py gunicorn.conf.py
+.venv/bin/bandit -r apps config scripts manage.py gunicorn.conf.py -q
+.venv/bin/pip-audit --progress-spinner off
+poetry check --lock
+```
+
+Use the matching Compose project/overlay for deployment checks in `deployment.md` and
+`georgia-mountain-fairgrounds.md`. Mutation nonzero results require review, not disabled
+checks or altered validation. Preserve the stricter implementation when a conflict arises.
+
+### Final validation disposition
+
+Final rebuilt web image `sha256:90d0672294d5a8787e97aaa2fbec1aa47c3574394bb25dca9853152fa8e0f551`
+passed Trivy OS/Python HIGH/CRITICAL scanning with zero findings at those severities.
+Source Dockerfile misconfiguration checks and Poetry lock vulnerability checks passed;
+the lock was also explicitly scanned with `--include-dev-deps`, with zero HIGH/CRITICAL
+findings. Source-only, redacted Gitleaks found no leaks. The final runtime deployment check
+reported zero issues and the tenant-scoped migration check reported no model changes.
+Both mutation campaigns' disposable databases and temporary secret directories were
+confirmed removed. Reviewed mutant source/status artifacts remain private and ignored.
+
+The local validation stack is **stopped**, with all volumes and the provisioned campground
+retained; the separate loopback PostgreSQL test service remains available. No public
+production service was launched. The local stack can be restarted with its existing
+protected development TLS configuration:
+
+```sh
+APP_DOMAIN=localhost DJANGO_ALLOWED_HOSTS=localhost APP_UID=501 APP_GID=10001 \
+  docker compose -p campground-hardened-validation -f compose.yaml \
+  -f /private/tmp/campground-traefik-validation.yaml up -d db web proxy
+```
+
+That scratch overlay binds only loopback 18080/18443; it is specific to this validation
+workspace, not a portable deployment manifest. Verify/trust the development CA through the
+normal local procedure; never bypass certificate verification. Use `deployment.md` for a
+new installation. Earlier pre-task Git work and a concurrently created owner checkpoint
+were preserved; no Git commit or push was made by this task.
+
+## Docker Hub distribution — 2026-11-24
+
+Current phase: simplified image distribution for isolated evaluation; production acceptance
+remains incomplete. Owner requested build/tag/publish to Docker Hub, selected `thecyberbutler`,
+and explicitly approved **three public repositories with source visibility** after the
+private-repository quota prevented three private repositories. SD-025 records the scope,
+risks, alternatives, mitigations and irreversible public-copy limitation. No approval is pending.
+
+### Completed publication and functionality
+
+Published and verified tag **`0.1.0-alpha.20261124-08d15ef2bd0f`** in:
+
+- `docker.io/thecyberbutler/campground-web`
+- `docker.io/thecyberbutler/campground-db`
+- `docker.io/thecyberbutler/campground-proxy`
+
+All three manifest indexes contain Linux AMD64 and ARM64 images plus minimal build provenance.
+Remote index digests match the locally scanned images. Anonymous registry inspection and
+anonymous pulls by digest passed for both architectures in all three repositories. The exact
+indexes and source snapshot hash are recorded in
+`releases/0.1.0-alpha.20261124-08d15ef2bd0f/{manifest.json,images.env,README.md}`.
+No latest/stable tag, public application deployment, or production-readiness claim was made.
+
+Added `scripts/release_images.py`: private allowlisted source snapshot, source-content hash
+in prerelease tag, two-platform local builds, per-platform security scans, PostgreSQL test/
+coverage gates, image ownership/startup probes, credential-helper-only registry auth,
+visibility/namespace/tag/digest checks, refusal to overwrite different existing tags, exact
+artifact push and remote digest verification. No rebuild occurs during publication. A
+nonzero gate blocks publishing; failed/partial publication cannot emit a complete deployment
+lock. The script defaults to private repositories; explicit public mode requires the
+separately documented owner approval. Existing repository visibility is never silently changed.
+
+Added `compose.registry.yaml`, which removes local build directives and substitutes verified
+images for all five services, reusing the web digest for migration/provision jobs. It retains
+the base Compose networks, mounts, secret separation, ports, users, capability drops, readonly
+filesystems, health/resource limits and controlled migrations. Prebuilt artifacts use fixed
+UID/GID 10001; existing differently-owned data/secrets require reviewed migration, not relaxed
+permissions/root workarounds. Local source-building deployment remains available.
+
+### Security impacts and findings
+
+Public distribution intentionally exposes packaged source/dependency/build metadata under
+SD-025. Anyone may retain downloaded copies; this cannot be undone by deleting a repository.
+No camper data, existing accounts, runtime secrets, certificate volumes, Docker credentials,
+mutation artifacts or owner editor files were included in build contexts or published images.
+No runtime authentication/authorization/database/container control was weakened. Docker Hub
+is a distribution dependency only; self-hosted application operation is unchanged.
+
+The first private build snapshot produced root-owned unreadable application files inside
+local candidates. Image execution checks caught this before publication. Corrected ordinary
+source modes under the still-private parent workspace, added a regression, rebuilt and
+validated both platforms; no privileges or secret permissions were expanded. Failed initial
+candidates were not published. The publishing token could not change visibility; after the owner's follow-up, public
+visibility was verified. No broader token permissions were requested by this task. No existing
+repository/image content was deleted by this task.
+
+No new known application vulnerability was identified. The packaging defect is resolved;
+external-source credential publication and earlier release limitations remain as previously
+recorded. Scanners and digest verification do not establish independent publisher signatures,
+complete toolchain assurance or production readiness.
+
+### Validation actually executed
+
+- Release snapshot: **153 PostgreSQL tests passed** with the **85% coverage gate passed**, both
+  during build and immediately before publishing. A full working-repository run measured
+  **92.35%** coverage with 153 tests. Existing independent-connection concurrency/security
+  tests remain included; PostgreSQL was restarted for these tests, never replaced by SQLite.
+- Final targeted publishing regression suite: **12 passed**, including three added post-build
+  negative tests for visibility mismatch and refusal to overwrite an existing different digest.
+  Other cases cover registry/name/tag/platform/manifest validation, omitted secrets, symlinks,
+  HTTP redirect/TLS/error-output controls, readable snapshot modes under a private parent,
+  and an actual Compose merge comparison preserving every unrelated security setting.
+- Ruff lint/format and Bandit passed on source snapshots and final changes. Narrow B404/B603/
+  B108 reviewed annotations are documented in SD-025; no broad scanner rule was disabled.
+- Redacted Gitleaks source scans passed. Trivy source/Poetry lock (including dev dependencies)
+  and Dockerfile HIGH/CRITICAL scans passed. Every image/architecture passed HIGH/CRITICAL
+  vulnerability scanning and a separate secret scan without a severity filter, before build
+  completion and again immediately before publication. No findings were waived/suppressed.
+- Both architecture variants execute as 10001:10001 with expected directory ownership;
+  web imports required libraries; web/proxy refuse missing required secrets/TLS configuration.
+  Database binary/version and non-root directory ownership checked. This is **not** a fresh
+  full database initialization/HTTPS lifecycle test of the published UID-10001 stack.
+- Published digest lock rendered with real Docker Compose: no builds remain, all five services
+  retain readonly/cap-drop/no-new-privileges, and web/database ports remain unpublished.
+- All remote index digests and anonymous AMD64/ARM64 pulls verified. No registry credential
+  material was printed, persisted in release artifacts, or passed as a build argument.
+
+### Files, migrations and dependencies
+
+New: `compose.registry.yaml`, `scripts/release_images.py`,
+`tests/security/test_release_images.py`, `docs/container-publishing.md`, and the three
+non-secret release metadata files listed above.
+
+Updated in this task: `README.md`, `PROJECT_SPEC.md`, `SECURITY.md`,
+`docs/architecture.md`, `docs/deployment.md`, `docs/security.md`, `docs/threat-model.md`,
+`docs/security-decisions.md`, `docs/security-findings.md`, `docs/dependency-inventory.md`,
+`docs/backup-and-restore.md`, `docs/incident-response.md`, `docs/implementation-progress.md`.
+Earlier uncommitted work and owner `.vscode/` were preserved. No Git commit/push was made.
+
+No database migration, Python/runtime dependency, base-image change or new application
+service was introduced. Host tooling reuses existing Docker/Buildx, Requests, Trivy/Gitleaks
+and the Poetry test environment. All three Dockerfiles retain their existing security settings.
+
+### Repeatable commands and remaining work
+
+```sh
+TEST_DATABASE_PORT=55433 sh scripts/test.sh -q --assert=plain --tb=no --show-capture=no --cov --cov-fail-under=85
+.venv/bin/ruff check apps config scripts tests manage.py gunicorn.conf.py
+.venv/bin/ruff format --check apps config scripts tests manage.py gunicorn.conf.py
+.venv/bin/bandit -r apps config scripts manage.py gunicorn.conf.py -q
+.venv/bin/python scripts/release_images.py build --namespace thecyberbutler --version 0.1.0-alpha.20261124
+# Substitute the completed build's actual manifest path; public mode uses SD-025 approval.
+.venv/bin/python scripts/release_images.py publish .runtime/releases/candidate-EXAMPLE/manifest.json --public-approved
+# After configuring non-secret .env and a dedicated UID/GID-10001 deployment:
+docker compose --env-file .env --env-file releases/0.1.0-alpha.20261124-08d15ef2bd0f/images.env -f compose.yaml -f compose.registry.yaml --profile tools pull
+```
+
+Next: rehearse a fresh UID-10001 deployment with protected synthetic secrets and full tenant
+initialization/verified HTTPS; complete encrypted restore, ACME renewal, SMTP, load, manual
+security/accessibility and remaining application acceptance gates before production. No live
+application was deployed from Docker Hub in this task. Registry-side immutable-tag policy,
+independent artifact signing, full builder-toolchain/SBOM/distribution-license review and
+an approved CI environment remain further release assurance work; none is claimed verified.
+Do not bypass those reviews or reopen booking merely because images are easy to pull.
+
+Final source-only Gitleaks scan, including release metadata and new documentation, passed
+with no leaks found. The synthetic PostgreSQL test container was stopped again after tests,
+restoring its observed pre-validation state; all database volumes are retained. Start the
+existing isolated test service (`docker start campground-test-db-hardened`) before repeating
+tests on this workstation, or follow README's protected test provisioning on a new host.
+The existing application validation stack remains stopped. No production service was started.
+
+## Current task: test banner and AWS development deployment — 2026-11-24
+
+Banner implementation covers directory, tenant, auth/MFA and generic application errors,
+with a shared local CSS red banner and server-only validated environment label. HTMX fragments
+reuse the containing document. JSON/streams are preserved. Production security settings are
+unchanged. Full initial PostgreSQL suite passed **195 tests, 92.71% coverage**; a subsequent
+malformed-proxy-path regression was added and is awaiting the next release-snapshot run.
+Ruff lint/format and Bandit passed before that final small addition; final checks follow.
+
+Read-only SSH preflight was disclosed verbatim and executed with strict known-host checking.
+Target is Amazon Linux 2023/x86_64 with ~4 GB RAM, ~50 GB free storage, passwordless sudo,
+no Docker, no deployment path/UID conflicts and no 80/443 listeners. No remote changes were
+made during preflight. Fresh-host installation script and secret-safe external HTTPS checker
+are prepared. New banner-enabled images are being built/scanned; deployment is not yet verified.
+
+Security decisions: SD-026. No new pending security approval, dependency or database migration.
+Only this explicitly requested public development deployment is authorized; production gates
+remain outstanding. Existing work and owner .vscode files are preserved.
+
+Final banner release `0.1.0-alpha.20261124-935cbb3b3a29` is published in all three approved
+public repositories; remote digests match scanned indexes. Build and pre-publish runs each
+passed **196 PostgreSQL tests**, including security/concurrency regressions, with **92.97%**
+coverage and the 85% gate. Ruff/Bandit, source/documentation Gitleaks, Trivy source/lock/
+Dockerfile HIGH/CRITICAL checks, per-architecture image vulnerability and separate secret
+scans, and both-architecture non-root/missing-secret startup checks passed. Earlier candidate
+6e753d27475b was not published after the final early-proxy error regression was added.
+
+The complete remote transcript is in `docs/aws-test-deployment-transcript.md`, disclosed
+before remote mutations. Bundle checksums and publisher digest lock were compared before
+upload. Execution has started; final remote/live validation results follow below.
+
+### Completed AWS outcome
+
+The owner-requested development site is live at **https://camp-butts-test.thecyberbutler.io**;
+Georgia Mountain Fairgrounds is at `/c/georgia-mountain-fairgrounds/`. Installation and all
+reported validation commands completed successfully. This is a **development deployment,
+not a production-ready release**. Application login credentials were not created.
+
+- Published release: `0.1.0-alpha.20261124-935cbb3b3a29`; image references are digest-locked in
+  `releases/0.1.0-alpha.20261124-935cbb3b3a29/images.env` and the exact remote transcript.
+- AWS project/path: `camp-butts-test`, `/opt/camp-butts-test`. Docker 25.0.18 (Amazon package),
+  host Python 3.9.25 (Amazon package), verified official Compose 5.8.0. Application Python
+  remains 3.13. The 4-GB host has not been load-qualified for production.
+- DB/web health checks passed; Django `check --deploy --fail-level WARNING` passed. Runtime
+  database probes denied protected DDL, migration/operator data access and audit alteration.
+- Public HTTPS/initial ACME issuance verified with trusted certificate validation. Banner
+  verified once per directory/home/login/signup/campsites/404 page and on CSRF rejection;
+  red CSS/local Bootstrap/HTMX assets served. HTTP redirect, CSP/HSTS/nosniff/private caching,
+  CSRF, request-size bound, spoofed forwarding headers, unknown host/SNI and private-resource
+  rejection passed. Proxy-generated transport/413 pages are outside Django banner rendering.
+- All three actual containers run as 10001:10001, read-only root filesystems, ALL capabilities
+  dropped and no-new-privileges. DB/web publish no ports; only Traefik publishes 80/443.
+- Secret-directory mode 0700 and six file modes 0600/owner 10001:10001 verified by metadata
+  only; secret values were never printed or copied from the workstation.
+- Live application confirms development label, DEBUG false, secure session/CSRF cookies,
+  **216 inactive draft sites, booking closed, public availability off and zero user accounts**.
+- Fresh volumes were initialized; no production data migrated. No schema migration was
+  introduced by this task. Existing migrations were applied to the new tenant database.
+- No new runtime/frontend dependency, weakened control, pending security approval or newly
+  identified exploitable application vulnerability. Visual labeling/error coverage improved;
+  this is not a claim to have resolved a previously identified exploit. SD-025's existing public
+  image visibility approval still applies; SD-026 records this separately authorized test host.
+
+### Files changed in this task
+
+Application/configuration:
+`.env.example`, `compose.yaml`, `compose.dev.yaml`, `config/environment.py`, `config/errors.py`,
+`config/middleware.py`, `config/urls.py`, `config/settings/base.py`,
+`config/settings/development.py`, `config/settings/testing.py`, `apps/tenancy/middleware.py`,
+`templates/layouts/document.html`, `templates/components/test_instance_banner.html`,
+`templates/error.html`, `templates/base.html`, `templates/tenancy/directory.html`,
+`static/css/app.css`, `tests/security/test_environment_banner.py`.
+
+Operator tools:
+`scripts/aws_preflight.sh`, `scripts/deploy_aws_test.sh`, `scripts/check_public_test.py`.
+Private local staging/verification artifacts under ignored `.runtime/` contain no transferred
+secrets. The transcript preserves their exact contents; existing publishing tools were reused.
+
+Documentation:
+`README.md`, `PROJECT_SPEC.md`, `SECURITY.md`, `docs/architecture.md`, `docs/deployment.md`,
+`docs/administration.md`, `docs/backup-and-restore.md`, `docs/security.md`,
+`docs/threat-model.md`, `docs/security-decisions.md`, `docs/incident-response.md`,
+`docs/dependency-inventory.md`, `docs/security-findings.md`, `docs/implementation-progress.md`,
+`docs/aws-test-deployment-transcript.md`.
+
+Release metadata:
+`releases/0.1.0-alpha.20261124-935cbb3b3a29/README.md`, `manifest.json`, `images.env`.
+All earlier uncommitted work and owner editor settings are retained. No Git commit/push.
+
+### Repeatable validation and remaining work
+
+```sh
+# Start only the existing isolated synthetic PostgreSQL service before local tests:
+docker start campground-test-db-hardened
+TEST_DATABASE_PORT=55433 sh scripts/test.sh -q --assert=plain --tb=no --show-capture=no --cov --cov-fail-under=85
+.venv/bin/ruff check apps config scripts tests manage.py gunicorn.conf.py
+.venv/bin/ruff format --check apps config scripts tests manage.py gunicorn.conf.py
+.venv/bin/bandit -r apps config scripts manage.py gunicorn.conf.py -q
+bash -n scripts/aws_preflight.sh scripts/deploy_aws_test.sh
+SSL_CERT_FILE=/etc/ssl/cert.pem .venv/bin/python scripts/check_public_test.py
+```
+
+The transcript supplies exact executed remote Django/database/state/container validation
+commands. Do **not** rerun the fresh-install script on the installed host. Re-running public
+checks makes bounded synthetic requests, including CSRF/request-size negative cases, with
+no successful login or reservation creation.
+
+Still unverified/not executed in this task: public ACME **renewal**, expiry alerts, encrypted
+backup/restore (including tenant directory), host storage encryption/AWS security-group and
+IAM review, whole-host security update review, load/capacity testing, SMTP delivery,
+manual browser/accessibility/security review, and the remaining application/release gates.
+The previous mutmut campaign was not rerun for this presentation/deployment change; no
+mutation-score improvement is claimed. Standalone pip-audit was not rerun; current Trivy
+Poetry-lock scans included development dependencies. Existing external-source credential
+publication remains recorded separately; no source credential was imported or reproduced.
+
+Recommended next steps: use synthetic data; create an operator account via the protected
+interactive onboarding procedure and enroll MFA; verify host encryption/management access,
+recovery and certificate monitoring; review campground roster/rate conflicts before opening
+inventory; complete outstanding acceptance/security gates before production or real data.
+
+Final source/documentation/release-metadata Gitleaks scan passed. The local synthetic test
+PostgreSQL container was stopped after validation, restoring its observed pre-task state;
+all volumes are retained. The AWS development deployment remains running.

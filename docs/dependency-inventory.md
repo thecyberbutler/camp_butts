@@ -152,3 +152,62 @@ allauth's settings/token-generator hooks. Django's private ContentType manager c
 is deliberately disabled; pytest-django's transaction fixture is wrapped only in tests.
 Reassess these integration points on dependency upgrades. No custom crypto primitive,
 managed tenant library/service or additional infrastructure was introduced.
+
+## Mutation testing dependency review — 2026-11-24
+
+Owner-requested mutmut is necessary for deliberate test adequacy checks. Reviewed official
+[3.8.1 metadata](https://pypi.org/project/mutmut/3.8.1/),
+[documentation](https://mutmut.readthedocs.io/en/latest/index.html) and
+[changelog](https://github.com/boxed/mutmut/blob/main/HISTORY.rst): maintained release dated
+2026-10-28 with Python 3.13 support. Poetry introduced nine development packages, with no
+runtime dependency updates. Candidate-set and final installed-environment pip-audit checks
+reported no known vulnerabilities. Package artifacts are hash-locked from verified PyPI TLS.
+Licenses were reviewed from package metadata and bundled license files, including mdit's MIT
+license and LibCST's mixed license notices; preserve notices on redistribution. Full legal
+release review remains separate.
+
+| Added package | Version | Group | License |
+|---|---|---|---|
+| mutmut | 3.8.1 | dev | BSD-3-Clause |
+| click | 8.5.1 | dev | BSD-3-Clause |
+| libcst | 1.9.0 | dev | MIT; bundled PSF/Apache notices |
+| setproctitle | 1.3.8 | dev | BSD-3-Clause |
+| textual | 8.2.8 | dev | MIT |
+| linkify-it-py | 2.2.0 | dev | MIT |
+| mdit-py-plugins | 0.7.0 | dev | MIT |
+| pyyaml-ft | 8.0.0 | dev | MIT |
+| typing-extensions | 4.16.0 | dev | PSF-2.0 |
+
+These increase the developer tool supply-chain surface, not application runtime permissions
+or packages. The wrapper constrains execution/data exposure; the running web container was
+checked to have no mutmut installation. No managed service, CDN or added container exists.
+
+Final onboarding validation also scanned the complete Poetry lock with Trivy's
+`--include-dev-deps`; zero HIGH/CRITICAL findings were reported. The final rebuilt runtime
+image and Dockerfile checks passed at those severities. These results are point-in-time;
+future advisories and remaining builder/legal/frontend release review still apply.
+
+## Docker Hub publishing tools
+
+No new Python or runtime dependencies. The host publishing helper uses existing development
+Requests, Docker CLI/Buildx and the already reviewed digest-pinned Trivy/Gitleaks containers.
+Docker Hub is an owner-authorized distribution destination, not an application runtime
+dependency. Both AMD64 and ARM64 variants are scanned independently before publication.
+Images retain their pinned bases and bundled license notices; published builds use fixed
+UID/GID 10001. BuildKit minimal provenance is included. Source hashes and remote index
+digests are recorded in release artifacts. Existing builder bootstrap/transitive license
+and production toolchain review limitations remain; scans are not a security guarantee.
+
+AWS test-host tooling: Amazon Linux 2023's signed Docker/Python packages (current repository
+release selected at installation), plus official Docker Compose **v5.8.0**, Linux x86_64,
+SHA-256 `b8840f5008c447f41fce0a57ae3adeab42c89b1eb6e6012524bcabbfb4ffbaf6`.
+Source: https://github.com/docker/compose/releases/tag/v5.8.0 (Apache-2.0).
+Compose is required to interpret the existing hardened deployment files; no Python runtime
+or frontend dependency is added. Host package versions must be recorded after installation.
+The manual Compose plugin does not auto-update; review upstream advisories and repeat digest
+verification for upgrades. This pin is not a substitute for host vulnerability management.
+
+Actual AWS packages verified after installation: `docker-25.0.18-1.amzn2023.0.4.x86_64`
+and `python3-3.9.25-1.amzn2023.0.11.x86_64`, plus Compose v5.8.0. This Python is the Amazon
+Linux host's secret-generation/verification tool; the application remains Python 3.13 in
+its pinned image. No application dependency or mandatory-stack version was replaced.

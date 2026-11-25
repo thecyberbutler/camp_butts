@@ -123,3 +123,36 @@ See [backup and restore](docs/backup-and-restore.md), [security](docs/security.m
 [incident response](docs/incident-response.md), and [dependencies](docs/dependency-inventory.md).
 On errors, check protected file ownership, explicit hosts, service health and audit events.
 Never enable DEBUG, dump settings/requests, remove constraints or bypass MFA to troubleshoot.
+
+## Georgia Mountain Fairgrounds and mutation testing
+
+The first real campground profile is `georgia-mountain-fairgrounds`; choose it through
+`/?campground=georgia-mountain-fairgrounds`. Its 216 map-derived sites are **inactive drafts**,
+not verified inventory. Online booking is closed pending roster/rate/policy reconciliation.
+See [source review and operator import](docs/georgia-mountain-fairgrounds.md).
+
+Mutmut 3.8.1 is development-only. After the protected PostgreSQL test setup:
+
+```sh
+.venv/bin/python scripts/mutation_test.py --port 55433 --timeout 900
+TEST_DATABASE_PORT=55433 sh scripts/test.sh -q --assert=plain --tb=no --show-capture=no --cov --cov-fail-under=85
+```
+
+Read [mutation isolation, reports and limitations](docs/mutation-testing.md) before expanding
+the campaign. Never apply mutants to application source or run them against production.
+Current validation and remaining release gates are in `docs/implementation-progress.md`.
+
+## Prebuilt Docker Hub images
+
+The owner-approved public repositories are `thecyberbutler/campground-web`,
+`thecyberbutler/campground-db` and `thecyberbutler/campground-proxy`, with AMD64/ARM64
+prereleases. Use [the publishing/deployment guide](docs/container-publishing.md) and the
+verified `releases/<tag>/images.env` with `compose.registry.yaml` to deploy without local
+builds. Published images use UID/GID 10001; keep secrets 0600 and owned by that deployment
+identity. All existing migration, HTTPS and release requirements remain. No stable/latest
+release or production-readiness claim is made.
+
+Public development instances can use `APP_ENVIRONMENT=development` with production settings
+to display the red **THIS IS A TEST INSTANCE** banner while retaining all security controls.
+`test` also displays it; `production` hides it; other values are rejected. See
+[the AWS test deployment procedure](docs/deployment.md#aws-public-development-instance).

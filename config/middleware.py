@@ -1,7 +1,8 @@
 from ipaddress import ip_address
 
 from django.conf import settings
-from django.http import HttpResponseBadRequest
+
+from config.errors import bad_request
 
 
 class ProxyBoundaryMiddleware:
@@ -14,7 +15,7 @@ class ProxyBoundaryMiddleware:
             try:
                 request.client_ip = str(ip_address(request.META["HTTP_X_REAL_IP"]))
             except (KeyError, ValueError):
-                return HttpResponseBadRequest("Invalid proxy request.")
+                return bad_request(request, exception=None)
         else:
             for header in (
                 "HTTP_X_FORWARDED_PROTO",
@@ -34,6 +35,18 @@ class ResponseSecurityMiddleware:
 
     def __call__(self, request):
         response = self.get_response(request)
+        # Generic complete error pages also cover direct middleware/CSRF/rate-limit
+        # responses. Keep status and headers; never wrap JSON, exports or streams.
+        if (
+            response.status_code >= 400
+            and not response.streaming
+            and response.get("Content-Type", "").split(";", 1)[0] == "text/html"
+        ):
+            from config.errors import error_content
+
+            response.content = error_content(response.status_code)
+            if response.has_header("Content-Length"):
+                response["Content-Length"] = str(len(response.content))
         response["Content-Security-Policy"] = (
             "default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; "
             "font-src 'self'; connect-src 'self'; form-action 'self'; base-uri 'none'; "

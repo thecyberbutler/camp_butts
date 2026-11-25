@@ -1,0 +1,21 @@
+# Use with compose.yaml and a generated release images.env. No local builds.
+services:
+  web:
+    build: !reset null
+    image: ${CAMPGROUND_WEB_IMAGE:?Set the verified web image digest}
+    pull_policy: missing
+  migrate:
+    build: !reset null
+    image: ${CAMPGROUND_WEB_IMAGE:?Set the verified web image digest}
+    pull_policy: missing
+  provision:
+    image: ${CAMPGROUND_WEB_IMAGE:?Set the verified web image digest}
+    pull_policy: missing
+  db:
+    build: !reset null
+    image: ${CAMPGROUND_DB_IMAGE:?Set the verified database image digest}
+    pull_policy: missing
+  proxy:
+    build: !reset null
+    image: ${CAMPGROUND_PROXY_IMAGE:?Set the verified proxy image digest}
+    pull_policy: missing

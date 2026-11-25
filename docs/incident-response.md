@@ -46,3 +46,26 @@ could cross schema or application boundaries. Shared runtime/signing/MFA/DB/host
 requires platform-wide containment and review; do not assume schema isolation contains it.
 Never restore another campground's schema under a new identity without an explicit reviewed
 migration and token/key/session revocation procedure.
+
+## Public-source credential exposure
+
+If reference material contains a credential, do not reproduce its value in tickets, logs,
+fixtures or responses. Record only its type/location and exclude the asset from imports.
+Credential rotation/removal on an external source requires that source owner's action;
+do not claim upstream remediation. The public campground PDF finding is recorded in
+`security-findings.md`; no original PDF was added to the application.
+
+## Publishing credential or image compromise
+
+Revoke compromised Docker Hub tokens, stop publication, preserve trusted build hashes and
+digest records, and review registry access/visibility. Never print tokens or export Docker
+credential-store contents. Alert affected operators with verified replacement digests;
+review any deployment that pulled a compromised artifact. Rebuild from reviewed source,
+rerun gates and rotate application secrets if runtime compromise is suspected. Deleting or
+privatizing a public image cannot recall copies already downloaded.
+
+For the AWS public development host, use the strict known-host SSH alias `camp-butts-test`.
+Disclose exact remote commands before execution as requested by the owner. Stop only project
+`camp-butts-test` to contain exposure; preserve volumes, protected secrets and evidence. Do
+not paste Docker inspect/environment/log output into incident reports. The visible test
+banner does not reduce incident severity or authorize real personal data on an unaccepted host.

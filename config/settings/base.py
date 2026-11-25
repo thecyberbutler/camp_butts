@@ -5,10 +5,12 @@ from pathlib import Path
 from cryptography.fernet import Fernet
 from django.core.exceptions import ImproperlyConfigured
 
+from config.environment import validate_environment
 from config.secrets import read_secret
 
 BASE_DIR = Path(__file__).resolve().parents[2]
 DEBUG = False
+APP_ENVIRONMENT = validate_environment(os.environ.get("APP_ENVIRONMENT", "production"))
 SECRET_KEY = read_secret("DJANGO_SECRET_KEY_FILE", 64)
 MFA_ENCRYPTION_KEY = read_secret("MFA_KEY_FILE", 44)
 SESSION_ENCRYPTION_KEY = read_secret("SESSION_KEY_FILE", 44)
@@ -72,6 +74,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "apps.configuration.context.campground",
+                "config.environment.deployment_context",
             ]
         },
     }

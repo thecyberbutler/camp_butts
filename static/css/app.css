@@ -29,3 +29,5 @@ input[type=checkbox] { width: 1.2rem; height: 1.2rem; }
 .map-maintenance { fill: #8b5305; }
 .map-unavailable { fill: #56625b; }
 .campground-map a:focus rect { stroke: #1558a6; stroke-width: 6px; }
+
+.test-instance-banner { position: sticky; top: 0; z-index: 1050; width: 100%; padding: .75rem 1rem; background: #b91c1c; color: #fff; text-align: center; font-weight: 800; letter-spacing: .04em; }

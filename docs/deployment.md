@@ -207,3 +207,59 @@ docker compose run --rm migrate tenant_command --campground pine-grove makemigra
 Global directory/operator events need an encrypted platform recovery procedure in addition
 to the tenant backups described in backup-and-restore.md. Full multi-tenant restore validation
 is still a release blocker. No production data was adopted or deployed during development.
+
+## First real campground import
+
+See `georgia-mountain-fairgrounds.md` for the register/migrate/setup/import/grant sequence.
+Import before activating the new directory entry. Apply configuration migration 0003 to
+every existing tenant and reapply runtime grants before deploying new application code.
+Tenant activation publishes the profile; imported sites and online booking remain closed.
+The application image includes only reviewed JSON under `data/campgrounds`, not original
+PDF/map assets, developer mutation artifacts, or mutmut/dev dependencies.
+
+## Deployment using prebuilt images
+
+Use `container-publishing.md` and `compose.registry.yaml` with a verified release's
+`images.env` to pull the exact web/database/proxy digests. Apply the same overlay/env files
+to every operator/job/startup command above. Published images use UID/GID 10001, including
+fresh database/static/certificate directory ownership. Existing different-UID volumes must
+not be silently reused or made broadly writable. Provision fresh correctly owned secrets
+and rehearse any ownership/data migration independently. The production readiness gates
+and controlled tenant migration/grant sequence remain unchanged.
+
+## AWS public development instance
+
+The owner requested `https://camp-butts-test.thecyberbutler.io` on `3.89.25.233`.
+Use the production Compose configuration plus registry overlay, **not** compose.dev.yaml:
+`APP_ENVIRONMENT=development` enables the red banner while production Django settings,
+Gunicorn, public-CA HTTPS and every existing runtime protection stay enabled. Do not enable
+DEBUG or use the localhost certificate/reloader on this public host.
+
+`scripts/aws_preflight.sh` performs read-only discovery. `scripts/deploy_aws_test.sh` is a
+fresh Amazon Linux 2023/x86_64 installation transcript, deliberately refusing existing
+paths/identities/volumes/network conflicts. Review the complete script and disclose exact
+SSH/SCP commands before any connection or change. It is **not** an upgrade or retry script.
+The bundle contains only Compose configuration, verified image digest references and
+operator scripts. Generate new secrets on-host, never copy workstation secret files.
+
+The project is `camp-butts-test`, installed under `/opt/camp-butts-test`. Docker commands
+require sudo; no Docker group access is granted. The non-login identity is UID/GID 10001.
+Only Traefik publishes 80/443; DB/web remain private. AWS networking must allow the intended
+HTTPS/ACME traffic and limit SSH to authorized administration. There is no cloud firewall,
+IAM, SSH authentication or storage-encryption reconfiguration in this deployment script.
+The 4-GB host is an evaluation target, not a validated production capacity recommendation.
+
+After startup run `SSL_CERT_FILE=/etc/ssl/cert.pem .venv/bin/python scripts/check_public_test.py`
+on this macOS workstation (or omit SSL_CERT_FILE when system Python already trusts its OS CA
+store). It checks validated public TLS, banner/error pages, local assets, HTTP redirect,
+headers, CSRF, request bounds, unknown hosts/SNI and private-resource rejection without
+printing cookies or bodies. Certificates are never accepted with verification disabled.
+Database boundary validation and Django deployment checks also run on-host. Automated
+renewal, encrypted restore, host hardening, monitoring, SMTP and all release gates still
+need their separately recorded validation. No default operator account is created.
+
+Deployment validation on 2026-11-24: the requested public test site is running from
+`0.1.0-alpha.20261124-935cbb3b3a29`. Initial public ACME issuance and verified HTTPS were
+exercised successfully; **renewal and expiry alerting remain unverified**. Both DB/web are
+healthy and only proxy ports 80/443 are published. See `aws-test-deployment-transcript.md`
+for the exact commands used and implementation-progress.md for the full validation record.

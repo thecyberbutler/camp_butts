@@ -30,3 +30,6 @@ DATABASES["default"]["OPTIONS"]["options"] += (  # noqa: F405
 )
 
 DATABASES["default"]["TEST"] = {"TEMPLATE": "campground_test_template"}  # noqa: F405
+
+# This label cannot be suppressed by a production-valued environment variable.
+APP_ENVIRONMENT = "test"

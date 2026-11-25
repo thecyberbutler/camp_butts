@@ -2,6 +2,7 @@ services:
   web:
     environment:
       DJANGO_SETTINGS_MODULE: config.settings.development
+      APP_ENVIRONMENT: development
     entrypoint: [python, manage.py, runserver, "0.0.0.0:8000", --nothreading]
     volumes:
       - ./apps:/app/apps:ro

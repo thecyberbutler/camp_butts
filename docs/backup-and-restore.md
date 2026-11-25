@@ -87,3 +87,26 @@ platform directory/operator-event archival and recovery are still required. Do n
 per-tenant snapshots alone provide complete platform disaster recovery. Shared application
 signing/MFA/session keys require independent escrow; an encrypted database without them is
 not a complete recovery set. These gaps block production release.
+
+## Imported profile state
+
+Tenant backups include public profile fields, source-import digest, inactive draft sites
+and the booking-closure switch. Restore their values together and verify closure/inactive
+counts before routing traffic. Do not use a repeated or changed initial import as a backup
+restore mechanism. Mutation databases and ignored `.runtime/mutation` artifacts are
+disposable synthetic test state and are excluded from application recovery. The encrypted
+restore rehearsal remains required and is not claimed completed by the import tests.
+
+## Registry image recovery
+
+Retain the verified release image digest lock with protected deployment records. Registry
+images contain code only and are not backups of campsite/account/reservation data, secrets
+or certificate state. Restore still requires the encrypted database/platform metadata and
+separately protected keys. Use compatible image digests and original ownership; do not
+replace restored data permissions with broad access to fit a prebuilt image.
+
+The public AWS development project's fresh volumes/secrets belong only to `camp-butts-test`.
+No production data or local development database is copied there. Until encrypted recovery
+is rehearsed and host storage encryption verified, use synthetic test data only. A deployment
+failure or rollback must preserve volumes and protected secret files; never use `down -v`
+as a troubleshooting shortcut. Certificate state is confidential backup material too.

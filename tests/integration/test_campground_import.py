@@ -139,7 +139,7 @@ def test_published_profile_is_escaped_and_does_not_open_inventory(profile):
     )
 
 
-def test_import_command_accepts_reviewed_file_and_is_repeatable(profile, tmp_path):
+def test_import_command_accepts_reviewed_file_and_is_repeatable(profile, tmp_path, settings):
     from io import StringIO
 
     from django.core.management import call_command
@@ -147,6 +147,8 @@ def test_import_command_accepts_reviewed_file_and_is_repeatable(profile, tmp_pat
     path = tmp_path / "profile.json"
     path.write_text(json.dumps(profile))
     output = StringIO()
+    # pytest-django configures settings directly and clears SETTINGS_MODULE.
+    settings.SETTINGS_MODULE = "config.settings.testing"
     call_command("import_campground", "--file", str(path), stdout=output)
     call_command("import_campground", "--file", str(path), stdout=output)
     assert Campsite.objects.count() == 216
@@ -154,10 +156,13 @@ def test_import_command_accepts_reviewed_file_and_is_repeatable(profile, tmp_pat
 
 
 @pytest.mark.parametrize("kind", ["invalid", "duplicate", "oversized", "symlink"])
-def test_import_command_rejects_unsafe_files_without_echoing_input(profile, tmp_path, kind):
+def test_import_command_rejects_unsafe_files_without_echoing_input(
+    profile, tmp_path, kind, settings
+):
     from django.core.management import call_command
     from django.core.management.base import CommandError
 
+    settings.SETTINGS_MODULE = "config.settings.testing"
     marker = "untrusted-input-must-not-be-echoed"
     path = tmp_path / "profile.json"
     path.write_text(marker)

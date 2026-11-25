@@ -57,3 +57,27 @@ schemas. Authentication caches are stored inside each tenant schema. Keep signin
 keys in protected files, bind encrypted sessions and email/reset tokens to the tenant, and
 retain __Host cookies. Same-origin URL paths are not independent browser security origins;
 CSP/escaping remain mandatory and arbitrary tenant scripts are not supported.
+
+## Public campground profiles and initial import
+
+The mandatory stack remains suitable; no replacement or service split is needed. A bounded
+operator-only JSON import populates public contact/rate/rules fields and inactive campsite
+drafts inside the selected schema. It never fetches source URLs. A content digest supports
+non-destructive retries; atomic audit failure rolls back the entire import.
+`booking_enabled` is enforced in reservation policy validation and availability. The
+Georgia Mountain Fairgrounds import closes it independently of tenant-directory activation.
+See `georgia-mountain-fairgrounds.md`; development-only mutation tooling is separate from
+runtime images and documented in `mutation-testing.md`.
+
+## Image distribution
+
+The three existing containers can be built for Linux AMD64/ARM64 and distributed through
+owner-approved public Docker Hub repositories. `compose.registry.yaml` replaces only local
+build/image selection, preserving the existing deployment boundaries and one-shot jobs.
+Versioned source snapshots and verified manifest digest locks identify the artifact; no
+managed runtime service or automatic updater is introduced. See `container-publishing.md`.
+
+Deployment identification is independent of runtime security. `APP_ENVIRONMENT` controls
+only a shared HTML banner; the public AWS development instance uses production settings and
+Gunicorn. Common document/error layouts cover the directory and tenant/auth pages without
+requiring tenant/database context to render generic failures. See SD-026.

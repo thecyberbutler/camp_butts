@@ -1,8 +1,9 @@
 # Security decision register
 
 All entries dated 2026-11-24; review before production and by 2026-12-24.
-No project-owner security exception has been requested, granted or inferred.
-These decisions implement the supplied security requirements; they do not waive them.
+SD-001 through SD-024 introduced no project-owner security exception. SD-025 records the
+explicit owner approval for public image/source visibility only. All other security
+requirements and release gates remain mandatory.
 
 | ID | Decision and justification | Alternatives / security impact | Residual risk | Approval status / rollback |
 |---|---|---|---|---|
@@ -52,3 +53,101 @@ All changes preserve required TLS, MFA, CSRF, CSP, hashing, cookie/session ceili
 rate limits, audit append-only permissions, container and database network boundaries.
 No security exception or pending security approval exists. The owner-selected shared
 trust roots and same-origin limitations are recorded in docs/saas-architecture.md.
+
+## Campground onboarding and mutation testing — 2026-11-24
+
+| ID | Decision | Security rationale and residual risk | Approval / rollback |
+|---|---|---|---|
+| SD-023 | Offline, bounded, strict-schema initial campground import under migration identity; matching inactive tenant and empty data store; atomic audit and digest-based no-op retry | No URL fetching/SSRF, credentials, HTML trust, account creation, privilege grants or overwrite path. Only HTTPS links without URL credentials. Drafts inactive and booking switch closed; source discrepancies remain operator review items | Owner explicitly authorized inactive map drafts. No security exception. To withdraw publication, deactivate tenant routing; preserve audit/data rather than deleting history |
+| SD-024 | Exact development-only mutmut 3.8.1; disposable allowlisted copies and random synthetic PostgreSQL DBs, minimal environment, private artifacts, one worker and bounded process lifetime | No mutants applied to application source, no production data/DB, no inherited pre-fork DB state. Raw test output discarded; error/no-test/timeout outcomes fail review. Local tests retain access to existing local validation tools, so this is controlled test execution, not an OS sandbox for hostile code | Owner requested mutation testing. No runtime dependency or weaker control. Remove dev tool/config if withdrawn; retain useful regression tests and reviewed findings |
+
+Bandit B404/B603 at the wrapper's subprocess import/invocation were individually reviewed:
+the executable is the repository's local mutmut binary; arguments are a fixed command,
+one worker and a restrictive reservation-service selector. There is no shell or arbitrary
+command input. Environment/cwd are constructed, streams discarded, and process group bounded.
+The two specific annotations retain all other Bandit checks; no exploitable injection finding
+or broad rule is suppressed. Re-review if executable/argument/environment handling changes.
+
+No weakened security alternative was implemented. No pending security approval exists.
+Shared runtime/host trust roots from SD-017 remain unchanged. The booking switch is additional
+business protection; it does not replace authorization or PostgreSQL occupancy constraints.
+
+## Docker Hub distribution — 2026-11-24
+
+### SD-025: explicit public-image visibility approval
+
+The owner requested build/tag/publication to Docker Hub and selected namespace
+`thecyberbutler`. Private repositories were recommended. Docker Hub allowed the first
+private repository but rejected the next due to the account's private-repository quota.
+A single private repository with component tags was offered as the security-preserving
+alternative. The owner explicitly answered: **“Three public repositories — approve source
+visibility”** on 2026-11-24. This is a specific visibility approval, not a waiver of release
+security gates or permission to publish credentials, camper data, or production state.
+
+- Change/reason: distribute the three application/database/proxy images publicly to simplify
+  pulls without on-host builds and avoid the private-repository quota.
+- Protection affected: confidentiality/access restrictions on packaged application source,
+  dependency versions and build metadata. Runtime authorization and data access are unchanged.
+- Risk/impact: anyone can download, retain and inspect those distributable contents;
+  dependency/source details can support attacker reconnaissance. Public copies cannot be recalled.
+- Safer alternatives: one private repository with distinct component tags, a plan supporting
+  three private repositories, or continued local builds. One private repository was recommended.
+- Mitigations: reviewed allowlisted snapshot, no secret build arguments, no data volumes,
+  per-architecture secret/vulnerability scans, local PostgreSQL/security tests, least-privileged
+  runtime, non-latest prerelease tags, minimal provenance, digest-locked deployment references,
+  credential-helper authentication with token material kept out of output/files/arguments.
+- Scope/duration: permanent visibility choice for `thecyberbutler/campground-web`,
+  `thecyberbutler/campground-db`, and `thecyberbutler/campground-proxy`; review by 2026-12-24.
+  No other repository visibility, public application deployment, or stable release is approved.
+- Rollback: stop further pushes, restrict/remove affected registry artifacts through a controlled
+  operator action and retain reviewed deployment digests. Already downloaded public copies
+  cannot be recalled. Rotate credentials if a leak is ever discovered; image deletion is not remediation.
+- Status: **explicitly approved by project owner**, implementing their selected public option.
+  Earlier “no exception” statements describe the earlier milestones and do not override this record.
+
+The local publisher uses fixed subprocess argument arrays with no shell and withheld raw
+output (narrow Bandit B404/B603 review). Its B108 annotation refers to a container-private
+bounded noexec/nosuid tmpfs, not a predictable shared-host temporary file. Scanner containers
+have read-only mounts/root filesystems, no capabilities, no Docker socket and no app secrets.
+Only the host operator invokes Docker. No additional Python/runtime dependency is introduced.
+
+## Public development instance and environment banner — 2026-11-24
+
+### SD-026: presentation label independent of security mode
+
+The owner requested a red `THIS IS A TEST INSTANCE` banner and deployment to their
+AWS host `3.89.25.233`, using `camp-butts-test.thecyberbutler.io` and SSH alias
+`camp-butts-test`. This authorizes this public development instance; SD-025 alone did not.
+`APP_ENVIRONMENT` accepts only production/development/test. Development/test show the
+banner on complete application HTML documents, including authentication and generic errors.
+It cannot be changed by request input. HTMX fragments retain the document's existing banner;
+JSON/downloads/redirects and proxy-generated transport errors are not HTML application pages.
+Development/testing settings force their corresponding label. Invalid configuration fails.
+
+The public development deployment uses **production Django settings and Gunicorn**, with
+only the presentation label set to development. DEBUG remains false; HTTPS, secure cookies,
+CSRF, MFA, rate limits, CSP, tenant RLS, separate migration/runtime roles, and container/network
+boundaries are retained. No development reload server or source mount is exposed. Generic
+error rendering avoids tenant/session/database context and does not echo internal diagnostics.
+
+SSH uses the existing known-host entry with strict checking, batch mode, no agent/port
+forwarding and no connection multiplexing. The preflight was shown before connecting; it
+identified Amazon Linux 2023/x86_64, available sudo, no existing deployment or Docker, and
+about 4 GB RAM. The host key was matched to the locally trusted entry, not independently
+verified against the AWS console. Every remote command/script is disclosed before execution.
+
+The fresh-host script uses Amazon's signed package repositories for Docker and a pinned
+Docker Compose v5.8.0 official binary verified against its GitHub release SHA-256. No Docker
+group membership is added. Dedicated UID/GID 10001, root-controlled deployment configuration,
+0700 secret storage and 0600 fresh secret files preserve published-image boundaries. Existing
+paths/identities/resources/subnet conflicts cause refusal. No local secrets, accounts or
+production data are transferred. Import keeps all map drafts inactive and booking closed.
+Raw provisioning output is withheld; credentials never enter command arguments or transcripts.
+
+No weaker security alternative or new exception is approved/implemented. Residual risks:
+public prerelease attack surface, shared host/runtime trust, unverified AWS storage encryption
+and security-group configuration, finite test capacity, and outstanding production release
+gates. Only synthetic test data may be used pending host/recovery/security acceptance.
+Rollback stops this Compose project without deleting volumes/secrets; preserve evidence and
+use compatible reviewed image digests. Do not restore stale sessions or remove constraints.
+Deployment status and actual validation results are recorded in implementation-progress.md.

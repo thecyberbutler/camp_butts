@@ -9,6 +9,8 @@ from django.http import (
 )
 from django.template.loader import get_template
 
+from config.environment import deployment_context
+
 from .context import directory, lookup, tenant_scope
 
 
@@ -37,7 +39,9 @@ class TenantMiddleware:
                     return HttpResponseNotFound("Campground not found.")
                 return HttpResponseRedirect(f"/c/{tenant.slug}/")
             return HttpResponse(
-                get_template("tenancy/directory.html").render({"campgrounds": directory()})
+                get_template("tenancy/directory.html").render(
+                    {"campgrounds": directory(), **deployment_context(request)}
+                )
             )
         match = re.match(r"^/c/([a-z0-9]+(?:-[a-z0-9]+)*)/", request.path_info)
         if not match or len(match[1]) > 63:

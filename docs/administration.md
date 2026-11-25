@@ -94,3 +94,18 @@ or modify platform operator events. Only the protected host provisioning workflo
 the directory. See deployment.md for registration/adoption and deactivation. Directory names
 are public; tenant staff branding remains plain escaped text. A directory rename is currently
 an operator-only maintenance task, not a staff UI feature.
+
+## Georgia Mountain Fairgrounds initial inventory
+
+Follow `georgia-mountain-fairgrounds.md` for source review and the protected import sequence.
+The 216 inactive map drafts need authoritative per-site verification; numeric defaults do
+not describe actual capacity or hookups. Staff may review/edit drafts under existing MFA,
+reauthentication, authorization and audit controls. Opening campground booking is not
+exposed in the policy form. Confirm rates, seasonal/monthly policies and all release gates
+before implementing a controlled opening workflow. Do not populate credentials from the
+public rules PDF. Identical import retries preserve edits; changed imports cannot overwrite.
+
+The AWS development installation creates no default staff/admin account. Its Georgia Mountain
+Fairgrounds profile retains inactive draft inventory and closed booking. Follow the protected
+operator onboarding procedure for a deliberately created test account; do not put passwords,
+MFA seeds or recovery codes into SSH arguments/transcripts. The test banner is not authorization.

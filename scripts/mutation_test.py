@@ -9,6 +9,7 @@ import secrets
 import shutil
 import signal
 import stat
+
 # Reviewed fixed executable, argv and no shell; see SD-024.
 import subprocess  # nosec B404
 import tempfile

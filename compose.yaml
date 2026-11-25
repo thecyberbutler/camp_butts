@@ -19,6 +19,7 @@ x-app: &app
   environment: &environment
     DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS:?Set explicit allowed hosts}
     APP_TIME_ZONE: ${APP_TIME_ZONE:-America/New_York}
+    APP_ENVIRONMENT: ${APP_ENVIRONMENT:-production}
     DJANGO_SECRET_KEY_FILE: /run/secrets/django_key
     MFA_KEY_FILE: /run/secrets/mfa_key
     SESSION_KEY_FILE: /run/secrets/session_key

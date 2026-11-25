@@ -27,3 +27,18 @@ synthetic cross-tenant reproduction without real account IDs, tokens or camper r
 Schema/RLS isolation does not contain a compromised shared process, signing/encryption key,
 database administrator or host. Review all campgrounds after compromise of those trust roots.
 See docs/saas-architecture.md and the updated threat model; production release remains blocked.
+
+Public campground imports and mutation tests preserve the existing security requirements.
+Imported drafts remain inactive with server-side booking closed; source credentials are
+excluded. Mutation tools run only against disposable source copies and synthetic PostgreSQL
+data, and are absent from the runtime image. See SD-023/024, `docs/security-findings.md` and
+`docs/mutation-testing.md`. No additional security exception has been approved or inferred.
+
+Docker Hub public distribution of the three campground images was explicitly approved by
+the owner on 2026-11-24, including packaged source/dependency visibility (SD-025). This
+specific approval does not permit secrets/data publication, weaker runtime controls or
+bypassed production release gates. Published artifacts remain evaluation prereleases.
+
+The owner-requested AWS development instance is governed by SD-026. Its test banner is
+presentation only: public test operation retains production security controls and is not
+production approval. Use synthetic data until host and recovery acceptance is complete.

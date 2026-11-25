@@ -3320,3 +3320,41 @@ At the conclusion of each development session, provide:
 The final product must be a secure, reliable, maintainable, fully self-hosted campground reservation system suitable for real-world use by approximately 100 campers per campground, with verified tenant isolation and measured aggregate capacity.
 
 Security is not an optional feature. Security is a mandatory requirement of every feature.
+
+
+## Owner-requested first campground and mutation testing — 2026-11-24
+
+Provision Georgia Mountain Fairgrounds from its official overview, map, rates and rules.
+The owner explicitly selected inactive map drafts despite conflicting published counts.
+Treat all imported identifiers as unverified, retain source provenance, display rates as
+references only, and close server-side online booking until authoritative roster/policy
+review. Do not import source credentials or embed original remote assets.
+
+Use development-only mutmut to identify test gaps in addition to the mandatory PostgreSQL,
+security and concurrency suites. Run in disposable source copies and synthetic databases;
+never weaken actual application controls, apply mutants, suppress surviving findings or
+treat errors/timeouts as passes. These additions do not waive any existing security or
+release requirement. Details: docs/georgia-mountain-fairgrounds.md and docs/mutation-testing.md.
+
+
+## Owner-requested Docker Hub distribution — 2026-11-24
+
+Build, tag and publish application/database/proxy images under the Docker Hub namespace
+`thecyberbutler` for simplified self-hosted deployments. The owner explicitly approved
+three public repositories and disclosure of packaged application source/dependency metadata
+after a private-repository quota prevented three private repositories. See SD-025 for the
+exact approval, risks, alternatives and rollback limitations. This authorizes image
+distribution only; camper data, runtime credentials and database/TLS volumes must never be
+published. Runtime infrastructure remains self-hosted. Use verified digest locks, preserve
+container/database/authentication controls, and retain every production release gate.
+
+### Owner-requested deployment identification — 2026-11-24
+
+Every complete application HTML page in development/test must display a prominent red
+banner reading exactly `THIS IS A TEST INSTANCE`, including authentication and application
+error pages. Production hides it. The label must be server-controlled and must never
+implicitly relax security. Public development deployments retain production Django settings,
+Gunicorn and verified public HTTPS; the development label is presentation only. HTMX partials
+reuse the existing document banner. Non-HTML responses and proxy transport failures are
+outside this document-rendering requirement. The owner authorized a test deployment at
+camp-butts-test.thecyberbutler.io and requires exact remote transcripts before execution.
