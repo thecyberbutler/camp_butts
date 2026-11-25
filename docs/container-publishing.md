@@ -64,7 +64,7 @@ service on loopback (default 55433). No Docker socket is mounted in scanner/app 
 ```
 
 The command prints the private candidate directory under ignored `.runtime/releases`.
-It creates a fixed allowlisted snapshot without `.git`, `.env`, `.secrets`, `.vscode`, database
+It creates a fixed allowlisted snapshot without `.git`, `.env`, `.secrets`, local editor configuration, database
 volumes or mutation artifacts. Source files have ordinary read modes **inside a 0700 parent
 workspace**, preserving non-root image readability without making the host workspace public.
 It executes Ruff, Bandit and the real PostgreSQL suite/85% coverage gate, Gitleaks source

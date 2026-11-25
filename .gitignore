@@ -18,3 +18,4 @@ backups/
 .DS_Store
 mutants/
 .mutmut-cache
+.vscode/

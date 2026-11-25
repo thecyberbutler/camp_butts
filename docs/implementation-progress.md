@@ -134,7 +134,7 @@ listed above were actually run; no skipped gate is described as passed.
 - `tests/security/test_accounts.py`
 - `tests/security/test_mutation_authorization.py`
 
-The owner-created `.vscode/` directory was left untouched. The isolated HTTPS validation
+The owner-created local editor settings directory was left untouched. The isolated HTTPS validation
 stack and superseded test database are stopped; their volumes remain intact. The hardened
 test database remains available on loopback port 55433 for the documented test commands.
 
@@ -178,7 +178,7 @@ Modified/added by the proxy task: `.dockerignore`, `AGENTS.md`, `PROJECT_SPEC.md
 `tests/security/{test_static_and_tls.py,test_proxy_startup.py}`, `README.md`, `SECURITY.md`,
 `docs/{architecture,security,threat-model,security-decisions,implementation-progress,deployment,
 dependency-inventory,security-findings,backup-and-restore,incident-response}.md`.
-Removed: `Caddyfile`, `Caddyfile.dev`. Earlier application changes and owner `.vscode/` files remain intact.
+Removed: `Caddyfile`, `Caddyfile.dev`. Earlier application changes and owner local editor settings remain intact.
 
 Final proxy-task checks: source/lock/Dockerfile HIGH/CRITICAL scan and Gitleaks source scan
 passed; production and development Compose configurations and migration consistency
@@ -324,7 +324,7 @@ Next steps:
   `docs/administration.md`, `docs/backup-and-restore.md`, `docs/incident-response.md`,
   `docs/dependency-inventory.md`, `docs/implementation-progress.md`.
 
-Earlier application and Traefik changes remain intact. Owner `.vscode/` files were not edited.
+Earlier application and Traefik changes remain intact. Owner local editor settings were not edited.
 No public deployment, production-data migration, Git commit or push was performed.
 
 ### Repeatable validation and unexecuted release checks
@@ -611,7 +611,7 @@ Updated in this task: `README.md`, `PROJECT_SPEC.md`, `SECURITY.md`,
 `docs/architecture.md`, `docs/deployment.md`, `docs/security.md`, `docs/threat-model.md`,
 `docs/security-decisions.md`, `docs/security-findings.md`, `docs/dependency-inventory.md`,
 `docs/backup-and-restore.md`, `docs/incident-response.md`, `docs/implementation-progress.md`.
-Earlier uncommitted work and owner `.vscode/` were preserved. No Git commit/push was made.
+Earlier uncommitted work and owner editor settings were preserved. No Git commit/push was made.
 
 No database migration, Python/runtime dependency, base-image change or new application
 service was introduced. Host tooling reuses existing Docker/Buildx, Requests, Trivy/Gitleaks
@@ -663,7 +663,7 @@ are prepared. New banner-enabled images are being built/scanned; deployment is n
 
 Security decisions: SD-026. No new pending security approval, dependency or database migration.
 Only this explicitly requested public development deployment is authorized; production gates
-remain outstanding. Existing work and owner .vscode files are preserved.
+remain outstanding. Existing work and owner editor settings are preserved.
 
 Final banner release `0.1.0-alpha.20261124-935cbb3b3a29` is published in all three approved
 public repositories; remote digests match scanned indexes. Build and pre-publish runs each
@@ -774,7 +774,7 @@ all volumes are retained. The AWS development deployment remains running.
 ## Current task: Google sign-in — 2026-11-24
 
 Read AGENTS.md, the complete specification, architecture/security/threat/decision/progress
-records before modification. Initial tree clean except owner .vscode files. Owner requested
+records before modification. Initial tree clean except owner editor settings. Owner requested
 Google OAuth, supplied an External test client, installed its protected server-side file,
 and explicitly approved restricted Google-only egress (SD-027). No credentials read/printed.
 
@@ -910,7 +910,7 @@ the approved external identity/limited egress risk; no further security approval
 No custom database migration was added; allauth socialaccount migrations 0001–0006 were
 applied to the sole deployed campground. Runtime dependencies: OAuthlib/PyJWT and existing
 Requests transitives via the socialaccount extra; optional infrastructure: Squid. The
-mandatory stack remains in place. Owner `.vscode` files were left untouched. No Git commit/push.
+mandatory stack remains in place. Owner editor settings were left untouched. No Git commit/push.
 
 ### Repeat validation and outstanding checks
 
@@ -944,3 +944,12 @@ Recommended next steps: complete owner Google acceptance and normal account appr
 then finish encrypted recovery and operational review before real camper data or production.
 The application remains a development prerelease. Local synthetic PostgreSQL was stopped
 after validation with all volumes retained; the AWS test deployment remains running.
+
+## Repository hygiene — 2026-11-25
+
+Added an ignore rule for the owner’s local editor settings and removed references to its
+specific directory from tracked documentation. The directory had no tracked files; existing
+local settings were preserved. Git index/ignore checks and whitespace validation passed.
+No runtime, dependency, database, security-control or deployment change. No vulnerability
+or security exception introduced; no approval pending. This maintenance change is kept in
+a focused commit, separate from the requested workflow instruction and visual redesign.
