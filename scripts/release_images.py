@@ -7,13 +7,19 @@ import os
 import re
 import shutil
 import subprocess  # nosec B404
+import sys
 import tempfile
 from pathlib import Path
 
 import requests
 
 ROOT = Path(__file__).resolve().parents[1]
-COMPONENTS = {"web": "Dockerfile", "db": "Dockerfile.db", "proxy": "Dockerfile.proxy"}
+COMPONENTS = {
+    "web": "Dockerfile",
+    "db": "Dockerfile.db",
+    "proxy": "Dockerfile.proxy",
+    "egress": "Dockerfile.google-egress",
+}
 PLATFORMS = ("linux/amd64", "linux/arm64")
 TRIVY = "aquasec/trivy@sha256:8f6bb947dbc528902e11f2f5be52f7b519f6a39d5d148f41166f2040499768fb"
 GITLEAKS = (
@@ -37,14 +43,23 @@ SOURCES = (
     "Dockerfile",
     "Dockerfile.db",
     "Dockerfile.proxy",
+    "Dockerfile.google-egress",
     "compose.yaml",
     "compose.registry.yaml",
+    "compose.google.yaml",
 )
 DIGEST = re.compile(r"sha256:[0-9a-f]{64}")
 
 
 class ReleaseError(Exception):
     """Messages must never contain raw subprocess, HTTP or credential diagnostics."""
+
+
+def image_reference(namespace, component, tag):
+    # Reuse the existing approved public proxy repository; never create a fourth repo.
+    repository = "proxy" if component == "egress" else component
+    prefix = "google-egress-" if component == "egress" else ""
+    return f"docker.io/{namespace}/campground-{repository}:{prefix}{tag}"
 
 
 def run(argv, *, cwd=None, env=None, input_data=None):
@@ -211,9 +226,11 @@ def smoke_images(manifest):
             elif component == "db":
                 check += ' && test "$(stat -c %u /var/lib/postgresql/data)" = 10001'
                 check += " && test ! -e /usr/local/bin/gosu && postgres --version >/dev/null"
-            else:
+            elif component == "proxy":
                 check += " && test -r /etc/traefik/entrypoint.sh"
                 check += ' && test "$(stat -c %u /data)" = 10001'
+            else:
+                check += " && test -r /etc/squid/squid.conf && /usr/sbin/squid -k parse"
             # Fixed shell expression only; no source/CLI values are interpolated into it.
             run([*base, "--entrypoint", "/bin/sh", image["tag"], "-c", check])
             if component == "web":
@@ -237,6 +254,15 @@ def smoke_images(manifest):
                     pass
                 else:
                     raise ReleaseError("Missing-secret startup unexpectedly succeeded.")
+    from scripts.check_google_egress import ReleaseError as EgressError
+    from scripts.check_google_egress import check
+
+    try:
+        check(manifest["images"]["egress"]["tag"])
+    except EgressError:
+        raise ReleaseError(
+            "Google egress boundary validation failed; diagnostics withheld."
+        ) from None
 
 
 def validate_names(namespace, version):
@@ -342,7 +368,7 @@ def build(namespace, version):
     scan_source(source)
     verify_source(workspace)
     for component, dockerfile in COMPONENTS.items():
-        reference = f"docker.io/{namespace}/campground-{component}:{tag}"
+        reference = image_reference(namespace, component, tag)
         print(f"Building {reference} for AMD64 and ARM64", flush=True)
         run(
             [
@@ -436,9 +462,9 @@ def validate_manifest(manifest):
     if manifest["tag"] != tag or manifest["platforms"] != list(PLATFORMS):
         raise ReleaseError("Unexpected tag or platforms.")
     if set(manifest["images"]) != set(COMPONENTS):
-        raise ReleaseError("A complete three-image release is required.")
+        raise ReleaseError("A complete release including the Google egress image is required.")
     for component, image in manifest["images"].items():
-        expected = f"docker.io/{manifest['namespace']}/campground-{component}:{tag}"
+        expected = image_reference(manifest["namespace"], component, tag)
         if image["tag"] != expected or not DIGEST.fullmatch(image["digest"]):
             raise ReleaseError("Invalid image identity.")
 
@@ -461,7 +487,7 @@ def publish(path, *, public_approved=False):
     token = hub_login()
     namespace = manifest["namespace"]
     for component in COMPONENTS:
-        name = f"campground-{component}"
+        name = "campground-proxy" if component == "egress" else f"campground-{component}"
         endpoint = f"/v2/namespaces/{namespace}/repositories/{name}"
         repository = hub_request("GET", endpoint, token=token, missing=True)
         if repository is None:
@@ -481,9 +507,8 @@ def publish(path, *, public_approved=False):
             raise ReleaseError(
                 "Repository visibility does not match the approved publication mode."
             )
-        existing = hub_request(
-            "GET", endpoint + f"/tags/{manifest['tag']}", token=token, missing=True
-        )
+        image_tag = manifest["images"][component]["tag"].rsplit(":", 1)[1]
+        existing = hub_request("GET", endpoint + f"/tags/{image_tag}", token=token, missing=True)
         if (
             existing is not None
             and existing.get("digest") != manifest["images"][component]["digest"]
@@ -527,6 +552,7 @@ def main():
 
 
 if __name__ == "__main__":
+    sys.path.insert(0, str(ROOT))
     try:
         main()
     except ReleaseError as error:

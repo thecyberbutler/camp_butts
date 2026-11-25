@@ -8,7 +8,7 @@ package-mode = false
 [tool.poetry.dependencies]
 python = ">=3.13,<3.14"
 django = ">=5.2.19,<5.3"
-django-allauth = {version = ">=65.22.1,<66", extras = ["mfa"]}
+django-allauth = {version = ">=65.22.1,<66", extras = ["mfa", "socialaccount"]}
 django-axes = ">=9,<10"
 psycopg = {version = ">=3.2,<4", extras = ["binary"]}
 argon2-cffi = ">=25.1,<26"

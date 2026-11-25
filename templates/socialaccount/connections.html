@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Google sign-in</h1>
+<p>Changes require a password sign-in within the last five minutes. Privileged accounts also require application MFA. Sign in again after changing a connection.</p>
+<p><a href="{% url 'account_reauthenticate' %}">Confirm your password</a></p>
+{% if form.accounts %}
+<form method="post" action="{% url 'socialaccount_connections' %}">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button class="btn btn-outline-danger" type="submit">Disconnect selected account</button>
+</form>
+{% else %}<p>No Google account is connected.</p>{% endif %}
+<p>To connect, choose the Google account with the same email address as your campground account. This does not change campground approval, permissions or email-verification status.</p>
+{% include 'socialaccount/snippets/provider_list.html' with process='connect' %}
+{% endblock %}

@@ -120,3 +120,22 @@ Public test identification (SD-026) uses a server-validated environment label an
 HTML banner/error layout. It does not change DEBUG, TLS, cookies, CSRF, MFA or authorization.
 The AWS test deployment uses fresh host-only secrets and digest-locked non-root images;
 no workstation credentials or real camper data are transferred.
+
+## Google identity exception
+
+SD-027 records the owner's explicit restricted-egress approval. OAuth state is random,
+encrypted in the tenant-bound session, expires after five minutes, and is consumed under
+a PostgreSQL session-row lock. PKCE S256, a separate nonce and required signed RS256 OIDC
+claims protect the callback. Issuer, client audience/authorized party, time, subject and
+verified-email assertions are checked. Login does not implicitly link by email or bypass
+Axes, approval, activity checks or enrolled/required application MFA. Connect/disconnect
+requires recent local password assurance and framework reauthentication; changes revoke
+existing sessions. No Google access/refresh/ID tokens are persisted.
+
+The optional egress proxy admits only the fixed web IP and the two reviewed Google hosts
+on port 443, rejects private/metadata targets, and cannot reach the database network.
+Transport verifies TLS end to end, forbids redirects and bounds response sizes/timeouts.
+CONNECT permits any HTTPS path on the approved hosts at the network layer; application
+transport further limits methods and paths. A compromised web process could abuse approved
+Google destinations. Google identity/availability, shared-host compromise and provider
+credential compromise remain risks. No other egress or CSP exception is authorized.

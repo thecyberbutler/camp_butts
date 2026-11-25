@@ -10,8 +10,9 @@ allauth password/TOTP authentication, encrypted sessions/MFA storage, camper sea
 transactional reservations and maintenance blocks, modification/cancellation, local
 notifications, controlled SVG availability map, staff operations/calendar and limited CSV
 exports, camper deactivation/reactivation, campsite classification management and an
-audited read-only audit viewer. PostgreSQL exclusion constraints are authoritative for occupancy. No payments,
-external authentication, CDN assets or managed services.
+audited read-only audit viewer. PostgreSQL exclusion constraints are authoritative for occupancy. Optional [Google sign-in](docs/google-oauth.md) uses the owner-approved restricted egress
+exception; local authentication remains available. No payments, CDN assets or managed
+database services.
 
 ## Multiple campgrounds
 
@@ -107,7 +108,7 @@ docker compose run --rm migrate tenant_command --campground pine-grove makemigra
 
 `scripts/security-check.sh` adds Gitleaks and Trivy when those tools are installed.
 Scan tracked source and complete Git history before release. Git is now initialized and
-the current history scan passed. Scan all three deployment images, including OS packages.
+the current history scan passed. Scan all deployment images, including OS packages and the optional Google egress image.
 The current application/database and replacement Traefik image HIGH/CRITICAL gates passed.
 Historical Caddy findings are retained with their removal disposition.
 See [security findings](docs/security-findings.md).
@@ -156,3 +157,8 @@ Public development instances can use `APP_ENVIRONMENT=development` with producti
 to display the red **THIS IS A TEST INSTANCE** banner while retaining all security controls.
 `test` also displays it; `production` hides it; other values are rejected. See
 [the AWS test deployment procedure](docs/deployment.md#aws-public-development-instance).
+
+Google sign-in is deployed on the AWS test instance in prerelease
+`0.1.0-alpha.20261125-3386d5caf5b3`. Automated public/runtime checks passed; real human
+Google consent and approved-user login remain pending. See [Google setup](docs/google-oauth.md)
+and the [executed upgrade transcript](docs/aws-google-deployment-transcript.md).

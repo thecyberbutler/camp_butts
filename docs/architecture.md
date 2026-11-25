@@ -81,3 +81,19 @@ Deployment identification is independent of runtime security. `APP_ENVIRONMENT` 
 only a shared HTML banner; the public AWS development instance uses production settings and
 Gunicorn. Common document/error layouts cover the directory and tenant/auth pages without
 requiring tenant/database context to render generic failures. See SD-026.
+
+## Optional Google authentication (SD-027)
+
+The monolith and existing authentication stack are retained. `apps/google_auth` integrates
+allauth's Google authorization-code flow with PKCE, OIDC nonce/signature checks and tenant-
+bound single-use session state. Google is an explicitly approved external identity dependency.
+A private non-root Squid forward proxy permits HTTPS CONNECT only to Google's token and
+signing-key hosts; it is infrastructure, not a new application microservice. The web remains
+on internal networks; only this optional proxy joins its own outbound network. No DB network,
+public ports, Docker socket or application secrets are attached to the proxy.
+
+Every tenant receives allauth socialaccount migrations 0001–0006 and forced RLS. Runtime
+cannot access SocialApp credential tables or insert/update SocialToken rows. SELECT/DELETE
+on SocialToken are necessary for Django's account-unlink cascade; token storage is disabled
+and pending signup drops token objects. Protected per-tenant file configuration is the sole
+client-credential source. See [Google operations](google-oauth.md) for deployment/recovery.

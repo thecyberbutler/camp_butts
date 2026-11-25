@@ -770,3 +770,177 @@ inventory; complete outstanding acceptance/security gates before production or r
 Final source/documentation/release-metadata Gitleaks scan passed. The local synthetic test
 PostgreSQL container was stopped after validation, restoring its observed pre-task state;
 all volumes are retained. The AWS development deployment remains running.
+
+## Current task: Google sign-in — 2026-11-24
+
+Read AGENTS.md, the complete specification, architecture/security/threat/decision/progress
+records before modification. Initial tree clean except owner .vscode files. Owner requested
+Google OAuth, supplied an External test client, installed its protected server-side file,
+and explicitly approved restricted Google-only egress (SD-027). No credentials read/printed.
+
+Implementing optional per-campground allauth Google code flow, PKCE/nonce/signed-token checks,
+no email auto-linking/token storage, protected connection management and approval-preserving
+signup. Local-only operation remains the default without a protected credential file. The
+web stays internal; optional non-root Squid sidecar supplies the approved two-host TLS tunnel.
+No CSP/TLS/MFA or existing auth control is relaxed. Tests, scanner gates, deployment transcript
+and in-place test upgrade are pending. Initial 40 existing banner tests passed; installed
+pip-audit found no known vulnerabilities after allauth socialaccount extras were enabled.
+
+### Google implementation and local validation — 2026-11-25
+
+Implemented optional per-tenant Google code flow, protected credential parser, strict OIDC
+verification, PKCE/nonce, concurrent single-use callback state, approval-preserving signup,
+explicit password/MFA-protected linking/unlinking and session revocation. No provider tokens
+are stored; runtime cannot read SocialApp credentials or create/update SocialToken rows.
+Django's unlink cascade needs SELECT/DELETE on SocialToken, retained under forced tenant RLS.
+Added optional hardened Squid overlay, both-architecture release gates, real proxy boundary
+checks, encrypted pre-upgrade snapshot helper and fail-closed first-enable AWS upgrade.
+
+235 tests passed, 92.53% application/config coverage, including new OAuth callback concurrency,
+unlink assurance and encrypted snapshot tests. The isolated release gate also passed all 235
+tests with its restrictive umask after correcting a negative test's directory-mode setup.
+Ruff/format/Bandit and shell syntax checks passed. Initial installed pip-audit and real proxy
+allow/deny checks passed. Final release scans/publication and remote deployment remain pending.
+Vendor allauth socialaccount migrations 0001–0006 are required per tenant; no custom model
+migration is introduced. OAuthlib 4.0.1/PyJWT 2.15.1 and existing Requests transitives enter
+runtime via allauth's socialaccount extra; Squid is a scoped approved infrastructure addition.
+No new pending security exception. Google provider dependence and permitted-host egress abuse
+remain approved residual risks; live consent/token exchange, encrypted restore, off-host
+recovery and existing production release gates remain unverified.
+
+### Published and deployed result
+
+Published and deployed `0.1.0-alpha.20261125-3386d5caf5b3` to the existing AWS test instance.
+Release metadata is in `releases/0.1.0-alpha.20261125-3386d5caf5b3/`; remote manifest digests
+were verified before deployment. AMD64 database/Traefik filesystem layers are identical to
+the previous release. No application database reset, production data import, default account,
+automatic approval or privilege promotion was performed. No secret values were printed or
+transferred in the bundle. The owner-supplied Google credential file remains protected.
+
+The exact SSH/SCP scripts, file contents and one additional disclosed read-only status check
+are recorded in `aws-google-deployment-transcript.md`. Before migration, web writes stopped
+and a bounded full-database dump was streamed directly to Fernet encryption. Authenticated
+decryption was verified; no plaintext dump file was written. This does not prove PostgreSQL
+restore or complete disaster recovery. The key and ciphertext are separately protected on
+the same host; off-host escrow/complete recovery remain pending.
+
+Completed remote validation:
+- All four services running; web, DB and Google egress report healthy.
+- Django deployment checks pass with DEBUG false, development banner and secure cookies.
+- Actual runtime DB role denies schema/admin/audit mutation, SocialApp credential reads and
+  token INSERT/UPDATE; forced RLS protects new social-account tables.
+- Synthetic SocialAccount create/delete succeeds under the real runtime role and is rolled
+  back; no test user/link is retained.
+- Google signing-key HTTPS succeeds through the restricted proxy with TLS verification.
+- Actual non-root/read-only/capability/no-new-privileges, private networks, secret-mount
+  scope and sole public Traefik port boundaries pass.
+- Public HTTPS/banner/static/security headers, CSRF, host/SNI and body limits pass.
+- Public Google button, CSRF-protected start, fixed tenant callback/client/scope, PKCE/nonce,
+  invalid state rejection and disabled browser-token endpoint pass.
+
+The owner was asked to complete a real Google test login. Until that outcome is recorded,
+human consent, real authorization-code exchange and successful approved-user sign-in remain
+**unverified**. Google remains External/Testing with the owner-configured test audience.
+Campground approval and explicit local-account linking requirements remain in effect.
+
+No new unresolved applicable HIGH/CRITICAL dependency/image finding was reported by the scans.
+Draft cascade-permission, mapped-address ACL and test-fixture defects were corrected before
+deployment; these are not claims of remediating a previously deployed exploit. The existing
+upstream-published network credential finding remains unresolved externally. SD-027 records
+the approved external identity/limited egress risk; no further security approval is pending.
+
+### Modified files in the Google task
+
+- `.dockerignore`
+- `.env.example`
+- `AGENTS.md`
+- `Dockerfile.google-egress`
+- `PROJECT_SPEC.md`
+- `README.md`
+- `SECURITY.md`
+- `apps/accounts/signals.py`
+- `apps/configuration/context.py`
+- `apps/google_auth/__init__.py`
+- `apps/google_auth/adapter.py`
+- `apps/google_auth/provider.py`
+- `apps/google_auth/transport.py`
+- `apps/google_auth/urls.py`
+- `apps/google_auth/views.py`
+- `compose.google.yaml`
+- `config/google.py`
+- `config/settings/base.py`
+- `config/urls.py`
+- `docs/administration.md`
+- `docs/architecture.md`
+- `docs/aws-google-deployment-transcript.md`
+- `docs/backup-and-restore.md`
+- `docs/container-publishing.md`
+- `docs/dependency-inventory.md`
+- `docs/deployment.md`
+- `docs/google-oauth.md`
+- `docs/implementation-progress.md`
+- `docs/incident-response.md`
+- `docs/security-decisions.md`
+- `docs/security-findings.md`
+- `docs/security.md`
+- `docs/threat-model.md`
+- `infra/google-egress/squid.conf`
+- `poetry.lock`
+- `pyproject.toml`
+- `releases/0.1.0-alpha.20261125-3386d5caf5b3/README.md`
+- `releases/0.1.0-alpha.20261125-3386d5caf5b3/images.env`
+- `releases/0.1.0-alpha.20261125-3386d5caf5b3/manifest.json`
+- `scripts/check_database_boundary.py`
+- `scripts/check_google_egress.py`
+- `scripts/check_public_google.py`
+- `scripts/encrypt_deployment_snapshot.py`
+- `scripts/release_images.py`
+- `scripts/tenant_database.py`
+- `scripts/upgrade_aws_google.sh`
+- `static/js/google-redirect.js`
+- `templates/base.html`
+- `templates/google_auth/redirect.html`
+- `templates/socialaccount/connections.html`
+- `templates/socialaccount/snippets/login.html`
+- `templates/socialaccount/snippets/provider_list.html`
+- `tests/security/test_deployment_snapshot.py`
+- `tests/security/test_google_oauth.py`
+- `tests/security/test_release_images.py`
+
+No custom database migration was added; allauth socialaccount migrations 0001–0006 were
+applied to the sole deployed campground. Runtime dependencies: OAuthlib/PyJWT and existing
+Requests transitives via the socialaccount extra; optional infrastructure: Squid. The
+mandatory stack remains in place. Owner `.vscode` files were left untouched. No Git commit/push.
+
+### Repeat validation and outstanding checks
+
+```sh
+docker start campground-test-db-hardened
+TEST_DATABASE_PORT=55433 sh scripts/test.sh -q --assert=plain --tb=no --show-capture=no --cov --cov-fail-under=85
+.venv/bin/ruff check apps config scripts tests manage.py gunicorn.conf.py
+.venv/bin/ruff format --check apps config scripts tests manage.py gunicorn.conf.py
+.venv/bin/bandit -r apps config scripts manage.py gunicorn.conf.py -q
+bash -n scripts/upgrade_aws_google.sh
+SSL_CERT_FILE=/etc/ssl/cert.pem .venv/bin/python scripts/check_public_test.py
+.venv/bin/python scripts/check_public_google.py
+docker stop campground-test-db-hardened
+```
+
+The final release build and publish commands each ran source Gitleaks, Trivy source/dependency
+and both-architecture vulnerability/secret scans, 235 PostgreSQL tests, non-root startup
+checks and real proxy network checks. See `google-oauth.md` and `container-publishing.md` for
+repeatable image/network gates; do not run the disposable proxy test on the enabled server's
+in-use subnet. The first-enable upgrade script must not be rerun on this installed host.
+
+Not executed/verified: interactive real Google completion, a new mutmut campaign, full
+PostgreSQL encrypted restore/off-host key recovery, certificate renewal/alerts, host storage
+encryption/security-group/IAM review, broader host vulnerability/license/builder review,
+SMTP delivery, load/capacity tests and remaining production acceptance/security gates.
+For a separate bounded synthetic mutation run after starting its test DB:
+`.venv/bin/python scripts/mutation_test.py --port 55433 --timeout 900`. This existing
+reservation mutation command does not constitute OAuth mutation coverage.
+
+Recommended next steps: complete owner Google acceptance and normal account approval/linking;
+then finish encrypted recovery and operational review before real camper data or production.
+The application remains a development prerelease. Local synthetic PostgreSQL was stopped
+after validation with all volumes retained; the AWS test deployment remains running.

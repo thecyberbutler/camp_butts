@@ -21,7 +21,7 @@ def manifest():
         "platforms": list(release.PLATFORMS),
         "images": {
             name: {
-                "tag": f"docker.io/exampleowner/campground-{name}:{tag}",
+                "tag": release.image_reference("exampleowner", name, tag),
                 "digest": "sha256:" + "b" * 64,
             }
             for name in release.COMPONENTS

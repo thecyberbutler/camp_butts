@@ -110,3 +110,19 @@ No production data or local development database is copied there. Until encrypte
 is rehearsed and host storage encryption verified, use synthetic test data only. A deployment
 failure or rollback must preserve volumes and protected secret files; never use `down -v`
 as a troubleshooting shortcut. Certificate state is confidential backup material too.
+
+## Google enablement snapshot
+
+The AWS first-enable script streams `pg_dump --format=custom` directly to established Fernet
+encryption, with a 64 MiB bound and no plaintext dump file. It uses the existing operator DB
+credential only in the DB container, never runtime permission expansion. The 0600 key is
+inside `/root/camp-butts-google-recovery`; ciphertext and prior digest lock are in
+`/opt/camp-butts-test/pre-google-snapshot`. Separate 0700 directories protect both; key access
+remains a host-root trust boundary. Authenticated decryption is checked without printing data.
+
+This is a pre-upgrade database recovery aid, not complete disaster recovery: key and snapshot
+remain on one host, no off-host escrow or restore drill is claimed, and TLS/application/OAuth
+secret files require independent protected recovery. Preserve the new Google credential file
+without including it in ordinary deployment bundles. Never dump/print keys to recover. A
+restore must target a separately reviewed isolated database and preserve original tenant
+identities and constraints; destructive live replacement requires owner authorization.

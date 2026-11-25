@@ -42,3 +42,9 @@ bypassed production release gates. Published artifacts remain evaluation prerele
 The owner-requested AWS development instance is governed by SD-026. Its test banner is
 presentation only: public test operation retains production security controls and is not
 production approval. Use synthetic data until host and recovery acceptance is complete.
+
+Optional Google sign-in is the scoped owner-approved exception SD-027. Its dedicated egress
+proxy must stay private, non-root and destination restricted. Report OAuth replay, tenant
+confusion, unintended account linking, MFA bypass, token persistence or SSRF as security
+issues. Do not attach live callback URLs, OAuth tokens, cookies or the protected client file.
+Live consent validation and the existing production security release gates remain required.

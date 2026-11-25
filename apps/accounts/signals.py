@@ -2,6 +2,7 @@ import time
 
 from allauth.account import signals as account_signals
 from allauth.mfa import signals as mfa_signals
+from allauth.socialaccount import signals as social_signals
 from django.contrib.auth.signals import user_logged_in, user_logged_out, user_login_failed
 from django.db.models import F
 from django.dispatch import receiver
@@ -48,3 +49,13 @@ for signal in (
     mfa_signals.authenticator_reset,
 ):
     signal.connect(security_changed, weak=False)
+
+
+@receiver(social_signals.social_account_added)
+def google_connected(sender, request, sociallogin, **kwargs):
+    security_changed(sender, request, sociallogin.user)
+
+
+@receiver(social_signals.social_account_removed)
+def google_disconnected(sender, request, socialaccount, **kwargs):
+    security_changed(sender, request, socialaccount.user)

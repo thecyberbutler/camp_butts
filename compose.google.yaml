@@ -1,0 +1,44 @@
+# Optional owner-approved Google-only egress. Base web/database isolation is retained.
+services:
+  web:
+    environment:
+      GOOGLE_OAUTH_CONFIG_FILE: /run/secrets/google_oauth
+    secrets: [google_oauth]
+    networks:
+      google_private:
+        ipv4_address: 172.30.20.3
+    depends_on:
+      google-egress:
+        condition: service_healthy
+  google-egress:
+    image: ${CAMPGROUND_EGRESS_IMAGE:?Set the verified Google egress image digest}
+    user: "10001:10001"
+    restart: unless-stopped
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    tmpfs:
+      - /run/squid:rw,noexec,nosuid,size=4m,mode=0700,uid=10001,gid=10001
+      - /tmp:rw,noexec,nosuid,size=4m,mode=0700,uid=10001,gid=10001
+    pids_limit: 64
+    mem_limit: 128m
+    cpus: 0.5
+    networks:
+      google_edge: {}
+      google_private:
+        ipv4_address: 172.30.20.2
+    healthcheck:
+      test: [CMD, /usr/sbin/squid, -k, check, -f, /etc/squid/squid.conf]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+networks:
+  google_private:
+    internal: true
+    ipam:
+      config:
+        - subnet: 172.30.20.0/28
+  google_edge: {}
+secrets:
+  google_oauth:
+    file: ${SECRETS_DIR:-./.secrets}/google_oauth.json

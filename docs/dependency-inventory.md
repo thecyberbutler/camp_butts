@@ -39,9 +39,9 @@ Full legal/distribution review is not claimed.
 | bandit | 1.9.4 | dev | Apache-2.0 |
 | boolean-py | 5.0 | dev | BSD-2-Clause |
 | cachecontrol | 0.15.0 | dev | Apache-2.0 |
-| certifi | 2026.11.20 | dev | Mozilla Public License 2.0 (MPL 2.0) |
+| certifi | 2026.11.20 | main, dev | Mozilla Public License 2.0 (MPL 2.0) |
 | cffi | 2.1.1 | main | MIT-0 |
-| charset-normalizer | 3.5.3 | dev | MIT |
+| charset-normalizer | 3.5.3 | main, dev | MIT |
 | colorama | 0.4.6 | main, dev | Review upstream license |
 | coverage | 7.17.5 | dev | Apache-2.0 |
 | cryptography | 50.0.2 | main | Apache-2.0 OR BSD-3-Clause |
@@ -53,7 +53,7 @@ Full legal/distribution review is not claimed.
 | fido2 | 2.2.1 | main | BSD License; Apache Software License; Mozilla Public License 2.0 (MPL 2.0) |
 | filelock | 4.3.1 | dev | MIT |
 | gunicorn | 27.0.1 | main | MIT |
-| idna | 3.20 | dev | BSD-3-Clause |
+| idna | 3.20 | main, dev | BSD-3-Clause |
 | iniconfig | 2.3.1 | dev | MIT |
 | license-expression | 30.4.4 | dev | Apache-2.0 |
 | markdown-it-py | 4.3.0 | dev | MIT License |
@@ -78,7 +78,7 @@ Full legal/distribution review is not claimed.
 | pytest-django | 4.14.0 | dev | BSD License |
 | pyyaml | 6.0.4 | dev | MIT License |
 | qrcode | 8.2 | main | BSD License; Other/Proprietary License |
-| requests | 2.34.2 | dev | Apache Software License |
+| requests | 2.34.2 | main, dev | Apache Software License |
 | rich | 15.0.0 | dev | MIT License |
 | ruff | 0.17.6 | dev | MIT |
 | sortedcontainers | 2.4.0 | dev | Apache Software License |
@@ -87,7 +87,7 @@ Full legal/distribution review is not claimed.
 | tomli | 2.5.0 | dev | MIT |
 | tomli-w | 1.2.0 | dev | MIT License |
 | tzdata | 2026.6 | main | Review upstream license |
-| urllib3 | 2.8.0 | dev | MIT |
+| urllib3 | 2.8.0 | main, dev | MIT |
 | whitenoise | 6.12.0 | main | MIT |
 
 ## Locally served frontend
@@ -211,3 +211,19 @@ Actual AWS packages verified after installation: `docker-25.0.18-1.amzn2023.0.4.
 and `python3-3.9.25-1.amzn2023.0.11.x86_64`, plus Compose v5.8.0. This Python is the Amazon
 Linux host's secret-generation/verification tool; the application remains Python 3.13 in
 its pinned image. No application dependency or mandatory-stack version was replaced.
+
+## Google OAuth dependencies — 2026-11-25
+
+Enable the existing allauth 65.22.1 `socialaccount` extra: OAuthlib 4.0.1 (BSD-3-Clause),
+PyJWT 2.15.1 (MIT), and existing Requests 2.34.2/transitives become runtime dependencies.
+OAuthlib handles the framework OAuth flow; PyJWT/cryptography verify signed OIDC tokens.
+Poetry hashes and verified TLS are retained. Installed pip-audit reported no known findings;
+both-architecture image scans are required for the final candidate. Allauth private state
+hooks need compatibility regression tests on upgrades. No frontend dependency is added.
+
+The optional proxy uses Squid 7.6-r0 from Alpine 3.24's signed package repositories, on
+`alpine:3.24@sha256:f59abe656b692d901e184be3445e084786602108599d2a51d229c0f5a48c71bf`.
+Squid is GPL-2.0-or-later; retain package notices and corresponding-source/distribution
+obligations. No modifications to Squid source are made. Full legal release review remains
+open. Existing three approved public repositories are reused: the egress image is a
+separate `google-egress-<release>` tag in `campground-proxy`.

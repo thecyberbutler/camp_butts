@@ -103,7 +103,16 @@ def protect_schema(conn, tenant_id, schema, *, grant=True):
             )
         if grant:
             conn.execute(sql.SQL("REVOKE ALL ON {} FROM campground_app").format(target))
-            if table != "django_migrations":
+            if table == "socialaccount_socialtoken":
+                # Django's account deletion collector checks/deletes dependent rows.
+                # Never permit token creation or modification, even if settings drift.
+                conn.execute(sql.SQL("GRANT SELECT, DELETE ON {} TO campground_app").format(target))
+            if table not in {
+                "django_migrations",
+                "socialaccount_socialapp",
+                "socialaccount_socialapp_sites",
+                "socialaccount_socialtoken",
+            }:
                 privileges = (
                     sql.SQL("SELECT, INSERT")
                     if table == "audit_event"
@@ -120,6 +129,13 @@ def protect_schema(conn, tenant_id, schema, *, grant=True):
             [schema],
         ).fetchall()
         for (sequence,) in sequences:
+            if sequence.startswith(("socialaccount_socialapp", "socialaccount_socialtoken")):
+                conn.execute(
+                    sql.SQL("REVOKE ALL ON {} FROM campground_app").format(
+                        sql.Identifier(schema, sequence)
+                    )
+                )
+                continue
             conn.execute(
                 sql.SQL("GRANT USAGE, SELECT ON {} TO campground_app").format(
                     sql.Identifier(schema, sequence)

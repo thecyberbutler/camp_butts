@@ -6,6 +6,7 @@ from cryptography.fernet import Fernet
 from django.core.exceptions import ImproperlyConfigured
 
 from config.environment import validate_environment
+from config.google import google_configuration
 from config.secrets import read_secret
 
 BASE_DIR = Path(__file__).resolve().parents[2]
@@ -33,6 +34,8 @@ INSTALLED_APPS = [
     "django.contrib.postgres",
     "allauth",
     "allauth.account",
+    "allauth.socialaccount",
+    "apps.google_auth",
     "allauth.mfa",
     "allauth.usersessions",
     "axes",
@@ -127,9 +130,21 @@ ACCOUNT_REAUTHENTICATION_TIMEOUT = 300
 ACCOUNT_LOGIN_TIMEOUT = 300
 ACCOUNT_EMAIL_VERIFICATION = "mandatory" if os.environ.get("EMAIL_ENABLED") == "true" else "none"
 ACCOUNT_EMAIL_NOTIFICATIONS = False
+GOOGLE_OAUTH_APPS = google_configuration()
+SOCIALACCOUNT_ADAPTER = "apps.google_auth.adapter.GoogleAccountAdapter"
+SOCIALACCOUNT_AUTO_SIGNUP = False
+SOCIALACCOUNT_LOGIN_ON_GET = False
+SOCIALACCOUNT_STORE_TOKENS = False
+SOCIALACCOUNT_EMAIL_AUTHENTICATION = False
+SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = False
+SOCIALACCOUNT_EMAIL_VERIFICATION = ACCOUNT_EMAIL_VERIFICATION
+SOCIALACCOUNT_PROVIDERS = {"google": {"OAUTH_PKCE_ENABLED": True, "SCOPE": ["openid", "email"]}}
+SOCIALACCOUNT_FORMS = {"signup": "apps.google_auth.views.GoogleSignupForm"}
 RECOVERY_RATE = "3/h/ip,3/h/key"
 ACCOUNT_RATE_LIMITS = {
     "login": "10/m/ip",
+    "google_start": "10/m/ip",
+    "google_callback": "20/m/ip",
     "login_failed": "5/5m/key,20/5m/ip",
     "signup": "5/h/ip",
     "reservation_write": "20/m/key,40/m/ip",

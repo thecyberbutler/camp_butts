@@ -2,6 +2,7 @@ from django.urls import include, path
 
 from apps.accounts import views as accounts
 from apps.campsites import views as campsites
+from apps.google_auth import views as google
 from apps.notifications import views as notifications
 from apps.reservations import views as reservations
 
@@ -14,6 +15,14 @@ urlpatterns = [
         name="registration_received",
     ),
     path("", campsites.home, name="home"),
+    path(
+        "accounts/3rdparty/signup/", google.GoogleSignupView.as_view(), name="socialaccount_signup"
+    ),
+    path(
+        "accounts/3rdparty/",
+        google.GoogleConnectionsView.as_view(),
+        name="socialaccount_connections",
+    ),
     path("accounts/", include("allauth.urls")),
     path("dashboard/", campsites.dashboard, name="dashboard"),
     path("campsites/", campsites.listing, name="campsites"),

@@ -142,3 +142,24 @@ Keep drafts inactive/booking closed, use synthetic data, retain production reque
 controls, and verify host/network/recovery requirements before accepting real data. SSH host
 trust currently relies on the existing local known-host entry. Distribution trust includes
 Amazon's signed repositories and the pinned, SHA-256-verified official Compose binary.
+
+## Google sign-in extension (SD-027)
+
+New assets: per-tenant Google client credentials; provider subject/account links; temporary
+authorization code, PKCE verifier, nonce and state; encrypted pre-upgrade recovery snapshot.
+New boundaries: browser↔Google, web↔private CONNECT proxy↔Google, protected host credential
+file↔web. Google receives sign-in activity; no profile/photo scope or third-party frontend
+script is used. The operator configures exact tenant callback URLs and Google test audience.
+
+Threats and mitigations: login CSRF/replay (CSRF-protected start, PKCE/nonce, session-bound
+state and concurrent single-use locking); tenant/account confusion (UUID/client/actor binding,
+no email auto-linking); token substitution (verified RS256 and strict issuer/audience/claim
+checks); privilege escalation (existing approval/roles/MFA); credential leakage (file mounts,
+no token persistence, generic errors and no access logs); SSRF/metadata access (exact hosts,
+fixed ports/source and private-address denial plus verified TLS). Third-party Google email
+assertions do not automatically verify arbitrary external mailboxes locally.
+
+Residual: Google/provider outage or compromise, destination abuse within the two allowed
+hosts, allauth private-hook compatibility, shared runtime/host compromise, OAuth test-audience
+restrictions and unverified live human consent/token exchange until explicitly exercised.
+The host-local encrypted pre-upgrade snapshot is not off-host disaster recovery.

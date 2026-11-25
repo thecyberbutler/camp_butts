@@ -1,0 +1,8 @@
+{% load socialaccount %}
+{% get_providers as socialaccount_providers %}
+{% if socialaccount_providers %}
+<hr>
+<h2>Sign in with Google</h2>
+<p>Google sign-in is separate for each campground. Campground approval and application MFA still apply.</p>
+{% include 'socialaccount/snippets/provider_list.html' with process='login' %}
+{% endif %}

@@ -22,6 +22,9 @@ def check_role():
         "UPDATE audit_event SET action = action WHERE false",
         "DELETE FROM audit_event WHERE false",
         "SELECT 1 FROM django_migrations LIMIT 0",
+        "SELECT 1 FROM socialaccount_socialapp LIMIT 0",
+        "UPDATE socialaccount_socialtoken SET token=token WHERE false",
+        "INSERT INTO socialaccount_socialtoken (token) SELECT '' WHERE false",
         "SELECT 1 FROM public.campground_tenant_events LIMIT 0",
         "UPDATE public.campground_tenants SET active=active WHERE false",
         "SELECT nextval('public.campground_tenant_events_id_seq')",
@@ -39,6 +42,17 @@ def check_role():
             denied = True
         if not denied:
             raise RuntimeError("Runtime boundary did not deny a protected operation")
+    with transaction.atomic(), connection.cursor() as cursor:
+        cursor.execute("SELECT 1 FROM socialaccount_socialtoken LIMIT 0")
+        cursor.execute("DELETE FROM socialaccount_socialtoken WHERE false")
+        cursor.execute(
+            "SELECT count(*) FROM pg_class WHERE relnamespace=current_schema()::regnamespace "
+            "AND relname IN ('socialaccount_socialaccount', 'socialaccount_socialtoken', "
+            "'socialaccount_socialapp') AND relrowsecurity AND relforcerowsecurity"
+        )
+        if cursor.fetchone()[0] != 3:
+            raise RuntimeError("Social account tables lack forced tenant isolation")
+        transaction.set_rollback(True)
     print("Runtime database boundary verified; all protected operations denied.")
 
 

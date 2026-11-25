@@ -69,3 +69,15 @@ Disclose exact remote commands before execution as requested by the owner. Stop 
 `camp-butts-test` to contain exposure; preserve volumes, protected secrets and evidence. Do
 not paste Docker inspect/environment/log output into incident reports. The visible test
 banner does not reduce incident severity or authorize real personal data on an unaccepted host.
+
+## Google credential/provider incidents
+
+Disable Google by removing its protected configuration from the web service and recreating
+web without the optional Google overlay; remove the egress service/network after detaching
+web. Keep local login, tenant data and application MFA intact. Revoke/rotate the affected
+Google client secret in the Google console, atomically replace its protected file and recreate
+web only after review. Invalidate affected application sessions through the operator security
+process; do not assume Google-side revocation invalidates already-created local sessions.
+Provider tokens are not retained, so preserve only generic audit outcomes and protected
+operational evidence. Never log callback URLs, codes, cookies or token exchange bodies.
+Google-only accounts require the approved recovery process during outage; no bypass.

@@ -12,6 +12,7 @@
 !scripts/runtime_grants.sql
 !gunicorn.conf.py
 !infra/traefik/**
+!infra/google-egress/**
 **/__pycache__/**
 **/*.pyc
 

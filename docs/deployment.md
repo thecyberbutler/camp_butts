@@ -263,3 +263,24 @@ Deployment validation on 2026-11-24: the requested public test site is running f
 exercised successfully; **renewal and expiry alerting remain unverified**. Both DB/web are
 healthy and only proxy ports 80/443 are published. See `aws-test-deployment-transcript.md`
 for the exact commands used and implementation-progress.md for the full validation record.
+
+## Optional Google login upgrade
+
+Follow [Google configuration and operations](google-oauth.md). Add `compose.google.yaml`
+only with explicit restricted-egress approval and a protected per-tenant credential file.
+The registry lock supplies a fourth image reference using a `google-egress-…` tag in the
+existing approved proxy repository. Apply socialaccount migrations to **every** campground,
+reapply runtime grants/forced RLS, collect static assets, then enable the overlay. Run the
+runtime database boundary checker and real egress checks before opening sign-in.
+
+`scripts/upgrade_aws_google.sh` is a first-enable upgrade for the specific existing AWS test
+installation. It refuses unexpected tenants, a changed baseline lock or an already-enabled
+overlay. It stops web writes, streams a bounded encrypted DB snapshot, migrates, reapplies
+permissions and checks hardened runtime settings. It is not a generic/re-runnable deployer.
+The exact transcript and image digests must be disclosed before SSH execution.
+
+The first-enable upgrade was executed successfully on 2026-11-25 using
+`0.1.0-alpha.20261125-3386d5caf5b3`, superseding the test instance's previous
+`0.1.0-alpha.20261124-935cbb3b3a29` deployment. See the
+[executed transcript](aws-google-deployment-transcript.md) for exact commands and evidence.
+Public/runtime checks passed; interactive real Google completion remains pending.

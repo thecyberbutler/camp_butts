@@ -151,3 +151,56 @@ gates. Only synthetic test data may be used pending host/recovery/security accep
 Rollback stops this Compose project without deleting volumes/secrets; preserve evidence and
 use compatible reviewed image digests. Do not restore stale sessions or remove constraints.
 Deployment status and actual validation results are recorded in implementation-progress.md.
+
+## Google sign-in — 2026-11-24
+
+### SD-027: explicit Google identity and restricted egress approval
+
+The owner explicitly requested Google OAuth and deployment to the existing AWS test site.
+They supplied an External-audience test client and confirmed its protected file installation.
+The client secret was entered by the owner on-host; it was not sent through chat.
+After review of the existing no-Internet web boundary, the owner explicitly answered:
+**“Approve restricted Google egress proxy”**. This is a scoped network/trust exception,
+not approval for unrestricted Internet access, weakened MFA, CSP or TLS.
+
+- Proposed change/reason: optional Google OpenID Connect authorization-code sign-in, using
+  existing allauth; one private, non-root Squid CONNECT sidecar supplies necessary egress.
+- Protections affected: external-identity independence and the web container's complete
+  outbound isolation. Google becomes an identity/availability dependency and sees sign-in
+  activity, client/domain and browser information. The app receives subject and email only.
+- Risks: Google account/provider compromise, credential/state leakage, cross-tenant callback
+  confusion, account-link takeover, proxy/DNS/SSRF abuse, and additional dependency upkeep.
+- Alternatives: retain local-only login (preserves current isolation), or give web direct
+  Internet egress (weaker, rejected). Restricted CONNECT is the recommended approved design.
+- Mitigations: web stays on internal networks; proxy has no public port, DB network or app
+  secrets; exact oauth2.googleapis.com/www.googleapis.com:443 allowlist, blocked private/
+  metadata destinations, no TLS interception, credential logs or cache, non-root/readonly/
+  cap-drop/no-new-privileges and resource/time bounds. Application transport additionally
+  restricts exact methods/URLs, denies redirects, verifies TLS and bounds responses.
+- Authentication: explicit per-campground file credentials; client/tenant/session-bound
+  single-use state, PKCE and nonce; fixed RS256 signature/issuer/audience/expiry checks;
+  no browser-token/One Tap endpoint; no auto-link by email, no stored access/refresh tokens.
+  New Google registrations retain required details, policy consent, invitation and approval
+  rules and uniform completion without auto-login. Existing linking/disconnection requires
+  recent password reauthentication and privileged application MFA; link changes revoke sessions.
+- Email trust: Google verifies current Gmail/Workspace ownership; arbitrary third-party
+  Google account mailboxes do not gain locally verified email status from that assertion.
+- Duration/scope: enabled only for configured campgrounds while Google login is enabled;
+  initial scope is the owner's test client and test deployment. Review by 2026-12-24 and
+  before production. Local authentication remains available; no production release waiver.
+- Rollback: disable Google configuration and remove its optional Compose overlay/egress
+  service; preserve tenant data/links and local auth. Revoke Google credentials if compromised;
+  use the operator recovery process for Google-only accounts, never create a bypass.
+- Distribution: reuse the already approved public campground-proxy repository with a separate
+  google-egress prerelease tag. No fourth repository, camper data or runtime secret publication.
+
+Implemented and deployed as the 2026-11-25 Google prerelease. Automated callback/concurrency,
+real proxy, actual runtime boundary and public authorization-start checks passed. A human
+Google consent/token exchange and successful approved-user sign-in remain unverified.
+
+Implementation detail: SocialApp tables remain inaccessible to runtime. SocialToken permits
+only SELECT/DELETE, because Django's normal account-unlink collector checks and removes
+dependent rows even when token storage is disabled. INSERT/UPDATE and sequence permissions
+are denied, and forced tenant RLS remains active. This prevents token persistence while
+preserving the framework's safe unlinking semantics; it does not grant access to client
+credentials. Regression checks cover unlink assurance/session revocation and runtime grants.

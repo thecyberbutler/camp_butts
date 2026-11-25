@@ -1,0 +1,9 @@
+{% load socialaccount %}
+{% get_providers as socialaccount_providers %}
+{% for provider in socialaccount_providers %}
+<form method="post" action="{% url 'google_login' %}">
+  {% csrf_token %}
+  <input type="hidden" name="process" value="{{ process|default:'login' }}">
+  <button class="btn btn-outline-primary" type="submit">{% if process == 'connect' %}Connect Google{% else %}Continue with Google{% endif %}</button>
+</form>
+{% endfor %}

@@ -14,6 +14,7 @@
     {% if user.is_authenticated %}
       <a href="{% url 'dashboard' %}">My reservations</a><a href="{% url 'notifications' %}">Notifications</a>
       <a href="{% url 'mfa_index' %}">Account security</a><a href="{% url 'account_logout' %}">Sign out</a>
+      {% if google_login_enabled %}<a href="{% url 'socialaccount_connections' %}">Google sign-in</a>{% endif %}
       {% if perms.reservations.operate_reservations %}<a href="{% url 'operations' %}">Operations</a>{% endif %}
     {% else %}<a href="{% url 'account_login' %}">Sign in</a><a href="{% url 'account_signup' %}">Create account</a>{% endif %}
   </nav></header>

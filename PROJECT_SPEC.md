@@ -198,7 +198,9 @@ Do not claim formal compliance or certification unless independently verified.
 - Do not introduce Kubernetes.
 - Do not introduce unnecessary infrastructure.
 - Do not use managed database services.
-- Do not use external authentication providers.
+- Do not use external authentication providers except the owner-requested optional Google
+  OpenID Connect integration (SD-027). Only the explicitly approved restricted Google
+  egress is permitted; all existing MFA, approval and tenant-isolation controls remain required.
 - Do not use external CDN-hosted frontend dependencies.
 - Avoid unnecessary third-party dependencies.
 - Use type hints throughout Python code where practical.
@@ -2963,7 +2965,7 @@ Do not implement the following unless explicitly requested:
 - Native iOS applications.
 - Native Android applications.
 - Social media authentication.
-- External OAuth providers.
+- External OAuth providers other than the explicitly requested optional Google integration (SD-027).
 - Managed cloud services.
 - Managed email APIs.
 - SMS notification providers.

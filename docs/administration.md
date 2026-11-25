@@ -109,3 +109,18 @@ The AWS development installation creates no default staff/admin account. Its Geo
 Fairgrounds profile retains inactive draft inventory and closed booking. Follow the protected
 operator onboarding procedure for a deliberately created test account; do not put passwords,
 MFA seeds or recovery codes into SSH arguments/transcripts. The test banner is not authorization.
+
+## Google accounts
+
+Google login is optional per campground. On the test deployment the Google app is External
+and in Testing, with owner-configured test users. New accounts still complete local required
+details and policy consent and follow campground approval/invitation rules. Google identity
+does not confer staff privileges. Do not approve/promote an account merely because it matches
+an operator's email. Existing users sign in locally, explicitly reauthenticate, then connect
+a Google account with the same email through account settings. No automatic email linking.
+
+Connection changes invalidate sessions. Disconnect requires a usable local password and
+recent password reauthentication, plus application MFA for privileged accounts. A Google-only
+user must establish a permitted recovery/password path before disconnecting; do not add an
+authentication bypass. Keep app MFA independently enrolled for privileged users. See
+[Google operations](google-oauth.md) for credential rotation and disabling the integration.

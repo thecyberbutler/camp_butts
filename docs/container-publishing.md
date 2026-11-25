@@ -122,3 +122,19 @@ It does not grant a project software license or authorize publication of secrets
 Retain bundled upstream notices; complete the existing distribution/license review before
 production release. Registry availability/rate limits affect fresh pulls; already running
 self-hosted containers do not need Docker Hub to handle reservations.
+
+## Optional Google egress image
+
+Google-enabled releases build a fourth component, using the existing approved public
+`thecyberbutler/campground-proxy` repository with tag `google-egress-<release-tag>`.
+The release lock adds `CAMPGROUND_EGRESS_IMAGE`; no fourth repository or broader registry
+permissions are required. Deploy with `compose.google.yaml` only when its restricted-egress
+approval and protected client configuration exist. Historical three-component digest locks
+remain usable for their original deployments; the current publisher requires all four
+components for new releases.
+
+Both egress architectures undergo vulnerability/secret scans and non-root config parsing.
+A real disposable Docker network test verifies permitted Google TLS, unapproved destinations,
+private/metadata addresses including mapped IPv6, wrong peers/ports/methods and lack of direct
+Internet access. Publication repeats all gates and refuses mutable tag collisions. Runtime
+Google credentials are never part of the source snapshot, build context or image.

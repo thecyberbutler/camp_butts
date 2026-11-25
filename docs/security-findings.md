@@ -335,3 +335,25 @@ coverage were addressed without changing authorization, TLS, DEBUG or other prot
 These are labeling/coverage improvements, not a claim that a prior exploitable vulnerability
 was resolved. Host storage encryption, AWS firewall posture, recovery, renewal and production
 release gates remain unverified until separately recorded. The test banner is not access control.
+
+## Google implementation review — 2026-11-25
+
+- Pre-release review found that denying all SocialToken permissions would break Django's
+  account-unlink cascade. Runtime now has only SELECT/DELETE on that table; INSERT/UPDATE
+  and sequence access remain denied. Client credential tables remain inaccessible.
+  This was a draft implementation defect, not an observed deployed vulnerability.
+- A candidate IPv4-mapped IPv6 ACL normalized to IPv4 /0 in Squid, inadvertently denying
+  permitted Google access. The real network gate blocked publication. Corrected the ACL
+  to use Squid's normalization with the existing private IPv4 ranges, and added DNS-to-
+  mapped-metadata rejection checks. Allowed TLS and both metadata forms now pass their
+  respective positive/negative tests; no private-target protection was removed.
+- A negative snapshot-permission test assumed umask 022. The release run's umask 077
+  exposed it. Explicitly set the intentionally invalid test directory mode; application
+  secret/snapshot permissions remain unchanged. All 235 tests pass in the isolated release.
+- Current source and both-architecture image scans report no HIGH/CRITICAL vulnerabilities
+  or detected secrets. These are point-in-time automated results, not exhaustive assurance.
+  The Google live human flow and existing production gates remain pending.
+
+The approved Google/provider/egress trust impact is SD-027. No additional security exception
+is pending. The previously documented upstream-published network credential is still an
+external unresolved finding; its value is not copied into this repository.

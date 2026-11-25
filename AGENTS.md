@@ -185,6 +185,11 @@ Use:
 - Argon2id.
 - Django Axes.
 
+Owner-approved exception (SD-027): optional Google OpenID Connect through a restricted,
+non-root Google-only egress proxy. This does not authorize other identity providers,
+unrestricted egress, automatic email account linking, or bypassing application MFA/approval.
+
+
 Use supported, security-patched versions.
 
 Do not replace the required technology stack without explicit architectural approval.
