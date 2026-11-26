@@ -1624,3 +1624,20 @@ published-environment task remain unexecuted/unverified here. No vulnerability n
 resolved; the network denial is a setup blocker. Next: approve/save the single-host rule in
 the original setup environment, resume its existing commands and publish only after actual
 validation. Files: docs/codex-cloud-setup.md, docs/security-decisions.md and this progress record.
+
+### Cloud single-host approval received — 2026-11-26
+
+The owner explicitly approved dl-cdn.alpinelinux.org in the restricted Cloud development
+allowlist and requested save/resume instructions. Updated the setup guide and security
+decision to distinguish approval from application. No further approval is pending for
+this exact hostname. Preserve existing entries, restricted mode, TLS and package checks;
+no application runtime egress or other host is authorized. This local chat cannot edit
+the Cloud configuration. Save/Save draft in the original setup environment, verify the
+effective policy there, retry the PostgreSQL build and run the documented security/concurrency
+and startup validation before publishing. A fresh published-environment task remains the
+final reusable-setup check. No Cloud build/test/startup result is newly claimed.
+
+Documentation-only update: no dependencies, migrations, runtime code or architectural
+change. No vulnerability newly identified or resolved. The approved development egress
+and package supply-chain risks remain documented; git diff --check is the applicable
+local validation. Cloud validation commands remain in codex-cloud-setup.md.

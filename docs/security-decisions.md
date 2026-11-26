@@ -365,7 +365,7 @@ the installed framework's MFA-enrollment reauthentication through Google. Use th
 interactive local-password establishment procedure; do not disable reauthentication or
 fabricate MFA assurance. Actual owner enrollment remains pending.
 
-## Proposed Codex Cloud build-host access — 2026-11-26
+## Approved Codex Cloud build-host access — 2026-11-26
 
 The owner reported a PostgreSQL image build blocked by denied access to
 dl-cdn.alpinelinux.org. Proposed adding only that host to the existing restricted development
@@ -374,5 +374,9 @@ expands development egress/supply-chain exposure. Retaining the denial is the se
 alternative with incomplete setup; unrestricted networking or removing the libxml2 update
 is not recommended. Keep digest pins, package verification, proxy controls and isolated
 synthetic data. No application runtime/Google egress change is proposed. Remove the addition
-to roll back; rebuilds may need it again. Approval/save is pending; no access change was
-implemented here. See codex-cloud-setup.md for concrete validation and scope.
+to roll back; rebuilds may need it again. The owner explicitly approved on 2026-11-26:
+“I approve adding dl-cdn.alpinelinux.org to the Codex Cloud environment’s restricted allowlist.”
+Approval is complete for this host only; saving and runtime verification remain pending.
+No access change was implemented from this local chat. Review before production use and
+by 2026-12-26; this is a development-build grant, not application runtime egress approval.
+See codex-cloud-setup.md for concrete validation and scope.

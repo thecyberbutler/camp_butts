@@ -14,10 +14,11 @@ creating the non-root runtime user. Do not remove that security update or replac
 image with an unreviewed version to bypass the denial. This chat has no attached Cloud
 executor, network-editing tool or access to the setup chat's saved installation instructions.
 
-## Proposed narrow remediation
+## Approved narrow remediation
 
-Owner approval is pending for adding only `dl-cdn.alpinelinux.org` to the Cloud development
-environment's existing restricted host allowlist. Keep all existing entries and restrictions;
+The owner explicitly approved adding only `dl-cdn.alpinelinux.org` on 2026-11-26 to the Cloud
+development environment's existing restricted host allowlist. Saving and runtime verification
+remain pending; approval alone does not apply the setting. Keep all existing entries and restrictions;
 do not replace the list, enable unrestricted Internet access, add wildcard domains, change
 the application's Google egress allowlist, or copy AWS credentials/data into Cloud.
 
@@ -27,10 +28,19 @@ the denial preserves the boundary but leaves builds incomplete. Existing reviewe
 compatible digest-locked images can be evaluated separately; do not assume they satisfy
 this environment's architecture and synthetic test-user ownership requirements.
 
-After specific approval, review the saved single-host addition in the **setup environment's
+With that approval recorded, review the single-host addition in the **setup environment's
 settings**, then save it using the offered Save/Save draft action. The local desktop cannot
 apply this for the owner. Remove the addition to roll back; future uncached builds may need
 it again. Existing downloads cannot be recalled by removing network access.
+
+In the original setup chat, open its environment configuration. If returning through the
+environment list, use Settings > Codex Cloud > Environments, then the camp_butts menu > Edit.
+Keep Enable all public internet access off. Under Additional allowed domains, retain the
+existing entries and add exactly `dl-cdn.alpinelinux.org` (no scheme, path or wildcard).
+If the setup already proposed this entry, review it without adding a duplicate. Save draft
+or Save as offered, then resume setup with the message below. Publish/Republish only once
+the remaining checks pass, and start a fresh task to validate the published version.
+UI reference: [OpenAI Cloud environment documentation](https://learn.chatgpt.com/docs/environments/cloud-environments).
 
 Resume the original setup chat with:
 
