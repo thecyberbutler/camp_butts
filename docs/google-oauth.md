@@ -103,16 +103,21 @@ callback URL, cookies, codes or tokens as troubleshooting evidence; report statu
 
 ## Current test deployment
 
-The current live release is `0.1.0-alpha.20261125-5815b9993895` (interface update). It still
-uses the original email-only Google scopes and username-based local login. The email-account
-migration and Google profile changes are implemented/tested locally, **not yet deployed**.
-Configure the API/consent settings above before the new scanned release and migration-aware
-cutover described in `email-identity.md`. The public scope probe in the new source expects
-new scopes and should be run only after that deployment.
-For the deployed release, the owner-installed protected file was validated in the intended web image, without exposing
-its contents. The red test banner remains visible. Automated public start/CSRF/PKCE/nonce
-checks and actual runtime database/container/Google-key transport checks passed.
-Human Google consent, token exchange and approved-user sign-in are still pending.
+The current live release is `0.1.0-alpha.20261125-05df000f8652`, with email-only accounts
+and approved name/optional-phone prefilling for new Google registrations. The owner confirmed
+People API and OAuth scopes configured before deployment. Client credentials, exact callback
+and JavaScript-origin requirements are unchanged. Existing linked-account details are not
+overwritten; missing/denied phone access retains optional manual entry.
+
+Final automated acceptance completed on 2026-11-26: public scopes/start/CSRF/PKCE/nonce and
+invalid-callback controls, actual database/container boundaries, email-only schema/forms,
+Google certificates and unauthenticated People TLS all passed. The red test banner and
+closed booking/inactive drafts remain. The initial operator probe mishandled the expected
+unauthenticated response; the disclosed correction changed only verification code, then
+final checks passed with explicit completion evidence. See
+[the exact transcript](aws-email-profile-deployment-transcript.md).
+Human Google consent, live profile data, token exchange and approved-user sign-in remain
+unverified; use the manual steps above. Automated probes do not prove those outcomes.
 
 ## Verification
 

@@ -147,3 +147,18 @@ old application images cannot run against the new schema. Preserve IDs, password
 MFA/provider links and occupancy; retired sessions must not be revived by a restore. Profile
 name/phone suggestions are ordinary contact data after confirmation and belong in protected
 tenant backups; raw Google tokens and provider responses never belong in backup payloads.
+
+## Email identity cutover snapshot — 2026-11-25/26
+
+Before `accounts.0003_email_identity`, web was stopped and a custom-format DB dump streamed
+directly into authenticated encryption at
+`/opt/camp-butts-test/pre-email-05df000f8652/database.dump.fernet`. Its separate 0600 key is
+under `/root/camp-butts-email-recovery-05df000f8652/`; both directories are 0700. Authenticated
+decryption passed before migration. Existing snapshots, secrets and volumes were preserved.
+Protected records were compared in memory across migration, without writing/printing personal
+data or hashes. No restore was needed or performed. Final deployment checks passed after
+correcting an operator probe, with the new schema retained throughout recovery.
+
+The username removal is irreversible and old-image rollback is unsafe. A destructive restore
+requires separate approval and a reviewed isolated workflow that does not revive historical
+sessions/security state. This host-local snapshot is not verified off-host disaster recovery.

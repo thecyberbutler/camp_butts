@@ -139,10 +139,21 @@ private/metadata addresses including mapped IPv6, wrong peers/ports/methods and 
 Internet access. Publication repeats all gates and refuses mutable tag collisions. Runtime
 Google credentials are never part of the source snapshot, build context or image.
 
-## Latest evaluated interface release
+## Historical interface release
 
 `0.1.0-alpha.20261125-5815b9993895` is published for AMD64/ARM64 and deployed on the authorized
 AWS test instance. The committed release manifest and digest lock are under its `releases/`
 directory. Both build and publication repeated the source/image/test/egress gates; public
 acceptance and runtime boundary checks passed. This is still a prerelease with the existing
 production gates. See `aws-ui-deployment-transcript.md`; no stable or latest tag was created.
+
+## Latest evaluated email/profile release
+
+`0.1.0-alpha.20261125-05df000f8652` is published for AMD64/ARM64 and deployed on the test host;
+final acceptance completed 2026-11-26. Its committed manifest/digest lock covers all four
+components. Build and publication each passed 271 PostgreSQL tests (92.74% coverage), source/
+image gates and restricted Google/People egress checks. Database/proxy filesystem layers and
+all runtime image configurations match the preceding release except labels; web code and
+the approved People allowlist differ. See `aws-email-profile-deployment-transcript.md`.
+This release requires the email migration; it is not a presentation-only upgrade or production
+approval. No stable/latest alias, new repository visibility or registry permission was added.

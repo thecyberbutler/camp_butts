@@ -1,10 +1,12 @@
 # Implementation progress
 
-Updated: 2026-11-24. Status: development; **not approved for production**.
+Updated: 2026-11-26. Status: development; **not approved for production**.
 
-Latest milestone: three public Docker Hub prerelease images published and digest-verified
-for Linux AMD64/ARM64. See **Docker Hub distribution** below for current evidence and gates.
-Earlier sections preserve application, proxy, SaaS and campground-onboarding history.
+Latest milestone: scanned email-only/Google-profile prerelease
+`0.1.0-alpha.20261125-05df000f8652` published and deployed to the AWS test instance. Final
+runtime/public acceptance passed 2026-11-26; human Google consent/profile import is unverified.
+See the final milestone below for current evidence, file inventory and remaining gates.
+Earlier sections preserve historical state and approvals; they do not override SD-025–030.
 
 ## Repository assessment
 
@@ -1296,3 +1298,106 @@ Complete file inventory for the two requested account/profile features:
 
 The local synthetic DB was stopped after validation; volumes retained. No SSH, registry
 publication or live data change occurred. Commits are local; no Git remote push performed.
+
+## Scanned email/profile test deployment — 2026-11-25/26
+
+Current phase: continued phase 9 hardening and test deployment; phase 10 production acceptance
+remains incomplete. Owner confirmed People API/scopes configured and requested scan/deploy,
+with exact transcripts before connecting. Features remain separate commits `47bc241` (email)
+and `1c2cbbf` (Google profile); this deployment has its own documentation/release commit.
+
+Built and published `0.1.0-alpha.20261125-05df000f8652` for AMD64/ARM64 in the already approved
+public Docker Hub repositories. Source snapshot SHA-256 is in the committed manifest. Build
+and publication independently passed **271 PostgreSQL tests, 92.74% coverage**, Ruff/format,
+Bandit, Gitleaks, Trivy source/configuration/dependency HIGH/CRITICAL and all eight image
+vulnerability/secret gates. Both architectures passed non-root/missing-secret startup checks;
+real proxy tests passed Google/People TLS and rejected unauthorized/private/metadata routes.
+Poetry lock validation passed with existing metadata deprecation warnings; pip-audit found
+no known vulnerabilities. Remote image-index digests were verified. DB/proxy filesystem
+layers and all runtime image configurations match the previous release except labels.
+
+Three additional synthetic PostgreSQL tests validated the exact deployment wrapper's
+preflight/preservation, secondary-email refusal and rollback on an injected preservation
+mismatch. Initial fixture-loader and deferred-constraint teardown errors were corrected
+without changing application controls. Source/docs and exact deployment/recovery bundles
+passed secret scanning. No tests, findings or security rules were suppressed.
+
+The complete transcript, bundle contents and follow-ups were disclosed before their SSH
+connections. Baseline lock/Compose checks passed. Web stopped for an encrypted, authenticated
+snapshot, then `accounts.0003_email_identity` applied under the migrator in tenant scope.
+Before commit, in-memory comparisons confirmed preserved data and expected email/security-
+version changes. Old sessions retired; recent legacy lockouts carried forward. Reviewed
+runtime grants/RLS reapplied; assets collected; digest-locked services started. No account
+merges, approval/permission/password/MFA/Google-link changes, data restore or secret rotation.
+
+The first runtime probe incorrectly expected strict GoogleSession to return unauthenticated
+401/403. Its error handler stopped web; the corrected operator probe retained TLS and all
+application controls. A subsequent SSH reset prevented a success claim. Read-only status
+showed healthy new services; final verification was repeated with stdin isolated and an
+explicit completion marker after another ambiguous zero exit. Final deployment, database,
+container, network, schema, Google-cert/People TLS and public HTTPS/banner/CSRF/header/host/
+SNI/body-limit/OAuth-scope/PKCE/nonce/form/asset checks **passed**. Human consent, actual profile
+retrieval and approved-user Google sign-in were not performed or claimed.
+
+Security architecture: unchanged modular monolith, per-campground identities/schema/RLS,
+separate migrator/runtime roles and production controls under a development banner. Only the
+previously approved People scope/host expansion (SD-029) is activated. New migration protects
+identity continuity, sessions and lockouts. No new dependency or migration was authored in
+this deployment task; existing accounts.0003 was applied. No new vulnerability identified,
+prior vulnerability newly resolved, new security regression observed or pending approval.
+The operator-probe defect was resolved; existing provider/shared-host/source-visibility risks,
+external credential finding and lower-severity/manual/production gates remain unchanged.
+
+Files modified/added in this deployment task:
+
+- `README.md`
+- `docs/aws-email-profile-deployment-transcript.md` (all commands/scripts and wrapper tests)
+- `docs/backup-and-restore.md`
+- `docs/container-publishing.md`
+- `docs/deployment.md`
+- `docs/email-identity.md`
+- `docs/google-oauth.md`
+- `docs/implementation-progress.md`
+- `docs/security-decisions.md`
+- `docs/security-findings.md`
+- `releases/0.1.0-alpha.20261125-05df000f8652/README.md`
+- `releases/0.1.0-alpha.20261125-05df000f8652/manifest.json`
+- `releases/0.1.0-alpha.20261125-05df000f8652/images.env`
+
+Private transfer/test harness files remain ignored under `.runtime/aws-email-upgrade-05df000f8652/`;
+no secret/account data was copied into those artifacts. Application source is unchanged in
+this deployment task. No Git remote push is authorized or performed.
+
+### Executed commands and repeatable validation
+
+```sh
+poetry check --lock
+.venv/bin/pip-audit --progress-spinner off
+docker start campground-test-db-hardened
+TEST_DATABASE_PORT=55433 .venv/bin/python scripts/release_images.py build --namespace thecyberbutler --version 0.1.0-alpha.20261125
+SSL_CERT_FILE=/etc/ssl/cert.pem TEST_DATABASE_PORT=55433 .venv/bin/python scripts/release_images.py publish .runtime/releases/candidate-v63y9q1e/manifest.json --public-approved
+TEST_DATABASE_PORT=55433 sh scripts/test.sh .runtime/aws-email-upgrade-05df000f8652/test_migrate_email.py -q --assert=plain --tb=no --show-capture=no
+SSL_CERT_FILE=/etc/ssl/cert.pem .venv/bin/python scripts/check_public_test.py
+.venv/bin/python scripts/check_public_google.py
+.venv/bin/python .runtime/aws-email-upgrade-05df000f8652/check_public_ui.py
+```
+
+Do not republish an existing immutable tag or rerun a completed one-time deployment. For a
+fresh regression check use the synthetic DB and
+`TEST_DATABASE_PORT=55433 sh scripts/test.sh -q --assert=plain --tb=no --show-capture=no --cov --cov-fail-under=85`.
+Build creates a new private candidate path; the named candidate above records this run only.
+Remote commands and exact follow-up validation are preserved in the transcript.
+
+Remaining/unexecuted: interactive Google consent/name/phone/manual fallback/approved-login/MFA
+acceptance; a new mutmut campaign; full isolated/off-host recovery; host storage/firewall/IAM
+review; certificate renewal/alerts; broad browser/accessibility/load testing; SMTP delivery;
+and unfinished specification features/release gates. Optional mutation command with synthetic
+DB running: `.venv/bin/python scripts/mutation_test.py --port 55433 --timeout 900`.
+Recommended next: complete human Google acceptance, then recovery/host/operational review.
+Keep inventory inactive and booking closed until authoritative campground review. This is
+not production-ready and must not accept real camper data before outstanding gates are met.
+
+Final source/release/documentation Gitleaks and Trivy gates and `git diff --check` passed.
+The synthetic local PostgreSQL container was stopped with its volume retained. No additional
+AWS mutation followed successful final acceptance. Deployment records were committed as one
+focused release milestone; no Git remote push was performed.

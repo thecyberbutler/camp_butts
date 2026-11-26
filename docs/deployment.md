@@ -308,3 +308,23 @@ only the additional People API host, plus the Google Cloud API/consent configura
 private networking, TLS, credentials, UID/GID and host boundaries. Run public Google probes
 from the matching new release only after the email migration/profile deployment. No remote
 change occurred during this implementation task.
+
+## Email/profile test release — final validation 2026-11-26
+
+The test host now runs `0.1.0-alpha.20261125-05df000f8652`. This supersedes the historical
+interface release above. See [the complete executed transcript](aws-email-profile-deployment-transcript.md).
+The owner saw all original and follow-up commands before their SSH execution. Web was stopped
+for an authenticated encrypted snapshot and `accounts.0003_email_identity`; bounded in-memory
+comparisons verified protected data before transaction commit. Reviewed grants/RLS were
+reapplied, assets collected and new digest-locked services started. Existing sessions were
+retired; account approval, MFA, passwords and Google links were preserved.
+
+The initial People-connectivity probe incorrectly expected the application's strict transport
+to return 401/403. Web stopped as designed. Only that operator probe was corrected; the new
+release was resumed, and final deployment/DB/container/public checks passed. An SSH reset and
+ambiguous stdin-consuming check were not counted as success; explicit final completion was
+obtained. No old image rollback, data restore, secret rotation or control reduction occurred.
+
+Do not rerun any completed one-time transcript. Prepare a new baseline for future upgrades;
+never start the historical username-based image on this schema. Human Google acceptance,
+off-host/isolated recovery, host controls and other production gates remain outstanding.

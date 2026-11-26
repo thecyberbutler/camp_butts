@@ -168,16 +168,18 @@ responsive navigation with reduced-motion support. All styles and illustrations 
 See [interface design](docs/interface-design.md) for behavior, accessibility checks and
 deployment status. Completed features are recorded in separate validated Git commits.
 
-The reviewed interface is deployed on the test instance in prerelease
+The reviewed interface was first deployed on the test instance in prerelease
 [`0.1.0-alpha.20261125-5815b9993895`](releases/0.1.0-alpha.20261125-5815b9993895/README.md).
 Source/image scans, PostgreSQL regression tests, runtime boundary and public acceptance checks
 passed; see the [executed interface upgrade transcript](docs/aws-ui-deployment-transcript.md).
 This remains a development deployment with booking closed, not a production release.
 
 
-Pending next release: local login/registration uses email only (unique per campground), with
-an account-preserving migration; see [email identity](docs/email-identity.md). Google signup
-can prefill editable names and an optional phone number under the owner's SD-029 approval.
-Enable People API and update the client's Data Access scopes as described in
-[Google setup](docs/google-oauth.md) before deploying. No new credentials or callback URI are
-needed. These two features have not replaced the running interface prerelease yet.
+The test instance now runs
+[`0.1.0-alpha.20261125-05df000f8652`](releases/0.1.0-alpha.20261125-05df000f8652/README.md):
+local login/registration uses email only, unique per campground, and new Google registrations
+can prefill editable names and optional phone numbers. The owner confirmed People API and
+scopes configured. The account-preserving migration retired existing sessions; passwords,
+MFA, permissions and provider links were retained. Automated public/runtime checks passed.
+See the [exact executed transcript](docs/aws-email-profile-deployment-transcript.md) and
+[Google acceptance steps](docs/google-oauth.md). Human consent/profile import remains unverified.

@@ -382,3 +382,21 @@ scans plus actual restricted-network tests. These results do not replace a full 
 build or real Google consent/profile validation. No new vulnerability was identified or prior
 vulnerability newly declared resolved. SD-029's explicitly approved scope/egress residual
 risks and the existing production gates remain.
+
+## Email/profile release scan and deployment review — 2026-11-25
+
+Release `0.1.0-alpha.20261125-05df000f8652` passed source/configuration/dependency and
+AMD64/ARM64 web/DB/Traefik/Google-egress HIGH/CRITICAL and secret gates at both build and
+publication. Gitleaks also covered documentation and the exact deployment/recovery bundles;
+Bandit and pip-audit passed. Both full PostgreSQL runs passed 271 tests, 92.74% coverage.
+No new vulnerability was identified or prior vulnerability newly declared resolved. No
+finding was suppressed; existing lower-severity, external, host and production review remains.
+
+The live deployment's initial verification script incorrectly expected GoogleSession to
+return an unauthenticated People API 401/403; that transport correctly raises for non-200.
+The handler stopped web after the successful migration. Corrected only the token-free
+infrastructure probe to make a fixed, verified-TLS, no-redirect, timeout-bounded streaming
+request through the same proxy and check 401/403 without consuming/logging its body. The
+application transport remains unchanged and fail-closed. This was an operator-probe defect,
+not an identified authentication bypass or deployed application vulnerability. The exact
+additional transcript was disclosed before reconnecting; results are recorded in progress.

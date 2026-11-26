@@ -270,3 +270,26 @@ third-party Axes protocol field names are retained for compatibility, not select
 The schema change requires a stopped-web, encrypted-backup deployment and is not compatible
 with blindly restarting the previous username-based image. No live deployment is part of
 this implementation task. Existing security controls and release gates remain mandatory.
+
+### SD-029 / SD-030 deployment follow-up — 2026-11-25
+
+The owner confirmed People API and consent scopes configured and explicitly requested scan
+and test deployment, with the complete exact transcript shown before connecting. This uses
+the existing SD-025 public-image, SD-026 test-host and SD-029 scope/egress authorizations.
+No new security exception is inferred. Source/tests and both-architecture image/egress gates
+precede publication; remote digests are independently verified. Root-owned verified script
+copies and a host deployment lock protect execution.
+
+The schema-aware procedure validates the sole tenant and exact migration plan, stops web,
+creates and authenticates an encrypted DB snapshot, and applies accounts.0003 under the
+migration identity inside a tenant transaction. Before committing, it compares preserved
+model records and expected account/email changes in memory, with bounded reads and generic
+failures. It prints no account data or hashes. Existing runtime grants/RLS are reapplied and
+checked. Session retirement and legacy lockout carryover remain mandatory.
+
+Unlike the prior presentation upgrade, any failure after web stops leaves it stopped for a
+reviewed forward fix. An old username image must never run on the new schema; no automatic
+DB restore or historical-session revival is authorized. Snapshot/key remain separately
+protected on the same host, so full isolated/off-host recovery is still an open release gate.
+Exact execution/results: `aws-email-profile-deployment-transcript.md`. Existing production
+requirements, manual Google acceptance and provider/host/shared-runtime risks remain.

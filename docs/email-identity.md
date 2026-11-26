@@ -36,6 +36,8 @@ grants and deployment checks. Do not roll back to a username-based image on the 
 Recovery requires a separately reviewed forward fix or isolated restore; never restore stale
 sessions/privileges directly over live data. Disclose the exact transcript before deployment.
 
-This feature is implemented and validated locally; the live test release still uses the
-previous schema until a separately scanned release and schema-aware deployment are performed.
-See implementation progress for actual tests and production gates.
+The scanned release `0.1.0-alpha.20261125-05df000f8652` is now deployed on the test instance.
+Migration and in-memory protected-record comparisons passed; sessions were retired, reviewed
+grants/RLS reapplied, and runtime/public controls verified. Final acceptance completed on
+2026-11-26. See `aws-email-profile-deployment-transcript.md` for the exact commands, encrypted
+snapshot, corrected operator probe and evidence. Production gates remain open.
