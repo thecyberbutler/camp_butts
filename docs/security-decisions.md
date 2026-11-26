@@ -293,3 +293,15 @@ DB restore or historical-session revival is authorized. Snapshot/key remain sepa
 protected on the same host, so full isolated/off-host recovery is still an open release gate.
 Exact execution/results: `aws-email-profile-deployment-transcript.md`. Existing production
 requirements, manual Google acceptance and provider/host/shared-runtime risks remain.
+
+## Owner-authorized test Camper approval — 2026-11-26
+
+Diagnosis found the sole Google-linked test account active but pending campground approval.
+The owner explicitly confirmed “Yes—this is my account; approve Camper access” after review
+of the exact protected command. Applied only ordinary Camper approval through the existing
+`authorize_account` workflow, with policy/account locks, expected-state checks, audit and
+security-version increment. The command compared other account fields and retained the
+Google link. No new account, role elevation, email attestation, policy change, automatic
+linking, MFA bypass, secret change or new security exception was introduced. Future accounts
+still require the existing approval process. Do not infer broader authorization from this
+individual approval. See `google-login-diagnosis.md` for evidence and exact commands.

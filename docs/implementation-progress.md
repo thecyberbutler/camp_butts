@@ -1401,3 +1401,56 @@ Final source/release/documentation Gitleaks and Trivy gates and `git diff --chec
 The synthetic local PostgreSQL container was stopped with its volume retained. No additional
 AWS mutation followed successful final acceptance. Deployment records were committed as one
 focused release milestone; no Git remote push was performed.
+
+## Google login diagnosis and owner-authorized Camper approval — 2026-11-26
+
+Current phase: phase 9 test acceptance/hardening; production gates unchanged. The owner
+reported 403 after fresh Google authorization and supplied a HAR. Inspected only sanitized
+metadata: callback 403, one value per callback parameter, initial app sign-in absent and
+cookie headers absent from the export (not proof the browser omitted them). OAuth codes,
+state, Google identifiers and raw content were never displayed, copied into the repository,
+replayed or uploaded; the original sensitive capture remains in the owner's Downloads.
+
+Exact remote diagnostic scripts were disclosed before SSH. Aggregate read-only checks found
+one Google-linked account: active, unapproved, no privileged access. A synthetic invalid-code
+token request through the approved TLS-verified Google proxy returned invalid_grant rather
+than invalid_client; this supports client acceptance but does not establish a real user's
+successful token exchange. Pending account approval is a definite application sign-in blocker.
+The generic 403 hides the distinction between Google identity and campground authorization.
+
+The owner explicitly confirmed the account is theirs and authorized Camper approval only.
+Executed the disclosed existing protected `authorize_account` workflow under tenant scope,
+with policy/account locks, exact eligibility/sole-account/role guards, audit and security-
+version increment. Live in-memory comparisons confirmed other account fields and the Google
+link unchanged. No permissions beyond ordinary Camper approval were granted; registration
+approval, verification, MFA, rate limits, tenant isolation, closed booking and other controls
+remain. No application code/image/config change, new dependency, migration, deployment or
+secret rotation was necessary. The deployed release remains 0.1.0-alpha.20261125-05df000f8652.
+
+Validation: **8 existing Google policy/login/MFA tests passed** (55 outside the targeted
+selection deselected) and **3 synthetic approval-wrapper tests passed**, including ambiguous
+selection refusal and transactional rollback on unexpected data change. The live audited
+approval and preservation checks passed. No full-suite rerun, image build/scan, mutation
+campaign, or real human Google sign-in was performed/claimed for this operator task.
+
+No application authentication vulnerability was identified or newly resolved. This was an
+intended authorization gate plus unclear error presentation. No controls were weakened and
+no security approval is pending after the owner's scoped confirmation. HAR code/state are
+sensitive artifacts, not evidence of a newly discovered public credential leak. Existing
+external/host/lower-severity/manual production findings remain open.
+
+Files modified: `docs/google-login-diagnosis.md`, `docs/google-oauth.md`,
+`docs/security-decisions.md`, `docs/implementation-progress.md`. Private diagnostic/approval
+and synthetic test scripts are ignored under `.runtime/google-login-diagnosis-20261126/`.
+Exact commands/results and local repeat-validation commands are in the diagnosis document.
+Do not rerun the one-time approval against an already approved account.
+
+Next: owner starts a fresh Google login and confirms dashboard access; no automatic login
+was performed on their behalf. If it still fails, diagnose the next boundary without assuming
+approval was the only possible cause. Improve pending-approval messaging in a separately
+reviewed implementation without account enumeration. All existing recovery/host/manual
+acceptance and production gates remain; this is still not production-ready.
+
+Final Gitleaks scans passed for source/documentation and the private diagnostic scripts;
+`git diff --check` passed. The synthetic local DB was stopped with its volume retained.
+This operational diagnosis/approval record is one focused Git commit; no remote Git push.

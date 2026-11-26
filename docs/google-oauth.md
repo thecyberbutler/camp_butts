@@ -175,3 +175,19 @@ Additional references: [Google OIDC claims](https://developers.google.com/identi
 [People self-profile fields/scopes](https://developers.google.com/people/api/rest/v1/people/get),
 [OAuth scope configuration](https://developers.google.com/identity/protocols/oauth2/scopes),
 [sensitive-scope verification](https://developers.google.com/identity/protocols/oauth2/production-readiness/sensitive-scope-verification).
+
+## Access denied after Google consent
+
+Google identity confirmation and campground account eligibility are separate checks. An
+existing linked account must still be active and approved, pass rate limiting, and complete
+required/enrolled application MFA. New registrations retain policy consent and campground
+approval; Google consent does not grant local permissions or automatically link a matching
+email account. The generic 403 page currently does not explain a pending approval.
+
+On 2026-11-26, read-only diagnosis found the owner's sole Google-linked test account active
+but unapproved. After explicit owner identity confirmation and Camper-approval authorization,
+the protected audited command approved that account and preserved all other fields/Google
+links. Registration mode, MFA and all remaining controls are unchanged. No new release was
+needed; live browser retry remains necessary to confirm end-to-end login. See the
+[diagnosis and exact transcript](google-login-diagnosis.md). Never replay HAR codes/cookies
+or disable controls to diagnose a callback. Treat HAR files as sensitive evidence.
