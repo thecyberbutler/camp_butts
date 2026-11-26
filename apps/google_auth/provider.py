@@ -6,6 +6,7 @@ import time
 import jwt
 from allauth.account.models import EmailAddress
 from allauth.socialaccount.internal import jwtkit
+from allauth.socialaccount.models import SocialAccount
 from allauth.socialaccount.providers.google.provider import GoogleProvider
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 from allauth.socialaccount.providers.oauth2.client import OAuth2Error
@@ -17,6 +18,8 @@ from apps.accounts.middleware import security_stamp
 from apps.tenancy.context import current_tenant
 
 from .adapter import require_link_assurance
+from .constants import GOOGLE_SCOPES, PHONE_SCOPE
+from .profile import profile_name, profile_phone
 
 
 class VerifiedGoogleOAuth2Adapter(GoogleOAuth2Adapter):
@@ -53,7 +56,18 @@ class VerifiedGoogleOAuth2Adapter(GoogleOAuth2Adapter):
             ):
                 raise ValueError
             claims["email"] = forms.EmailField().clean(claims.get("email", "")).casefold()
-            return self.get_provider().sociallogin_from_response(request, claims)
+            sociallogin = self.get_provider().sociallogin_from_response(request, claims)
+            granted = kwargs["response"].get("scope")
+            phone_granted = granted is None or (
+                isinstance(granted, str) and PHONE_SCOPE in granted.split()
+            )
+            if (
+                state.get("process") == "login"
+                and phone_granted
+                and not SocialAccount.objects.filter(provider="google", uid=claims["sub"]).exists()
+            ):
+                sociallogin.user.phone = profile_phone(token.token)
+            return sociallogin
         except (KeyError, ValueError, TypeError, AttributeError, ValidationError, jwt.PyJWTError):
             raise OAuth2Error("Google identity verification failed") from None
 
@@ -63,7 +77,7 @@ class SecureGoogleProvider(GoogleProvider):
     supports_token_authentication = False
 
     def get_scope_from_request(self, request):
-        return ["openid", "email"]
+        return list(GOOGLE_SCOPES)
 
     def get_auth_params_from_request(self, request, action):
         return {"access_type": "online", "prompt": "select_account"}
@@ -86,7 +100,7 @@ class SecureGoogleProvider(GoogleProvider):
             process,
             next_url=reverse("socialaccount_connections" if process == "connect" else "dashboard"),
             auth_params={"access_type": "online", "prompt": "select_account", "nonce": nonce},
-            scope=["openid", "email"],
+            scope=list(GOOGLE_SCOPES),
             nonce=nonce,
             tenant=str(current_tenant().id),
             client_id=self.app.client_id,
@@ -94,6 +108,13 @@ class SecureGoogleProvider(GoogleProvider):
             actor=str(request.user.pk) if process == "connect" else None,
             stamp=security_stamp(request.user) if process == "connect" else None,
         )
+
+    def extract_common_fields(self, data):
+        return {
+            "email": data["email"],
+            "first_name": profile_name(data.get("given_name")),
+            "last_name": profile_name(data.get("family_name")),
+        }
 
     def extract_extra_data(self, data):
         return {"email": data["email"]}

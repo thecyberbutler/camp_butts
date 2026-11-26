@@ -2,6 +2,8 @@
 
 import requests
 
+from .constants import PEOPLE_SELF_URL
+
 
 class GoogleSession(requests.Session):
     def __init__(self):
@@ -12,8 +14,9 @@ class GoogleSession(requests.Session):
         permitted = {
             ("POST", "https://oauth2.googleapis.com/token"),
             ("GET", "https://www.googleapis.com/oauth2/v1/certs"),
+            ("GET", PEOPLE_SELF_URL),
         }
-        if (method.upper(), url) not in permitted:
+        if (method.upper(), url) not in permitted or kwargs.get("params"):
             raise requests.RequestException("Unapproved identity-provider endpoint")
         kwargs.update(
             allow_redirects=False,

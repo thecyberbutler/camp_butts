@@ -232,3 +232,10 @@ Interface refresh, 2026-11-25: no new runtime, development or frontend package. 
 Bootstrap/HTMX, system fonts, local CSS and newly authored fixed SVG geometry. No remote font
 or artwork license dependency. The allauth button template retains its upstream structure
 with presentation classes; allauth's existing MIT notice/license obligations still apply.
+
+
+Email identity and Google profile prefilling (2026-11-25) add no package or library. Existing
+Django/allauth, Requests, PyJWT and Squid provide the functionality. SD-029 adds a reviewed
+Google API endpoint/scope, not a managed application/database service; transitive dependencies
+and lock file are unchanged. The changed Squid configuration was built/scanned for AMD64 and
+ARM64 and exercised in disposable real-network boundary tests; see implementation progress.

@@ -5,6 +5,7 @@ from pathlib import Path
 from cryptography.fernet import Fernet
 from django.core.exceptions import ImproperlyConfigured
 
+from apps.google_auth.constants import GOOGLE_SCOPES
 from config.environment import validate_environment
 from config.google import google_configuration
 from config.secrets import read_secret
@@ -143,7 +144,7 @@ SOCIALACCOUNT_STORE_TOKENS = False
 SOCIALACCOUNT_EMAIL_AUTHENTICATION = False
 SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = False
 SOCIALACCOUNT_EMAIL_VERIFICATION = ACCOUNT_EMAIL_VERIFICATION
-SOCIALACCOUNT_PROVIDERS = {"google": {"OAUTH_PKCE_ENABLED": True, "SCOPE": ["openid", "email"]}}
+SOCIALACCOUNT_PROVIDERS = {"google": {"OAUTH_PKCE_ENABLED": True, "SCOPE": list(GOOGLE_SCOPES)}}
 SOCIALACCOUNT_FORMS = {"signup": "apps.google_auth.views.GoogleSignupForm"}
 RECOVERY_RATE = "3/h/ip,3/h/key"
 ACCOUNT_RATE_LIMITS = {

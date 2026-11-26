@@ -6,6 +6,13 @@ from urllib.parse import parse_qs, urlsplit
 
 import requests
 
+GOOGLE_SCOPES = {
+    "openid",
+    "email",
+    "profile",
+    "https://www.googleapis.com/auth/user.phonenumbers.read",
+}
+
 ORIGIN = "https://camp-butts-test.thecyberbutler.io"
 PREFIX = ORIGIN + "/c/georgia-mountain-fairgrounds/accounts/"
 CLIENT_ID = "232928548083-ipnfvophvjhhb8bq0rdcu3iqmpfu8ets.apps.googleusercontent.com"
@@ -52,7 +59,7 @@ def check():
         parameters = parse_qs(url.query)
         require(parameters["client_id"] == [CLIENT_ID])
         require(parameters["redirect_uri"] == [PREFIX + "google/login/callback/"])
-        require(set(parameters["scope"][0].split()) == {"openid", "email"})
+        require(set(parameters["scope"][0].split()) == set(GOOGLE_SCOPES))
         require(parameters["code_challenge_method"] == ["S256"])
         require(parameters["access_type"] == ["online"])
         require(len(parameters["state"][0]) >= 32 and len(parameters["nonce"][0]) >= 32)

@@ -85,6 +85,12 @@ class GoogleSignupForm(SocialSignupForm):
         ):
             self.fields[name] = copy.deepcopy(LocalSignupForm.base_fields[name])
         self.fields["email"].disabled = True
+        self.fields["phone"].help_text = (
+            "Optional. Review the number suggested by Google, or enter a contact number. "
+            "This does not verify the number or enable phone sign-in."
+        )
+        for name in ("first_name", "last_name"):
+            self.fields[name].help_text = "Review the name suggested by Google or enter your name."
 
 
 class GoogleSignupView(SignupView):

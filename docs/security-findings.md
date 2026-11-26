@@ -366,3 +366,19 @@ Gitleaks source/deployment-bundle checks, Bandit and pip-audit passed. No new fi
 identified by these executed checks and no finding was suppressed or security waiver added.
 No prior vulnerability is newly declared resolved by this presentation update. Lower-severity,
 host, manual and remaining production acceptance reviews are not implied by this scan result.
+
+## Google profile implementation scan review — 2026-11-25
+
+Gitleaks initially flagged `tests/security/test_google_oauth.py` with `generic-api-key`.
+Reviewed the redacted location: the matched value was the public three-scope OAuth string
+in the missing-phone-grant test, adjacent to a synthetic signing-fixture argument. It was
+not an API key or credential. Reexpressed the same public scopes as an explicit joined list
+in the test, reran that case and the complete source scan successfully. No rule suppression,
+allowlist or security exception was added; no actual credential leak is claimed or reproduced.
+
+Final source/documentation Gitleaks, Trivy source/dependency/configuration, Bandit and
+pip-audit passed. The changed Google egress image passed AMD64/ARM64 HIGH/CRITICAL and secret
+scans plus actual restricted-network tests. These results do not replace a full new release
+build or real Google consent/profile validation. No new vulnerability was identified or prior
+vulnerability newly declared resolved. SD-029's explicitly approved scope/egress residual
+risks and the existing production gates remain.

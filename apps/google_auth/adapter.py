@@ -56,6 +56,11 @@ class GoogleAccountAdapter(DefaultSocialAccountAdapter):
     def get_requests_session(self):
         return GoogleSession()
 
+    def get_signup_form_initial_data(self, sociallogin):
+        initial = super().get_signup_form_initial_data(sociallogin)
+        initial["phone"] = sociallogin.user.phone or ""
+        return initial
+
     def generate_state_param(self, state):
         return secrets.token_urlsafe(32)
 

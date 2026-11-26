@@ -173,3 +173,11 @@ The reviewed interface is deployed on the test instance in prerelease
 Source/image scans, PostgreSQL regression tests, runtime boundary and public acceptance checks
 passed; see the [executed interface upgrade transcript](docs/aws-ui-deployment-transcript.md).
 This remains a development deployment with booking closed, not a production release.
+
+
+Pending next release: local login/registration uses email only (unique per campground), with
+an account-preserving migration; see [email identity](docs/email-identity.md). Google signup
+can prefill editable names and an optional phone number under the owner's SD-029 approval.
+Enable People API and update the client's Data Access scopes as described in
+[Google setup](docs/google-oauth.md) before deploying. No new credentials or callback URI are
+needed. These two features have not replaced the running interface prerelease yet.

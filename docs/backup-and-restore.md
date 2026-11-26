@@ -139,3 +139,11 @@ No schema change or database restore occurred. The compatible rollback handler c
 the prior reviewed image lock/static assets without restoring stale DB state; it was not
 needed during this successful upgrade. A full isolated restore, off-host key escrow and
 recovery drill remain outstanding. These host-local artifacts do not satisfy those gates.
+
+
+Email-only migration requires retaining the encrypted pre-upgrade database and independently
+protected keys before removing the username column. The migration is intentionally irreversible;
+old application images cannot run against the new schema. Preserve IDs, password hashes,
+MFA/provider links and occupancy; retired sessions must not be revived by a restore. Profile
+name/phone suggestions are ordinary contact data after confirmation and belong in protected
+tenant backups; raw Google tokens and provider responses never belong in backup payloads.

@@ -23,7 +23,7 @@ def tunnel(host, port=443):
         conn.close()
 
 for host in ("example.com", "169.254.169.254", "127.0.0.1", "10.0.0.1",
-             "www.googleapis.com.evil.invalid", "[::1]"):
+             "www.googleapis.com.evil.invalid", "people.googleapis.com.evil.invalid", "[::1]"):
     tunnel(host)
 tunnel("www.googleapis.com", 80)
 conn = http.client.HTTPConnection("172.30.20.2", 3128, timeout=10)
@@ -36,6 +36,12 @@ conn.set_tunnel("www.googleapis.com", 443)
 conn.request("GET", "/oauth2/v1/certs")
 assert conn.getresponse().status == 200
 conn.close()
+conn = http.client.HTTPSConnection(
+    "172.30.20.2", 3128, context=ssl.create_default_context(), timeout=15)
+conn.set_tunnel("people.googleapis.com", 443)
+conn.request("GET", "/v1/people/me?personFields=phoneNumbers&sources=READ_SOURCE_TYPE_PROFILE")
+assert conn.getresponse().status in (401, 403)  # No real OAuth token in infrastructure probes.
+conn.close()
 try:
     with socket.create_connection(("1.1.1.1", 443), timeout=2):
         raise AssertionError("Direct Internet route exists")
@@ -45,10 +51,11 @@ print("Google TLS tunnel and denied destinations/methods/ports/direct egress ver
 """
 DENY_GOOGLE = r"""
 import http.client
-conn = http.client.HTTPConnection("172.30.20.2", 3128, timeout=10)
-conn.request("CONNECT", "www.googleapis.com:443")
-assert conn.getresponse().status == 403
-conn.close()
+for host in ("www.googleapis.com", "people.googleapis.com"):
+    conn = http.client.HTTPConnection("172.30.20.2", 3128, timeout=10)
+    conn.request("CONNECT", host + ":443")
+    assert conn.getresponse().status == 403
+    conn.close()
 print("Google tunnel denied under the negative boundary condition.")
 """
 
@@ -134,7 +141,12 @@ def check(image):
         for address in ("169.254.169.254", "::ffff:169.254.169.254"):
             run(["docker", "rm", "-f", container])
             running = False
-            start("--add-host", "www.googleapis.com:" + address)
+            start(
+                "--add-host",
+                "www.googleapis.com:" + address,
+                "--add-host",
+                "people.googleapis.com:" + address,
+            )
             client(DENY_GOOGLE)
         print(
             "Google proxy: verified TLS; unapproved/private/metadata targets, wrong peer, "

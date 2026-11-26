@@ -145,3 +145,13 @@ restrictive CSP, local assets and the server-controlled red test banner. Decorat
 fixed source-controlled geometry, not an upload/rendering feature. Native disclosure controls
 do not authorize actions; underlying server checks remain authoritative. No new secrets,
 permissions, external resources or security exceptions are introduced.
+
+
+SD-029 extends the Google scope/egress exception only for name and optional phone prefilling.
+The proxy additionally allows `people.googleapis.com:443`; application transport restricts
+one self-profile URL, phone-only field/source mask, GET, no query overrides/redirects, verified
+TLS, timeouts and a 64 KiB response bound. Signed-token name claims and returned phone data
+are type/length validated and escaped, then editable on signup. Existing linked accounts
+are not overwritten. Phone permission/data/network failure only leaves optional contact input
+blank; it never bypasses ID-token verification or downgrades TLS. No phone authentication,
+verification, MFA, recovery, token persistence or automatic linking is introduced.

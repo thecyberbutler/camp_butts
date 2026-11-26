@@ -183,3 +183,17 @@ unchanged IP attempt history and session retirement mitigate them. Staff/operato
 email-based without a public account directory. Existing Google-subject binding and no-email-
 auto-linking controls remain. Destructive schema rollback is not automatic; migration requires
 stopped writers, encrypted backup and reviewed per-tenant execution.
+
+
+## Approved Google profile data — 2026-11-25
+
+Additional assets/boundary: editable name/phone suggestions and transient access-token use
+at `people.googleapis.com`. Scope creep, contact harvesting, unsafe profile strings, raw
+payload retention, wrong-subject data and treating phone as verified identity are risks.
+The fixed `people/me` phone-only/profile-source request, bounded verified transport, signed
+OIDC names, sanitized editable fields, minimal retained data, existing subject/tenant/state
+binding and no phone-auth or automatic link behavior constrain them. Existing-account details
+are never updated from the provider. The wider approved CONNECT host remains exploitable by
+a compromised web process; application URL checks are defense in depth, not containment of
+arbitrary code execution. People API/provider outage, unavailable profile phone and consent/
+verification requirements remain operational limitations; optional manual entry is retained.

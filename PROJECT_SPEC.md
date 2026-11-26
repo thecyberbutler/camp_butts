@@ -3368,3 +3368,16 @@ color interaction while preserving accessible contrast, keyboard use, reduced-mo
 preferences, locally served assets and all existing security controls. Retain the mandatory
 stack and prominent test-instance banner. This is presentation work, not approval to relax
 CSP, change authentication, enable bookings or introduce external frontend services.
+
+
+## Owner-requested Google profile prefilling — 2026-11-25
+
+The owner explicitly approved name and optional phone import after review of the broader
+OAuth scopes and restricted People API egress (SD-029). Request `openid email profile` and
+`https://www.googleapis.com/auth/user.phonenumbers.read`; only fetch the signed-in user's
+own phone numbers from the fixed People API self-profile endpoint. Retain editable signup
+confirmation, optional manual phone fallback, existing policy/approval/MFA controls and no
+email-based linking. Do not retain unrelated profile/contacts data, provider tokens or claim
+that an imported phone is verified or suitable for authentication/recovery. Never overwrite
+existing account contact details on ordinary sign-in or linking. Existing account migration
+and production security requirements remain in force.

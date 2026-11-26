@@ -300,3 +300,11 @@ The pending email-only schema change requires the separate migration/cutover pro
 `email-identity.md`. The historical presentation-only upgrade script must not be used for it;
 its automatic old-image rollback is incompatible with a removed username column. No live
 schema upgrade is claimed by the email-only implementation task.
+
+
+The approved profile-prefill release also needs a freshly scanned Google egress image allowing
+only the additional People API host, plus the Google Cloud API/consent configuration in
+`google-oauth.md`. The old live proxy intentionally cannot reach that host. Keep all existing
+private networking, TLS, credentials, UID/GID and host boundaries. Run public Google probes
+from the matching new release only after the email migration/profile deployment. No remote
+change occurred during this implementation task.

@@ -188,6 +188,9 @@ Use:
 Owner-approved exception (SD-027): optional Google OpenID Connect through a restricted,
 non-root Google-only egress proxy. This does not authorize other identity providers,
 unrestricted egress, automatic email account linking, or bypassing application MFA/approval.
+SD-029 additionally approves Google name/optional phone signup prefilling through profile/phone
+scopes and the restricted People API self-profile endpoint. No contacts access, stored tokens,
+verified-phone identity or additional provider/egress is authorized.
 
 
 Use supported, security-patched versions.

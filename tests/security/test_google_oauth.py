@@ -24,6 +24,7 @@ from django.test import Client
 
 from apps.accounts.models import Invitation, User
 from apps.google_auth.adapter import GoogleAccountAdapter
+from apps.google_auth.constants import PEOPLE_SELF_URL
 from apps.google_auth.transport import GoogleSession
 from apps.tenancy.context import tenant_scope
 from config.google import google_configuration
@@ -83,7 +84,17 @@ def start(client, process="login", suffix=""):
 
 
 def callback(
-    client, authorization, monkeypatch, signing_key, *, claims=None, algorithm="RS256", perform=True
+    client,
+    authorization,
+    monkeypatch,
+    signing_key,
+    *,
+    claims=None,
+    algorithm="RS256",
+    perform=True,
+    phone_data=None,
+    phone_error=False,
+    granted_scope=None,
 ):
     key, cert = signing_key
     data = {
@@ -118,6 +129,13 @@ def callback(
                 "https://testserver/c/default/accounts/google/login/callback/"
             )
             payload = {"access_token": token, "id_token": credential, "token_type": "Bearer"}
+            if granted_scope is not None:
+                payload["scope"] = granted_scope
+        elif url == PEOPLE_SELF_URL:
+            assert kwargs["headers"]["Authorization"] == "Bearer " + token
+            if phone_error:
+                raise requests.RequestException("Synthetic optional profile denial")
+            payload = phone_data if phone_data is not None else {"phoneNumbers": []}
         else:
             assert url == "https://www.googleapis.com/oauth2/v1/certs"
             payload = {"synthetic": cert}
@@ -151,7 +169,12 @@ def test_start_requires_csrf_and_fixes_scope_redirect_pkce_and_nonce(google):
         client,
         suffix="?scope=https://evil.invalid&auth_params=access_type%3Doffline&next=https://evil.invalid",
     )
-    assert set(params["scope"].split()) == {"openid", "email"}
+    assert set(params["scope"].split()) == {
+        "openid",
+        "email",
+        "profile",
+        "https://www.googleapis.com/auth/user.phonenumbers.read",
+    }
     assert params["access_type"] == "online" and params["code_challenge_method"] == "S256"
     assert len(params["nonce"]) >= 32 and len(params["state"]) >= 32
     assert params["redirect_uri"].endswith("/c/default/accounts/google/login/callback/")
@@ -465,7 +488,7 @@ def test_simultaneous_callbacks_consume_state_once(google, camper, monkeypatch, 
     from concurrent.futures import ThreadPoolExecutor
     from threading import Barrier
 
-    from django.db import close_old_connections
+    from django.db import close_old_connections, connections
 
     SocialAccount.objects.create(user=camper, provider="google", uid="12345678901234567890")
     client = Client()
@@ -486,9 +509,217 @@ def test_simultaneous_callbacks_consume_state_once(google, camper, monkeypatch, 
                 secure=True,
             ).status_code
         finally:
-            close_old_connections()
+            connections.close_all()
 
     with ThreadPoolExecutor(max_workers=2) as executor:
         results = list(executor.map(lambda _: attempt(), range(2)))
     assert sorted(results) == [302, 403]
     assert sum(method == "POST" for method, _ in calls) == 1
+
+
+def test_google_profile_prefills_editable_registration_without_extra_data_retention(
+    google, monkeypatch, signing_key
+):
+    client = Client(enforce_csrf_checks=True)
+    response, calls = callback(
+        client,
+        start(client),
+        monkeypatch,
+        signing_key,
+        claims={
+            "email": "profile@gmail.com",
+            "given_name": "Google",
+            "family_name": "Camper",
+            "picture": "https://untrusted.invalid/avatar",
+            "phone_number": "ignore-claim",
+        },
+        phone_data={
+            "phoneNumbers": [
+                {"value": "+1 202-555-0111"},
+                {"canonicalForm": "+12025550122", "metadata": {"primary": True, "verified": True}},
+            ],
+            "addresses": [{"formattedValue": "must-not-retain"}],
+        },
+    )
+    assert ("GET", PEOPLE_SELF_URL) in calls
+    pending = client.session["socialaccount_sociallogin"]
+    assert pending["account"]["extra_data"] == {"email": "profile@gmail.com"}
+    assert not pending.get("token")
+    assert "must-not-retain" not in json.dumps(pending)
+    assert "untrusted.invalid" not in json.dumps(pending)
+    page = client.get(response.url, secure=True)
+    form = page.context["form"]
+    assert "username" not in form.fields and form.fields["email"].disabled
+    assert form["first_name"].value() == "Google" and form["last_name"].value() == "Camper"
+    assert form["phone"].value() == "+12025550122" and not form.fields["phone"].disabled
+    completed = post(
+        client,
+        response.url,
+        {
+            "email": "tampered@example.test",
+            "first_name": "Chosen",
+            "last_name": "Name",
+            "phone": "+1 202-555-0133",
+            "rules_agreed": True,
+            "policies_agreed": True,
+        },
+    )
+    assert completed.status_code == 302
+    user = User.objects.get(email="profile@gmail.com")
+    assert (user.first_name, user.last_name, user.phone) == ("Chosen", "Name", "+1 202-555-0133")
+    assert not user.approved and not user.is_staff and not user.has_usable_password()
+    assert not SocialToken.objects.exists() and "_auth_user_id" not in client.session
+    assert SocialAccount.objects.get(user=user).extra_data == {"email": user.email}
+
+
+@pytest.mark.parametrize(
+    "phone_data",
+    [
+        {},
+        {"phoneNumbers": []},
+        {"phoneNumbers": None},
+        {"phoneNumbers": "invalid"},
+        {"phoneNumbers": [{"value": "x" * 33}]},
+        {"phoneNumbers": [{"value": "<script>"}]},
+        {"phoneNumbers": [{"value": "+12025550122"}] * 21},
+        {"phoneNumbers": [None, {"value": {"nested": "invalid"}}]},
+    ],
+)
+def test_missing_malformed_phone_does_not_block_verified_signup(
+    google, monkeypatch, signing_key, phone_data
+):
+    client = Client()
+    response, _ = callback(client, start(client), monkeypatch, signing_key, phone_data=phone_data)
+    assert response.status_code == 302
+    assert client.get(response.url, secure=True).context["form"]["phone"].value() == ""
+    assert "_auth_user_id" not in client.session
+
+
+def test_denied_people_permission_uses_manual_phone(google, monkeypatch, signing_key):
+    client = Client()
+    response, _ = callback(client, start(client), monkeypatch, signing_key, phone_error=True)
+    assert response.status_code == 302
+    assert client.get(response.url, secure=True).context["form"]["phone"].value() == ""
+
+
+def test_missing_phone_grant_does_not_call_people_api(google, monkeypatch, signing_key):
+    client = Client()
+    response, calls = callback(
+        client,
+        start(client),
+        monkeypatch,
+        signing_key,
+        granted_scope=" ".join(("openid", "email", "profile")),
+    )
+    assert response.status_code == 302 and len(calls) == 2
+    assert client.get(response.url, secure=True).context["form"]["phone"].value() == ""
+
+
+def test_existing_account_profile_is_never_overwritten(google, camper, monkeypatch, signing_key):
+    camper.first_name, camper.last_name, camper.phone = "Local", "Camper", "+12025550100"
+    camper.save()
+    SocialAccount.objects.create(user=camper, provider="google", uid="12345678901234567890")
+    client = Client()
+    response, calls = callback(
+        client,
+        start(client),
+        monkeypatch,
+        signing_key,
+        claims={"given_name": "Provider", "family_name": "Changed"},
+        phone_data={"phoneNumbers": [{"value": "+12025550199"}]},
+    )
+    assert response.status_code == 302 and len(calls) == 2
+    camper.refresh_from_db()
+    assert (camper.first_name, camper.last_name, camper.phone) == (
+        "Local",
+        "Camper",
+        "+12025550100",
+    )
+
+
+@pytest.mark.parametrize(
+    "value", [None, {"bad": "type"}, "x" * 151, "Bad\x00Name", "Bad\u202eName"]
+)
+def test_invalid_profile_names_require_manual_entry(google, monkeypatch, signing_key, value):
+    client = Client()
+    response, _ = callback(
+        client,
+        start(client),
+        monkeypatch,
+        signing_key,
+        claims={"given_name": value, "family_name": value},
+    )
+    form = client.get(response.url, secure=True).context["form"]
+    assert form["first_name"].value() == "" and form["last_name"].value() == ""
+
+
+def test_profile_names_are_escaped_in_signup(google, monkeypatch, signing_key):
+    client = Client()
+    response, _ = callback(
+        client,
+        start(client),
+        monkeypatch,
+        signing_key,
+        claims={"given_name": "<script>alert(1)</script>", "family_name": "Camper"},
+    )
+    page = client.get(response.url, secure=True)
+    assert b"<script>alert(1)</script>" not in page.content
+    assert b"&lt;script&gt;" in page.content
+
+
+@pytest.mark.parametrize(
+    "url",
+    [
+        "https://people.googleapis.com/v1/people/another?personFields=phoneNumbers",
+        "https://people.googleapis.com/v1/people/me?personFields=connections",
+        "https://people.googleapis.com/v1/people/me/connections?personFields=phoneNumbers",
+        PEOPLE_SELF_URL + "&key=unexpected",
+    ],
+)
+def test_people_transport_rejects_other_people_fields_and_parameters(url):
+    with GoogleSession() as session, pytest.raises(requests.RequestException):
+        session.get(url)
+
+
+def test_people_transport_retains_tls_size_and_redirect_controls(monkeypatch):
+    seen = []
+
+    def request(self, method, url, **kwargs):
+        seen.append(kwargs)
+        response = requests.Response()
+        response.status_code = 200
+        response._content = b"x" * 65537
+        response._content_consumed = True
+        return response
+
+    monkeypatch.setattr(requests.Session, "request", request)
+    with GoogleSession() as session, pytest.raises(requests.RequestException):
+        session.get(PEOPLE_SELF_URL, verify=False, allow_redirects=True)
+    assert seen[0]["verify"] is True and seen[0]["allow_redirects"] is False
+    assert seen[0]["timeout"] == (3.05, 10) and seen[0]["stream"] is True
+
+
+def test_people_transport_rejects_query_parameter_override():
+    with GoogleSession() as session, pytest.raises(requests.RequestException):
+        session.get(PEOPLE_SELF_URL, params={"personFields": "connections"})
+
+
+def test_invalid_phone_token_is_never_sent(monkeypatch):
+    from apps.google_auth.profile import profile_phone
+
+    def network_forbidden(*args, **kwargs):
+        pytest.fail("Malformed token must not reach HTTP transport")
+
+    monkeypatch.setattr(GoogleSession, "request", network_forbidden)
+    for value in (None, {}, "", "header\r\ninjection", "x" * 8193):
+        assert profile_phone(value) == ""
+
+
+def test_profile_api_tls_failure_uses_manual_entry_without_bypassing_verification(monkeypatch):
+    from apps.google_auth.profile import profile_phone
+
+    def failed_tls(*args, **kwargs):
+        raise requests.exceptions.SSLError("Synthetic verification failure")
+
+    monkeypatch.setattr(GoogleSession, "request", failed_tls)
+    assert profile_phone(secrets.token_urlsafe(32)) == ""

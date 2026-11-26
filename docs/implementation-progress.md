@@ -1164,3 +1164,135 @@ Repeat with the protected synthetic PostgreSQL running:
 The targeted commands use `tests/security/test_email_identity.py` and
 `tests/concurrency/test_email_registration.py`. Deployment requires migration review and a
 new scanned release; the running AWS test instance is unchanged.
+
+## Google name and optional phone prefilling — 2026-11-25
+
+Owner explicitly approved profile/phone scopes and restricted People API access after risk,
+control, alternative and rollback disclosure (SD-029). Implemented with the existing stack;
+no new dependency/migration is added by this feature. Email-only identity is separately
+committed as `47bc241` with `accounts.0003_email_identity`.
+
+New Google registration prefills bounded first/last names from verified ID-token claims and
+an optional primary/first usable phone from the fixed People self-profile endpoint. Fields
+remain editable; rules/policies are not preaccepted. Missing/denied/malformed phone or optional
+profile TLS failure leaves manual input without weakening authentication/TLS. Existing accounts
+and explicit linking do not fetch phones or overwrite local details. No contact-list access,
+unrelated profile fields, persistent tokens, phone verification/authentication/recovery or
+automatic email linking. Profile suggestions are transient in the existing encrypted signup
+session and only confirmed contact fields enter the account record.
+
+The existing private non-root proxy gains only `people.googleapis.com:443`. Application
+transport fixes GET/URL/query fields/sources and denies query overrides, redirects and excess
+response size. Actual proxy TLS, wrong-peer/host/port/method, private/metadata (including mapped
+IPv6), DNS-to-metadata and direct-egress denial passed with the changed configuration. Both
+AMD64/ARM64 proxy images passed vulnerability/secret scans, non-root execution and config parsing.
+Local review tag: `campground-google-egress:profile-review`; not published or deployed.
+
+Validation: the complete PostgreSQL suite **271 passed, 92.74% coverage**, including new signed
+callback/profile/permission/fallback/escaping/non-overwrite/transport tests and email migration,
+concurrent signup, callback replay, tenant isolation, MFA and reservation concurrency regressions.
+The callback test's worker cleanup now closes each thread's DB connections, resolving the
+observed synthetic-test teardown warning; the final full run had no such warning. No test or
+security check was weakened or skipped. Ruff/format and Bandit passed before the final full run;
+final scans/documentation checks follow below.
+
+Google operator setup: enable People API in the existing test OAuth client's project; retain
+OpenID/email scopes and add profile (`userinfo.profile` in Data Access) plus
+`https://www.googleapis.com/auth/user.phonenumbers.read`. Keep Testing audience/test users;
+review any Google production verification requirements. Client ID/secret/callback and
+JavaScript origins need no changes. Never send credentials or callback tokens in chat.
+Detailed setup and exact callback remain in `google-oauth.md`.
+
+Files: `apps/google_auth/{constants,profile,provider,transport,adapter,views}.py`,
+`config/settings/base.py`, `infra/google-egress/squid.conf`, `scripts/check_google_egress.py`,
+`scripts/check_public_google.py`, `tests/security/test_google_oauth.py`, AGENTS/PROJECT_SPEC/
+README and architecture/security/threat-model/deployment/Google/dependency/backup/progress docs.
+Security impact is the specifically approved broader Google data/egress boundary; no other
+exception or pending security approval. No vulnerability identified or newly declared resolved;
+remaining prior findings/production gates are unchanged.
+
+No AWS connection, image publication or deployment in this implementation task. The running
+interface prerelease `0.1.0-alpha.20261125-5815b9993895` still uses the previous username schema
+and Google scopes. Do not run the new public scope probe against it and claim a regression.
+Next: owner Google Cloud configuration, a new fully scanned release, encrypted backup and
+stopped-writer migration per campground with exact transcript disclosure; then human Google
+consent/profile/approved-login acceptance. Do not reuse the UI-only old-image rollback script.
+A new mutation campaign, live profile retrieval, cross-browser/screen-reader testing, full
+off-host restore and existing production acceptance work remain unexecuted/unverified.
+
+Final checks passed: Ruff lint/format, Bandit, Gitleaks source/documentation, Trivy
+source/dependency/configuration and pip-audit. The secret scanner initially flagged a public
+OAuth scope string in a synthetic test; reviewed it as a false positive, clarified the test
+expression and reran the case and scans without suppressing rules. See security-findings.md.
+The targeted rerun passed. No actual secret disclosure or vulnerability is claimed.
+
+Repeat commands (synthetic database only; image reference is a local reviewed test build):
+
+```sh
+docker start campground-test-db-hardened
+TEST_DATABASE_PORT=55433 sh scripts/test.sh -q --assert=plain --tb=no --show-capture=no --cov --cov-fail-under=85
+.venv/bin/ruff check apps config scripts tests manage.py gunicorn.conf.py
+.venv/bin/ruff format --check apps config scripts tests manage.py gunicorn.conf.py
+.venv/bin/bandit -r apps config scripts manage.py gunicorn.conf.py -q
+.venv/bin/pip-audit --progress-spinner off
+.venv/bin/python -m scripts.check_google_egress campground-google-egress:profile-review
+docker stop campground-test-db-hardened
+```
+
+The isolated proxy validation used the release helper's allowlisted snapshot, multi-platform
+build, per-platform Trivy scans and non-root smoke/network checks. No existing deployment
+network or secret was mounted. A complete published release remains outstanding; run the
+normal build/publish gates and prepare a schema-aware transcript before updating AWS.
+
+Complete file inventory for the two requested account/profile features:
+
+- `AGENTS.md`
+- `PROJECT_SPEC.md`
+- `README.md`
+- `apps/accounts/adapters.py`
+- `apps/accounts/forms.py`
+- `apps/accounts/management/commands/authorize_account.py`
+- `apps/accounts/management/commands/create_invitation.py`
+- `apps/accounts/managers.py`
+- `apps/accounts/migrations/0003_email_identity.py`
+- `apps/accounts/models.py`
+- `apps/accounts/security.py`
+- `apps/dashboard/views.py`
+- `apps/google_auth/adapter.py`
+- `apps/google_auth/constants.py`
+- `apps/google_auth/profile.py`
+- `apps/google_auth/provider.py`
+- `apps/google_auth/transport.py`
+- `apps/google_auth/views.py`
+- `config/settings/base.py`
+- `docs/administration.md`
+- `docs/architecture.md`
+- `docs/backup-and-restore.md`
+- `docs/dependency-inventory.md`
+- `docs/deployment.md`
+- `docs/email-identity.md`
+- `docs/google-oauth.md`
+- `docs/implementation-progress.md`
+- `docs/security-decisions.md`
+- `docs/security-findings.md`
+- `docs/security.md`
+- `docs/threat-model.md`
+- `infra/google-egress/squid.conf`
+- `scripts/check_google_egress.py`
+- `scripts/check_public_google.py`
+- `templates/dashboard/accounts.html`
+- `templates/dashboard/audit.html`
+- `templates/dashboard/campers.html`
+- `tests/concurrency/test_email_registration.py`
+- `tests/concurrency/test_invitations.py`
+- `tests/conftest.py`
+- `tests/integration/test_workflows.py`
+- `tests/security/test_account_management.py`
+- `tests/security/test_accounts.py`
+- `tests/security/test_email_identity.py`
+- `tests/security/test_google_oauth.py`
+- `tests/security/test_staff.py`
+- `tests/security/test_tenancy.py`
+
+The local synthetic DB was stopped after validation; volumes retained. No SSH, registry
+publication or live data change occurred. Commits are local; no Git remote push performed.

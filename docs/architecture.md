@@ -113,3 +113,10 @@ supported email-only settings and a custom Django manager provide local authenti
 Migration validation, session retirement and carried-forward lockouts preserve account
 security during cutover. See `email-identity.md`; no automatic account merge or cross-tenant
 identity is introduced, and old images are not compatible with the migrated schema.
+
+
+Approved Google profile prefilling uses verified ID-token name claims and one bounded
+self-profile People API GET for new-registration phone suggestions. It stays in the monolith,
+uses existing Requests transport and the same restricted proxy, and adds no dependency.
+The only additional outbound host is `people.googleapis.com` (SD-029). Tokens/raw provider
+payloads are discarded; local confirmed name/phone fields retain their existing data model.
