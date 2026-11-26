@@ -5,7 +5,7 @@ A self-hosted Django SaaS application for multiple campgrounds, initially approx
 not production-ready.** See [implementation progress](docs/implementation-progress.md)
 for verified functionality and outstanding release gates.
 
-Implemented: approval-first registration, optional invitation/open/disabled modes,
+Implemented: configurable registration, with open Camper signup enabled on the test instance,
 allauth password/TOTP authentication, encrypted sessions/MFA storage, camper search,
 transactional reservations and maintenance blocks, modification/cancellation, local
 notifications, controlled SVG availability map, staff operations/calendar and limited CSV
@@ -183,3 +183,10 @@ scopes configured. The account-preserving migration retired existing sessions; p
 MFA, permissions and provider links were retained. Automated public/runtime checks passed.
 See the [exact executed transcript](docs/aws-email-profile-deployment-transcript.md) and
 [Google acceptance steps](docs/google-oauth.md). Human consent/profile import remains unverified.
+
+As of 2026-11-26 the test campground permits open registration and immediate reservation
+eligibility without staff approval. Complete signup, sign in and book within the normal
+reservation policies. All 216 campsites are active with synthetic test capacity/hookup/map
+values, under the existing red test banner. Original import data is unchanged; production
+requires verified inventory and release gates. See [the exact configuration transcript](docs/open-registration-test-transcript.md)
+and [administrator onboarding](docs/administration.md#current-administrator-setup-for-the-aws-test-instance).

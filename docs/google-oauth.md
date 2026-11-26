@@ -85,7 +85,7 @@ see [snapshot limitations](backup-and-restore.md#google-enablement-snapshot).
    32-character validator. Only a bounded primary/first usable number is suggested. This
    never marks the number verified or enables phone login, MFA or account recovery.
    New users complete local required registration details, rules and policy acceptance.
-   Georgia Mountain Fairgrounds remains approval-based. The uniform registration response
+   Georgia Mountain Fairgrounds now uses owner-selected open registration; new ordinary campers need no staff approval. The uniform registration response
    does not grant login, approve accounts or assign staff privileges.
 3. Existing local accounts are never linked merely because email addresses match. Sign in
    locally, use **Google sign-in**, confirm the local password, and connect the matching
@@ -112,7 +112,7 @@ overwritten; missing/denied phone access retains optional manual entry.
 Final automated acceptance completed on 2026-11-26: public scopes/start/CSRF/PKCE/nonce and
 invalid-callback controls, actual database/container boundaries, email-only schema/forms,
 Google certificates and unauthenticated People TLS all passed. The red test banner and
-closed booking/inactive drafts remain. The initial operator probe mishandled the expected
+test booking and all 216 sites were subsequently enabled under SD-031 on 2026-11-26. The initial operator probe mishandled the expected
 unauthenticated response; the disclosed correction changed only verification code, then
 final checks passed with explicit completion evidence. See
 [the exact transcript](aws-email-profile-deployment-transcript.md).
@@ -191,3 +191,12 @@ links. Registration mode, MFA and all remaining controls are unchanged. No new r
 needed; live browser retry remains necessary to confirm end-to-end login. See the
 [diagnosis and exact transcript](google-login-diagnosis.md). Never replay HAR codes/cookies
 or disable controls to diagnose a callback. Treat HAR files as sensitive evidence.
+
+## Open registration follow-up — 2026-11-26
+
+The owner's latest policy supersedes the earlier approval-only test configuration. New Google
+registrations that finish required details/consent are immediately eligible Campers in open
+mode; sign in normally afterward. No automatic signup login/email linking, privilege grant,
+verification bypass or MFA change. Existing restricted/inactive accounts are not silently
+reactivated by a mode change. The Google Cloud client remains in Testing, so its configured
+test-user audience still applies; local email/password registration is open independently.

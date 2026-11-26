@@ -2,11 +2,13 @@
 
 Updated: 2026-11-26. Status: development; **not approved for production**.
 
-Latest milestone: scanned email-only/Google-profile prerelease
-`0.1.0-alpha.20261125-05df000f8652` published and deployed to the AWS test instance. Final
-runtime/public acceptance passed 2026-11-26; human Google consent/profile import is unverified.
-See the final milestone below for current evidence, file inventory and remaining gates.
-Earlier sections preserve historical state and approvals; they do not override SD-025–030.
+Latest milestone: open Camper registration and booking enabled on the AWS test instance,
+with all 216 sites active and populated with usable test attributes/grid positions. The full
+PostgreSQL suite passed 273 tests and public checks passed on 2026-11-26. The running image
+release remains `0.1.0-alpha.20261125-05df000f8652`; no image change was needed. Administrator
+setup remains protected and tenant-scoped. See the final milestone for current evidence.
+Earlier sections preserve historical state/approvals and are superseded where explicitly
+recorded by SD-031 and the owner-authorized test configuration.
 
 ## Repository assessment
 
@@ -1454,3 +1456,108 @@ acceptance and production gates remain; this is still not production-ready.
 Final Gitleaks scans passed for source/documentation and the private diagnostic scripts;
 `git diff --check` passed. The synthetic local DB was stopped with its volume retained.
 This operational diagnosis/approval record is one focused Git commit; no remote Git push.
+
+## Open registration, full test inventory and administrator guidance — 2026-11-26
+
+Current phase: phase 9 test acceptance/hardening, production gates still incomplete. The owner
+explicitly selected no manual approval for regular campers, then directed that all campsites
+be available on the test instance with the existing red banner as the test-environment notice.
+SD-031 records this specific policy/data approval, risks, alternatives, limits and rollback.
+
+Implemented through existing tenant configuration: registration_mode=open, booking_enabled=true,
+all 216 sites active. New local and Google registrants who complete details/consent are eligible
+Campers and can sign in/book immediately within normal policies, without operator approval.
+Uniform signup completion and a normal sign-in step preserve duplicate-account protections.
+No existing pending/inactive accounts were silently approved/reactivated and no roles promoted.
+The single previously approved owner account remains Camper. No reservation approval is added;
+its existing automatic-confirmation configuration is retained.
+
+Test site data now uses an ordinary RV/tent type, 6 guests, 45-foot RV allowance, 50-amp service,
+water/sewer and pets, with distinct positions on an 18-column grid. Removed inactive-draft
+wording from live site descriptions while retaining area/map identifiers. Original imported
+source data remains unchanged and unverified; this test instance is not an authoritative
+roster or production-data source. The red banner remains the environment notice. No extra
+per-site test label was introduced.
+
+The exact remote command/script was disclosed before SSH. Production/DEBUG/unexpected-policy/
+inventory/existing-reservation guards, policy/site locks, bounded expected inventory and an
+atomic tenant transaction protect the operation. Each site and policy/type change was audited;
+post-update comparison verified only expected policy fields changed. The live operation
+completed successfully. No migrations, dependencies, app code/container/network/secret changes,
+image rebuild, registry publication or restart were needed. The release remains
+0.1.0-alpha.20261125-05df000f8652. No administrator or Django superuser account was created.
+
+Added two permanent regression tests covering actual CSRF-protected local/Google signup,
+normal sign-in, least privilege despite injected staff/superuser form fields, and confirmed
+reservation creation without operator approval. The full PostgreSQL suite passed **273 tests,
+92.74% coverage**, including security, tenant and concurrency regressions. Three additional
+synthetic tests of the exact operational script passed: complete inventory opening/map
+positions, production refusal, and full rollback if audit fails after mutations. Ruff/format,
+Bandit, Gitleaks source/docs/operation scripts and Trivy source/config/dependency gates passed.
+Public HTTPS/banner/static/security-header/CSRF/host/SNI/body-limit checks passed; the homepage
+now exposes booking entry, omits the closure notice and keeps the test banner.
+
+The administrator answer is documented in administration.md: register an ordinary account,
+independently verify identity/email, establish a local password privately if needed, use the
+protected audited authorize_account command with role Administrator, then enroll and use
+TOTP MFA. Administrator is campground-scoped; no platform-wide super-admin web account or
+Django Admin route is implemented. Platform provisioning remains host-operator-only. Manual
+instructions are not an authorization or record of a live promotion.
+
+Security impact: owner-approved removal of new-camper manual vetting increases spam/impersonation/
+hoarding exposure; test data activation removes the nonproduction inventory-review gate. All
+other authentication/verification/MFA, anti-enumeration, rate limiting, tenant/database/container
+boundaries, booking limits and PostgreSQL constraints remain. No new vulnerability identified
+or prior vulnerability newly resolved, no suppressed finding and no pending approval for this
+scope. Existing host/provider/shared-runtime risks and production findings remain. Google
+Cloud's Testing audience restriction is external to account approval and is unchanged; local
+email registration is open independently. Unconfigured SMTP and unfinished features are not
+represented as enabled or verified. No production readiness is claimed.
+
+Files modified/added:
+
+- `README.md`
+- `PROJECT_SPEC.md`
+- `docs/administration.md`
+- `docs/architecture.md`
+- `docs/deployment.md`
+- `docs/georgia-mountain-fairgrounds.md`
+- `docs/google-oauth.md`
+- `docs/implementation-progress.md`
+- `docs/open-registration-test-transcript.md`
+- `docs/security.md`
+- `docs/security-decisions.md`
+- `docs/threat-model.md`
+- `tests/integration/test_open_registration.py`
+
+Private operational/test/probe files are ignored under `.runtime/open-registration-20261126/`.
+Exact live command/script and public probe are preserved in the transcript. The underlying
+model/import default remains conservative; new campground onboarding must explicitly select
+this owner's open policy rather than silently change existing tenant policies during migration.
+
+Executed/repeatable validation (synthetic DB only):
+
+```sh
+docker start campground-test-db-hardened
+TEST_DATABASE_PORT=55433 sh scripts/test.sh tests/integration/test_open_registration.py -q --assert=plain --tb=no --show-capture=no
+TEST_DATABASE_PORT=55433 sh scripts/test.sh .runtime/open-registration-20261126/test_enable.py -q --assert=plain --tb=no --show-capture=no
+TEST_DATABASE_PORT=55433 sh scripts/test.sh -q --assert=plain --tb=no --show-capture=no --cov --cov-fail-under=85
+.venv/bin/ruff check apps config scripts tests manage.py gunicorn.conf.py
+.venv/bin/ruff format --check apps config scripts tests manage.py gunicorn.conf.py
+.venv/bin/bandit -r apps config scripts manage.py gunicorn.conf.py -q
+SSL_CERT_FILE=/etc/ssl/cert.pem .venv/bin/python scripts/check_public_test.py
+.venv/bin/python .runtime/open-registration-20261126/check_public.py
+```
+
+Do not rerun the completed live configuration script; it intentionally refuses changed state.
+Remaining/unexecuted: human signup/Google consent/reservation acceptance on the enabled site,
+a new mutmut campaign, image rebuild/scans (no runtime code changed), full isolated/off-host
+recovery, verified production inventory, host/firewall/storage/IAM review, renewal/monitoring,
+SMTP delivery, broader browser/accessibility/capacity work and unfinished specification gates.
+Optional mutation run: `.venv/bin/python scripts/mutation_test.py --port 55433 --timeout 900`.
+Next: exercise new-user booking on the test site and follow protected Administrator onboarding
+if privileged operations are needed. Never copy the test capacities/positions into production.
+
+Final source/documentation/configuration and private-operation Gitleaks/Trivy scans passed;
+`git diff --check` passed. The local synthetic PostgreSQL container was stopped with its
+volume retained. Changes are recorded in one focused commit; no Git remote push performed.

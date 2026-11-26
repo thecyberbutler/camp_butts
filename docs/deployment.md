@@ -328,3 +328,17 @@ obtained. No old image rollback, data restore, secret rotation or control reduct
 Do not rerun any completed one-time transcript. Prepare a new baseline for future upgrades;
 never start the historical username-based image on this schema. Human Google acceptance,
 off-host/isolated recovery, host controls and other production gates remain outstanding.
+
+
+## Test configuration update — 2026-11-26
+
+The owner selected open Camper registration and enabled every test campsite. The running
+release is unchanged; these are existing database-backed options, applied through a protected,
+audited transaction after disclosure of the exact script. See
+[the operation transcript](open-registration-test-transcript.md). All 216 sites now have usable
+synthetic capacities/hookups/grid positions; the red test banner remains. No site or account
+permission/verification/MFA bypass was added. Reservation constraints and configured limits
+remain in force. Source imports and conservative creation defaults are unchanged; future
+onboarding must explicitly choose the owner's intended open registration policy. Never rerun
+historical checks that require closed booking/inactive inventory as if they describe this
+new authorized test state. Production requires an authoritative roster and its own gates.

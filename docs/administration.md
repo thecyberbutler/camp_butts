@@ -3,7 +3,7 @@
 ## First administrator and MFA
 
 Select the intended campground at `/c/SLUG/` and use its registration form with a unique password. Registration creates an
-unprivileged pending account. On the protected host, after independently verifying
+unprivileged Camper account. In open mode it is immediately eligible; restricted modes retain their configured checks. On the protected host, after independently verifying
 identity, run `tenant_command --campground SLUG setup_roles`, then:
 
 ```sh
@@ -43,9 +43,12 @@ Business policies and plain-text branding are editable by authorized administrat
 Defaults: 1–14 nights, maximum 2 active reservations, 1-day notice, 180-day advance window,
 2-day cancellation/modification notice, no simultaneous multi-site bookings, automatic
 reservation confirmation, 24-hour holds if approval is enabled. Pending holds always
-occupy inventory until resolved or expired. Registration mode defaults to approval;
-model/service support open, invitation and disabled modes, but a dedicated mode-management
-interface is still required. Do not change security settings through incidental forms.
+occupy inventory until resolved or expired. The owner selected open registration for ordinary campers
+on 2026-11-26; it is enabled on the test instance. The underlying model/import default remains
+conservative until an operator explicitly selects the intended tenant policy. New campground
+onboarding must explicitly select the owner-required open mode; do not assume that migration
+alone changes an existing tenant. Approval/invitation/disabled modes remain supported for
+explicitly restricted deployments. A dedicated mode-management UI remains future work.
 
 `tenant_command --campground SLUG create_invitation --actor EMAIL --output /protected/new-file --uses 1 --days 7`
 writes a generated invitation to a new 0600 file in a 0700 directory. Store only its
@@ -98,15 +101,16 @@ an operator-only maintenance task, not a staff UI feature.
 ## Georgia Mountain Fairgrounds initial inventory
 
 Follow `georgia-mountain-fairgrounds.md` for source review and the protected import sequence.
-The 216 inactive map drafts need authoritative per-site verification; numeric defaults do
+The 216 imported map identifiers need authoritative per-site verification for real use; numeric defaults do
 not describe actual capacity or hookups. Staff may review/edit drafts under existing MFA,
 reauthentication, authorization and audit controls. Opening campground booking is not
 exposed in the policy form. Confirm rates, seasonal/monthly policies and all release gates
 before implementing a controlled opening workflow. Do not populate credentials from the
 public rules PDF. Identical import retries preserve edits; changed imports cannot overwrite.
 
-The AWS development installation creates no default staff/admin account. Its Georgia Mountain
-Fairgrounds profile retains inactive draft inventory and closed booking. Follow the protected
+The AWS development installation creates no default staff/admin account. The owner explicitly
+enabled all 216 sites and booking on the test instance on 2026-11-26; those capacities,
+hookups and grid positions are synthetic test data, not authoritative inventory. Follow the protected
 operator onboarding procedure for a deliberately created test account; do not put passwords,
 MFA seeds or recovery codes into SSH arguments/transcripts. The test banner is not authorization.
 
@@ -129,3 +133,38 @@ Email-only releases use the account email in `authorize_account EMAIL` and
 `create_invitation --actor EMAIL`, within the explicitly selected campground. Complete the
 migration in `email-identity.md` before using those commands with a new image. Existing
 privileged accounts still require independently verified identity/email and enrolled MFA.
+
+## Current administrator setup for the AWS test instance
+
+There is no platform-wide super-admin web account or Django Admin route. The supported
+application role is **Administrator within one campground**. Even a Django `is_superuser`
+flag would remain inside its tenant scope; it is not a platform provisioning role. Do not use
+raw database flags or `createsuperuser` as a substitute for the audited onboarding below.
+Platform-wide campground provisioning remains a protected host-operator task.
+
+These are manual instructions, not a record of an executed promotion. After independently
+verifying the account owner's identity, connect using the established SSH alias and run in
+the protected host terminal. Replace `ACCOUNT_EMAIL` with that existing account's email:
+
+```sh
+ssh camp-butts-test
+cd /opt/camp-butts-test
+dc() {
+  sudo docker compose -p camp-butts-test --env-file .env --env-file images.env \
+    -f compose.yaml -f compose.registry.yaml -f compose.google.yaml "$@"
+}
+# If the Google-only account needs a local password, this prompts privately:
+dc exec web python manage.py tenant_command --campground georgia-mountain-fairgrounds changepassword ACCOUNT_EMAIL
+# Protected, audited promotion; does not grant Django superuser or cross-tenant access:
+dc exec web python manage.py tenant_command --campground georgia-mountain-fairgrounds authorize_account ACCOUNT_EMAIL --role Administrator --attest-identity-checked
+```
+
+Use the initial `setup_roles` step above only when bootstrapping missing/reviewed groups; the
+existing test installation already has those groups. No default password or hidden account
+is supplied. Never place a password, MFA secret or recovery code in a command or chat.
+The existing Google Gmail/Workspace verification can satisfy local email verification when
+already recorded. Otherwise use normal verification or independently verify mailbox ownership
+before deliberately adding `--attest-email-ownership-verified`; never add that flag blindly.
+Sign in again, enroll TOTP and keep recovery codes private, then sign in using MFA. Privileged
+routes remain blocked until assurance requirements are satisfied. Recent reauthentication
+is still required for sensitive actions. This task did not promote the owner's Camper account.

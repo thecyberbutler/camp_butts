@@ -305,3 +305,39 @@ Google link. No new account, role elevation, email attestation, policy change, a
 linking, MFA bypass, secret change or new security exception was introduced. Future accounts
 still require the existing approval process. Do not infer broader authorization from this
 individual approval. See `google-login-diagnosis.md` for evidence and exact commands.
+
+## SD-031: owner-selected open camper registration and enabled test inventory — 2026-11-26
+
+The owner explicitly instructed: “Individual regular camper accounts do not need to be
+approved. Anyone needs to be able to create an account and create a reservation right away.”
+For the separate inventory gate they specified that all campsites on the test instance be
+available and the test banner serve as the notice that the data is not real. These are specific
+authorizations for open regular-camper registration and the existing development instance's
+test inventory; no broader authentication or production exception is inferred.
+
+- Change/reason: select existing open registration for new campers and enable all existing
+  test sites/booking so signup-to-reservation functionality can be exercised without staff
+  approval. Use consistent synthetic capacities/hookups/positions and normal site descriptions.
+- Protections affected: manual pre-registration vetting and the test inventory closure that
+  prevented use of unverified map drafts. Open registration increases spam, impersonation and
+  inventory-hoarding risk; synthetic attributes must never be treated as verified live inventory.
+- Alternatives: retain approval or invitation-only signup, verified-email signup once approved
+  SMTP is configured, or keep inventory closed/use a single labeled test campsite. The owner
+  explicitly selected open signup and all test sites with the existing environment banner.
+- Mitigations retained: new accounts only Camper; no staff/admin self-assignment; account and
+  IP limits; policy consent; normal email-verification settings; no automatic email linking;
+  MFA/recent assurance for privilege; tenant RLS; locked, audited transactions; PostgreSQL
+  exclusion/foreign-key constraints; capacity/date/per-account booking limits; HTTPS/CSP/CSRF;
+  no automatic signup login that would expose duplicate-account existence. No old inactive or
+  pending accounts are silently activated. Original source import stays unchanged.
+- Scope/duration: open registration is the owner's selected normal camper policy. Test-site
+  activation/sample attributes are only for the existing test deployment and are rejected by
+  the operation in production. Review before production; its actual roster and release gates
+  remain mandatory. This does not enable unconfigured SMTP, remove Google's external Testing
+  audience restrictions, or authorize a platform-wide administrator interface.
+- Rollback: an audited policy transaction can close booking or require approval for future
+  registrations. Preserve existing users, audit, occupancy and constraints; do not automatically
+  revoke prior approvals or cancel reservations. Review any account restrictions individually.
+- Recommendation/status: implement the explicitly requested open mode with existing controls,
+  retain distinct protected administrator onboarding, and validate full signup/login/booking
+  paths. Approved directly by the owner; exact operation in open-registration-test-transcript.md.

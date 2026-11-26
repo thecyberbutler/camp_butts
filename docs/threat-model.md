@@ -197,3 +197,17 @@ are never updated from the provider. The wider approved CONNECT host remains exp
 a compromised web process; application URL checks are defense in depth, not containment of
 arbitrary code execution. People API/provider outage, unavailable profile phone and consent/
 verification requirements remain operational limitations; optional manual entry is retained.
+
+
+## Open registration and test inventory — 2026-11-26
+
+SD-031 removes manual vetting for new ordinary campers at the owner's explicit direction.
+Risks include spam/Sybil signup, unverified local email claims and inventory hoarding. Retain
+normal verification settings (never claim an unverified mailbox is verified), IP/account
+limits, least privilege, consent, approval/inactivity gates for preexisting restricted users,
+per-account reservation limits, owner-filtered operations, MFA and PostgreSQL integrity.
+The owner also authorized all imported sites to be active for test use, with synthetic
+capacity/hookup/grid values. The test banner communicates environment status but is not access
+control or evidence of production inventory accuracy. Preserve original source provenance;
+never promote this test database into production without authoritative inventory/release
+review. Public prerelease and shared-host risks remain; no privilege boundary is expanded.

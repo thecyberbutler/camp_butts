@@ -102,3 +102,15 @@ Implement and test monthly/seasonal policies, deposits/cancellations and occupan
 as required; do not reinterpret the current generic defaults as the campground's policy.
 Review staff onboarding/MFA and all production release gates. Opening online bookings is
 separate controlled work after these requirements are met.
+
+
+## Owner-authorized test activation — 2026-11-26
+
+The owner directed that all campsites be available on the test instance with the environment
+banner as the notice that data is not real. Enabled all 216 imported identifiers only there,
+opened booking and selected open Camper registration. Replaced inactive-draft display text
+and type with normal site descriptions and RV/tent classification; supplied 6-person/45-foot/
+50-amp/water/sewer/pet test attributes and distinct grid positions. These do not resolve any
+source discrepancy or establish actual campsite specifications. The original import file and
+its safe inactive behavior are unchanged; production activation still requires verified data.
+See `open-registration-test-transcript.md` for the exact audited operation and validation.

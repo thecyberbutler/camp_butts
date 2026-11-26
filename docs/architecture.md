@@ -120,3 +120,11 @@ self-profile People API GET for new-registration phone suggestions. It stays in 
 uses existing Requests transport and the same restricted proxy, and adds no dependency.
 The only additional outbound host is `people.googleapis.com` (SD-029). Tokens/raw provider
 payloads are discarded; local confirmed name/phone fields retain their existing data model.
+
+
+Owner-selected open registration (SD-031) uses existing tenant configuration and existing
+local/Google account creation; no stack/service/schema change is needed. New users remain
+Camper-only and sign in after uniform signup completion. The test instance's 216 sites and
+booking gate are explicitly enabled with synthetic attributes and controlled grid positions.
+Original import defaults remain inactive for production review. Campground Administrator
+roles stay tenant-scoped; platform provisioning is still a protected host operation.

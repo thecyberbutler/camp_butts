@@ -9,7 +9,8 @@ and recovery codes. Argon2id uses Django's default 102400 KiB memory, 2 iteratio
 8 parallelism; no weaker hash fallback is configured. Passwords accept 15–256
 characters, with common-password and user-similarity checks. Axes tracks account
 and IP failures independently, with a 15-minute cooloff. Account identifiers are
-case-insensitive and database-unique. New accounts are approval-pending campers.
+case-insensitive and database-unique. New accounts are least-privileged campers; eligibility follows the configured registration mode.
+The owner selected open registration for normal campers (SD-031), enabled on the test instance.
 
 Signup has a uniform completion response and never logs a new user in automatically.
 Without SMTP, email recovery and email changes are denied. Email is not implicitly

@@ -3381,3 +3381,21 @@ email-based linking. Do not retain unrelated profile/contacts data, provider tok
 that an imported phone is verified or suitable for authentication/recovery. Never overwrite
 existing account contact details on ordinary sign-in or linking. Existing account migration
 and production security requirements remain in force.
+
+## Owner-selected open Camper registration and enabled test inventory — 2026-11-26
+
+Ordinary campers must be able to complete registration, sign in and reserve without manual
+account approval. Select the existing open registration mode for this owner policy, retaining
+least-privileged Camper roles, validation/consent, configured verification, anti-enumeration,
+rate limits, inactivity blocks, MFA and all reservation integrity/authorization controls.
+This supersedes the earlier recommendation of approval-first registration for the owner's
+normal camper flow; it does not authorize privileged self-registration or silent reactivation
+of previously restricted accounts. Existing restricted registration modes remain available
+when explicitly selected by an operator for a different deployment policy.
+
+The owner separately authorized all campsites on the test instance to be enabled, relying
+on the existing red test banner as the environment notice. Use test capacities/hookups/map
+positions as needed for functional reservation testing. Do not treat those values as verified
+real-world inventory, alter the reviewed source import, enable production bookings from these
+drafts, or waive any production release gate. Keep all database constraints and booking
+policies authoritative. Do not invent credentials or enable unconfigured external services.
