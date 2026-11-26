@@ -341,3 +341,26 @@ test inventory; no broader authentication or production exception is inferred.
 - Recommendation/status: implement the explicitly requested open mode with existing controls,
   retain distinct protected administrator onboarding, and validate full signup/login/booking
   paths. Approved directly by the owner; exact operation in open-registration-test-transcript.md.
+
+## Owner-authorized test Administrator promotion — 2026-11-26
+
+The owner explicitly requested: “Please promote my account to Administrator for Georgia
+Mountain Fairgrounds on the test instance and walk me through setting up MFA.” This
+authorizes the specific existing owner account's tenant role elevation, not a superuser,
+platform privilege, MFA bypass or broader role-policy change. Earlier identity confirmation
+identified the sole Google-linked account as theirs; ambiguity now causes refusal.
+
+Applied the existing audited authorize_account command under tenant/policy/account locks,
+with exact permission-set, active/approved Camper, verified email and nonproduction guards.
+The transaction increments security_version; old sessions fail. MFA and recent assurance
+remain mandatory. Elevated campground permissions increase the impact of account compromise;
+verified email, TOTP enrollment/use, protected operator access, audit and tenant isolation
+remain the mitigations. Keeping the Camper role would preserve lower privileges but would
+not meet the owner's administration request. Rollback uses a separately authorized audited
+Camper role assignment/session revocation, preserving account data and MFA. Review before
+production. No password or MFA material was created or displayed by the agent.
+
+Current onboarding limitation: Google-only accounts without existing MFA cannot satisfy
+the installed framework's MFA-enrollment reauthentication through Google. Use the protected
+interactive local-password establishment procedure; do not disable reauthentication or
+fabricate MFA assurance. Actual owner enrollment remains pending.

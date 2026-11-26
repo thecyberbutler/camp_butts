@@ -167,4 +167,50 @@ already recorded. Otherwise use normal verification or independently verify mail
 before deliberately adding `--attest-email-ownership-verified`; never add that flag blindly.
 Sign in again, enroll TOTP and keep recovery codes private, then sign in using MFA. Privileged
 routes remain blocked until assurance requirements are satisfied. Recent reauthentication
-is still required for sensitive actions. This task did not promote the owner's Camper account.
+is still required for sensitive actions. The instructions above originally preceded promotion;
+the owner-authorized 2026-11-26 promotion is recorded below.
+
+## Owner's test Administrator and MFA enrollment — 2026-11-26
+
+The owner explicitly requested promotion of their existing Google-linked account. The audited
+operator workflow granted Administrator only in Georgia Mountain Fairgrounds, retained verified
+email, incremented the security version and invalidated existing sessions. No superuser or
+platform access was granted. Exact operation: [test transcript](test-administrator-transcript.md).
+At promotion the account had neither a usable local password nor TOTP enrollment.
+
+MFA enrollment requires reauthentication. The installed allauth flow offers password, email
+code or existing MFA; it does not treat an ordinary Google sign-in as that reauthentication.
+With SMTP unavailable and no enrolled factor, establish a local password using the existing
+protected operator command in your own terminal. This is a documented onboarding limitation,
+not permission to disable reauthentication or mark an MFA record verified manually.
+
+1. Connect with `ssh camp-butts-test`, then `cd /opt/camp-butts-test`.
+2. Run the following command, replacing ACCOUNT_EMAIL with your existing account email.
+   Enter a unique password of at least 15 characters at the hidden prompts. Never send the
+   password to an agent or include it in shell arguments, chat or a capture.
+
+   ```sh
+   sudo docker compose -p camp-butts-test --env-file .env --env-file images.env -f compose.yaml -f compose.registry.yaml -f compose.google.yaml exec web python manage.py tenant_command --campground georgia-mountain-fairgrounds changepassword ACCOUNT_EMAIL
+   ```
+
+3. Sign in at `https://camp-butts-test.thecyberbutler.io/c/georgia-mountain-fairgrounds/accounts/login/`.
+   Normal pages remain denied until MFA; open
+   `https://camp-butts-test.thecyberbutler.io/c/georgia-mountain-fairgrounds/accounts/2fa/totp/activate/`
+   directly. Reauthenticate with the password you just established when prompted.
+4. In your own authenticator app, add a TOTP account by scanning the displayed QR code (or
+   manually entering its setup key). Keep the QR/key private. Enter the current six-digit
+   code in the application to activate. Check the phone's automatic time setting if rejected.
+5. MFA enrollment deliberately revokes sessions. Sign in again, using your email/password
+   or existing Google account, then the authenticator code. A code already used for enrollment
+   may require waiting for the next time interval before sign-in.
+6. Visit `https://camp-butts-test.thecyberbutler.io/c/georgia-mountain-fairgrounds/accounts/2fa/recovery-codes/`
+   and complete any reauthentication prompt. Store recovery codes privately in a secure vault
+   or locked offline location separate from the phone. Codes are single-use; do not paste or
+   show them to an agent. No screenshots/HAR captures of setup or recovery screens.
+7. Open `https://camp-butts-test.thecyberbutler.io/c/georgia-mountain-fairgrounds/operations/`.
+   Sensitive actions still require authentication within five minutes. MFA is required with
+   Google login too; Google phone import is not an authentication factor.
+
+Only the owner can complete these private interactive steps. Enrollment and actual privileged
+browser acceptance are not claimed as verified until performed. Do not reuse production
+credentials on this test instance. Account recovery without SMTP remains host-controlled.

@@ -1561,3 +1561,42 @@ if privileged operations are needed. Never copy the test capacities/positions in
 Final source/documentation/configuration and private-operation Gitleaks/Trivy scans passed;
 `git diff --check` passed. The local synthetic PostgreSQL container was stopped with its
 volume retained. Changes are recorded in one focused commit; no Git remote push performed.
+
+## Owner test Administrator promotion and MFA guidance — 2026-11-26
+
+Phase 9 test acceptance/hardening; production gates remain incomplete. The owner explicitly
+requested promotion of their previously identified Google-linked account to Administrator
+for Georgia Mountain Fairgrounds. Disclosed the full exact SSH transcript before connecting.
+The test-only guarded operation used the existing audited authorize_account command in a
+tenant transaction, checked exact role permissions, retained verified email/Google link,
+and incremented security_version. Live promotion succeeded; no Django superuser or platform
+permission was granted. Existing authenticated sessions are invalidated. No container restart,
+image publication, application code/configuration change, dependency or migration was needed.
+
+Live boolean checks found no enrolled TOTP and no usable local password. The installed
+allauth reauthentication flow requires a password, email code or existing MFA for enrollment;
+ordinary Google sign-in does not satisfy it. SMTP is unconfigured. Documented the existing
+protected interactive changepassword procedure, exact MFA enrollment/recovery/operations URLs,
+session revocation after enrollment, private code handling and mandatory MFA after Google
+login. The agent did not establish/view a password, QR, TOTP seed, session or recovery code.
+Owner password establishment, MFA enrollment and privileged browser acceptance remain pending.
+
+Validation: 14 targeted PostgreSQL tests passed (5 private operational safety cases and 9
+existing role/authentication/MFA regressions). The final operation script's 5 tests passed
+again after adding the usable-password boolean. Private-script Gitleaks passed. Tests cover
+ambiguous selection, production/unverified-email refusal, audit rollback, exact role scope,
+session version revocation, encrypted TOTP/single-use recovery and Google MFA gating. No
+full-suite/concurrency rerun, dependency/image rebuild scan or human MFA acceptance is claimed
+for this operational change. Repeat commands and exact transcript: test-administrator-transcript.md.
+
+Security impact: owner-approved increased campground authority; mandatory MFA, least privilege,
+reauthentication, audit and tenant isolation retained. No new vulnerability identified or
+resolved; Google-only MFA bootstrap is a documented usability limitation with a protected
+onboarding path. No promotion approval remains pending. Existing host/shared-runtime/provider
+risks and production findings remain unchanged. Files: docs/administration.md,
+docs/test-administrator-transcript.md, docs/security-decisions.md and this progress record.
+Private operator/tests remain ignored under .runtime/admin-promotion-20261126/.
+
+Next: owner sets a unique test password privately, enrolls TOTP, stores recovery codes and
+checks operations access. Full recovery/host/manual security and remaining specification
+gates are still required before production. No production-readiness claim.
