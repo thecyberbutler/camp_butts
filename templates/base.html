@@ -7,20 +7,31 @@
 {% endblock %}
 {% block body %}
   <a class="skip-link" href="#main">Skip to content</a>
-  <header class="site-header"><nav class="container d-flex flex-wrap gap-3 align-items-center py-3" aria-label="Main navigation">
-    <a href="/">Campgrounds</a>
-    <a class="brand" href="{% url 'home' %}">{{ campground.name }}</a>
-    <a href="{% url 'campsites' %}">Find a campsite</a>
-    {% if user.is_authenticated %}
-      <a href="{% url 'dashboard' %}">My reservations</a><a href="{% url 'notifications' %}">Notifications</a>
-      <a href="{% url 'mfa_index' %}">Account security</a><a href="{% url 'account_logout' %}">Sign out</a>
-      {% if google_login_enabled %}<a href="{% url 'socialaccount_connections' %}">Google sign-in</a>{% endif %}
-      {% if perms.reservations.operate_reservations %}<a href="{% url 'operations' %}">Operations</a>{% endif %}
-    {% else %}<a href="{% url 'account_login' %}">Sign in</a><a href="{% url 'account_signup' %}">Create account</a>{% endif %}
-  </nav></header>
-  <main id="main" class="container py-5">
+  <header class="site-header">
+    <nav class="container site-nav" aria-label="Main navigation">
+      <a class="brand" href="{% url 'home' %}">{% include 'components/brand_mark.html' %}<span class="brand-copy"><small>Camping &amp; reservations</small>{{ campground.name }}</span></a>
+      <div class="nav-links">
+        <a href="/">Campgrounds</a>
+        <a href="{% url 'campsites' %}" {% if request.resolver_match.url_name == 'campsites' %}aria-current="page"{% endif %}>Find a campsite</a>
+        {% if user.is_authenticated %}
+          <a href="{% url 'dashboard' %}" {% if request.resolver_match.url_name == 'dashboard' %}aria-current="page"{% endif %}>My reservations</a>
+          {% if perms.reservations.operate_reservations %}<a href="{% url 'operations' %}">Operations</a>{% endif %}
+          <details class="account-menu"><summary>Your account</summary><div class="account-menu-panel">
+            <a href="{% url 'notifications' %}">Notifications</a>
+            <a href="{% url 'mfa_index' %}">Account security</a>
+            {% if google_login_enabled %}<a href="{% url 'socialaccount_connections' %}">Google sign-in</a>{% endif %}
+            <a href="{% url 'account_logout' %}">Sign out</a>
+          </div></details>
+        {% else %}
+          <a href="{% url 'account_login' %}" {% if request.resolver_match.url_name == 'account_login' %}aria-current="page"{% endif %}>Sign in</a>
+          <a class="btn btn-primary btn-sm" href="{% url 'account_signup' %}">Create account</a>
+        {% endif %}
+      </div>
+    </nav>
+  </header>
+  <main id="main" class="container page-content">
     {% for message in messages %}<p role="status" class="alert alert-info">{{ message }}</p>{% endfor %}
-    {% block content %}{% endblock %}
+    {% block content_layout %}{% block content %}{% endblock %}{% endblock %}
   </main>
-  <footer class="container py-4 border-top">{{ campground.name }} · Make room for the outdoors.</footer>
+  <footer class="container site-footer"><p>{{ campground.name }} · Make room for the outdoors.</p><a href="/">Explore campgrounds <span aria-hidden="true">↗</span></a></footer>
 {% endblock %}

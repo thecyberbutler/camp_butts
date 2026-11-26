@@ -1,7 +1,8 @@
 {% extends 'base.html' %}
-{% block content %}<p class="eyebrow">Your reservation</p><h1>{{ reservation.campsite.name }}</h1>
-<p class="lead">{{ reservation.check_in }} – {{ reservation.check_out }}</p><p>{{ reservation.get_status_display }}</p>
-<p>Confirmation: {{ reservation.confirmation }}</p><p>{{ reservation.adults }} adults · {{ reservation.children }} children</p>
-<div class="plain-text">{{ reservation.camper_notes }}</div>
-{% if reservation.status == 'pending' or reservation.status == 'confirmed' %}<div class="d-flex gap-3 mt-4"><a href="{% url 'modify' reservation.pk %}">Change dates</a><a href="{% url 'cancel' reservation.pk %}">Cancel reservation</a></div>{% endif %}
+{% block content %}
+<div class="page-heading"><div><p class="eyebrow">Your reservation</p><h1>{{ reservation.campsite.name }}</h1></div><a href="{% url 'dashboard' %}">Back to my reservations</a></div>
+<section class="surface-panel"><span class="status-pill">{{ reservation.get_status_display }}</span><p class="lead mt-3">{{ reservation.check_in }} – {{ reservation.check_out }}</p>
+<dl class="reservation-meta"><div><dt>Confirmation</dt><dd>{{ reservation.confirmation }}</dd></div><div><dt>Your group</dt><dd>{{ reservation.adults }} adults · {{ reservation.children }} children</dd></div></dl>
+{% if reservation.camper_notes %}<h2 class="h5">Your notes</h2><div class="plain-text">{{ reservation.camper_notes }}</div>{% endif %}
+{% if reservation.status == 'pending' or reservation.status == 'confirmed' %}<div class="d-flex flex-wrap gap-3 mt-4"><a class="btn btn-outline-primary" href="{% url 'modify' reservation.pk %}">Change dates</a><a class="btn btn-outline-danger" href="{% url 'cancel' reservation.pk %}">Cancel reservation</a></div>{% endif %}</section>
 {% endblock %}

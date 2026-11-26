@@ -1,14 +1,20 @@
 {% extends 'layouts/document.html' %}
 {% block title %}Choose a campground{% endblock %}
 {% block body %}
-<main class="container py-5">
-  <h1>Choose a campground</h1>
-  <p>Find your campground to view its reservation site. Accounts are separate for each campground.</p>
-  <form method="get" action="/" class="mb-4">
-    <label for="campground">Campground address name</label>
-    <input class="form-control" id="campground" name="campground" maxlength="63" required pattern="[a-z0-9]+(-[a-z0-9]+)*" autocomplete="off">
-    <button class="btn btn-primary mt-2" type="submit">Continue</button>
-  </form>
-  <ul>{% for slug, name in campgrounds %}<li><a href="/c/{{ slug }}/">{{ name }}</a></li>{% empty %}<li>No campgrounds are currently available.</li>{% endfor %}</ul>
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header"><div class="container site-nav"><a class="brand" href="/">{% include 'components/brand_mark.html' %}<span class="brand-copy"><small>Make room for the outdoors</small>Campground reservations</span></a></div></header>
+<main id="main" class="container page-content directory-main">
+  <section class="directory-hero"><p class="eyebrow">Good days start outside</p><h1>Choose a campground</h1><p class="lead">A place to slow down. A stay to look forward to.<br>Find your campground and start planning.</p></section>
+  <ul class="directory-list">{% for slug, name in campgrounds %}<li><a class="site-card directory-link" href="/c/{{ slug }}/">{% include 'components/brand_mark.html' %}<span><strong>{{ name }}</strong><small>View campground <span aria-hidden="true">↗</span></small></span></a></li>{% empty %}<li class="empty-state"><h2>No campgrounds are currently available.</h2><p>Please check back soon.</p></li>{% endfor %}</ul>
+  <details class="surface-panel directory-selector reference-details"><summary>Have a campground address?</summary>
+    <form method="get" action="/">
+      <label for="campground">Campground address name</label>
+      <input id="campground" name="campground" maxlength="63" required pattern="[a-z0-9]+(-[a-z0-9]+)*" autocomplete="off" aria-describedby="campground-help">
+      <p class="helptext" id="campground-help">Enter the address name provided by your campground.</p>
+      <button class="btn btn-primary mt-2" type="submit">Continue <span aria-hidden="true">→</span></button>
+    </form>
+  </details>
+  <p class="text-center text-muted">Accounts are separate for each campground.</p>
 </main>
+<footer class="container site-footer"><p>A little planning. More time outside.</p></footer>
 {% endblock %}

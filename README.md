@@ -162,3 +162,8 @@ Google sign-in is deployed on the AWS test instance in prerelease
 `0.1.0-alpha.20261125-3386d5caf5b3`. Automated public/runtime checks passed; real human
 Google consent and approved-user login remain pending. See [Google setup](docs/google-oauth.md)
 and the [executed upgrade transcript](docs/aws-google-deployment-transcript.md).
+
+The shared interface uses rounded cards and forms, warm colors, subtle interactions and
+responsive navigation with reduced-motion support. All styles and illustrations are local.
+See [interface design](docs/interface-design.md) for behavior, accessibility checks and
+deployment status. Completed features are recorded in separate validated Git commits.

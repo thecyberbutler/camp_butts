@@ -139,3 +139,9 @@ CONNECT permits any HTTPS path on the approved hosts at the network layer; appli
 transport further limits methods and paths. A compromised web process could abuse approved
 Google destinations. Google identity/availability, shared-host compromise and provider
 credential compromise remain risks. No other egress or CSP exception is authorized.
+
+The interface refresh (SD-028) preserves template autoescaping, CSRF/form destinations,
+restrictive CSP, local assets and the server-controlled red test banner. Decorative SVG is
+fixed source-controlled geometry, not an upload/rendering feature. Native disclosure controls
+do not authorize actions; underlying server checks remain authoritative. No new secrets,
+permissions, external resources or security exceptions are introduced.

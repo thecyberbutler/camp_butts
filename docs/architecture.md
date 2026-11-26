@@ -97,3 +97,12 @@ cannot access SocialApp credential tables or insert/update SocialToken rows. SEL
 on SocialToken are necessary for Django's account-unlink cascade; token storage is disabled
 and pending signup drops token objects. Protected per-tenant file configuration is the sole
 client-credential source. See [Google operations](google-oauth.md) for deployment/recovery.
+
+## Shared interface presentation
+
+The 2026-11-25 design refresh stays in Django templates and the existing local CSS layer.
+Native disclosure elements organize account navigation and long reference text without a
+new script dependency. System fonts and fixed local vector artwork keep the existing asset
+boundary. Shared allauth layouts/buttons inherit normal authentication forms and controls.
+No views, models, authorization logic, database/network boundaries or deployment configuration
+change. See `interface-design.md` and SD-028.

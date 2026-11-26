@@ -1,6 +1,10 @@
 {% extends 'base.html' %}
-{% block content %}<h1>My reservations</h1>
+{% block content %}
+<div class="page-heading"><div><p class="eyebrow">Your time outside</p><h1>My reservations</h1></div><a class="btn btn-primary" href="{% url 'campsites' %}">Find a campsite <span aria-hidden="true">↗</span></a></div>
 {% if not user.approved %}<p role="status" class="alert alert-info">Your account is awaiting campground approval. Booking becomes available after approval.</p>{% endif %}
-{% for reservation in page_obj %}<article class="site-card mb-3"><h2 class="h4"><a href="{% url 'reservation_detail' reservation.pk %}">{{ reservation.campsite.name }}</a></h2><p>{{ reservation.check_in }} – {{ reservation.check_out }} · {{ reservation.get_status_display }}</p></article>
-{% empty %}<p>You have no reservations yet.</p><a class="btn btn-primary" href="{% url 'campsites' %}">Find a campsite</a>{% endfor %}
-{% include 'pagination.html' %}<h2 class="mt-5">Recent notifications</h2>{% for item in notifications %}<p>{{ item.message }}</p>{% empty %}<p>No notifications.</p>{% endfor %}{% endblock %}
+{% for reservation in page_obj %}<article class="site-card reservation-card mb-3"><div><p class="eyebrow">Your next chapter outdoors</p><h2 class="h4"><a href="{% url 'reservation_detail' reservation.pk %}">{{ reservation.campsite.name }}</a></h2><p class="card-copy">{{ reservation.check_in }} – {{ reservation.check_out }}</p></div><span class="status-pill">{{ reservation.get_status_display }}</span></article>
+{% empty %}<div class="empty-state"><h2>Your next adventure starts here.</h2><p>You have no reservations yet. Explore the campground and find a place for your next stay.</p><a href="{% url 'campsites' %}">Explore campsites <span aria-hidden="true">→</span></a></div>{% endfor %}
+{% include 'pagination.html' %}
+<section class="mt-5"><div class="page-heading"><h2>Recent notifications</h2><a href="{% url 'notifications' %}">View all notifications <span aria-hidden="true">→</span></a></div>
+<div class="surface-panel">{% for item in notifications %}<p>{{ item.message }}</p>{% empty %}<p class="mb-0 text-muted">You’re all caught up. Updates about your stays will appear here.</p>{% endfor %}</div></section>
+{% endblock %}

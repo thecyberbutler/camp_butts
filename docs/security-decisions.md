@@ -204,3 +204,19 @@ dependent rows even when token storage is disabled. INSERT/UPDATE and sequence p
 are denied, and forced tenant RLS remains active. This prevents token persistence while
 preserving the framework's safe unlinking semantics; it does not grant access to client
 credentials. Regression checks cover unlink assurance/session revocation and runtime grants.
+
+## SD-028: local interface modernization — 2026-11-25
+
+The owner requested rounded edges, shading, softer transitions and more color interaction.
+Implement in existing local CSS/Django templates with native disclosure controls, system
+fonts and fixed decorative SVG. Retain allauth form attributes/slots, template escaping,
+CSRF, restrictive CSP, authorization and the red test banner. No new script, third-party
+asset/service, dependency, permission, migration or network is needed.
+
+Alternative: a new frontend framework/animation or hosted asset service would add unnecessary
+dependencies/trust. The existing stack meets this presentation requirement. Reduced-motion,
+keyboard focus, labels and mobile overflow checks protect usability. No security reduction
+or additional approval is proposed. Residual risks are unreviewed browser/screen-reader
+combinations and existing application/release findings; this is not security certification.
+Review before production. Rollback is a normal reviewed revert of the presentation commit,
+without database, credential or permission changes. No live deployment is part of this task.

@@ -960,3 +960,90 @@ Recorded the owner's request in AGENTS.md: commit each completed, validated feat
 its tests/documentation and keep unrelated work separate. Secret exclusions and security
 gates remain mandatory. Reviewed the instruction diff and Git whitespace; no runtime change,
 dependency, migration, vulnerability or pending approval. No remote push is part of this task.
+
+## Interface modernization — 2026-11-25
+
+Current phase: presentation refinement, completed locally; development prerelease and all
+existing production security gates remain in force. Repository hygiene and commit workflow
+were committed separately as `74e7d7c` and `0427eee`.
+
+### Completed functionality and decisions
+
+Added a shared forest-green/warm-neutral design with rounded panels, softer shadows,
+responsive navigation, short hover/color transitions, accessible focus and reduced-motion
+support. Updated campground home/directory, login and account layouts, campsite search,
+reservations, camper dashboard, operations/tables and errors. Long reference information
+uses native disclosures; the booking-closure notice remains outside them. Locally authored
+decorative artwork gives the pages a consistent identity without external assets or scripts.
+The red development/test banner remains unchanged in wording and color.
+
+Architecture remains server-rendered Django with the existing Bootstrap/HTMX stack and
+local CSS/system fonts. No dependency, migration, Python application logic, permission,
+tenant boundary, database policy, CSRF, CSP, OAuth or MFA control changed. SD-028 records the
+presentation decision and residual compatibility risks. No security reduction or pending
+approval; no new vulnerability identified or existing vulnerability declared resolved.
+Existing findings and release gates remain open as previously documented.
+
+### Files modified or added for the design
+
+- `static/css/app.css`, `static/images/camp-landscape.svg`.
+- `templates/base.html`, `templates/components/brand_mark.html`, `templates/home.html`,
+  `templates/tenancy/directory.html`, `templates/error.html`, `templates/pagination.html`.
+- `templates/allauth/layouts/base.html`, `templates/allauth/elements/button.html`,
+  `templates/accounts/registration_received.html`, `templates/google_auth/redirect.html`,
+  `templates/socialaccount/connections.html`.
+- `templates/campsites/list.html`, `templates/campsites/results.html`,
+  `templates/campsites/detail.html`, `templates/reservations/form.html`,
+  `templates/reservations/detail.html`, `templates/dashboard.html`.
+- `templates/dashboard/operations.html`, `templates/dashboard/audit.html`,
+  `templates/dashboard/calendar.html`, `templates/dashboard/export.html`.
+- `README.md`, `PROJECT_SPEC.md`, `docs/interface-design.md`, `docs/architecture.md`,
+  `docs/dependency-inventory.md`, `docs/security.md`, `docs/security-decisions.md`,
+  `docs/threat-model.md`, `docs/implementation-progress.md`.
+
+### Validation
+
+- Existing PostgreSQL suite: **235 passed**, including authentication, MFA, Google,
+  authorization, tenant isolation, CSRF, banner, occupancy and concurrency regressions.
+  Final rerun also included one private synthetic preview-generation case: **236 passed**,
+  **92.53% coverage**. No tests or security controls weakened or skipped.
+- Chromium: **39 page/viewport checks** across 13 synthetic pages at 1440, 390 and 320 pixels.
+  Verified no horizontal overflow, loaded local assets, form labels and test banner;
+  keyboard account disclosure, visible focus and reduced-motion behavior also passed.
+  Reviewed desktop home/login/operations and mobile home screenshots. Browser rendering
+  used sanitized responses with hidden form secrets removed and blocked network requests;
+  it is not an end-to-end OAuth or screen-reader test.
+- Eight primary text/background palette pairs meet 4.5:1 contrast. Fixed SVG assets checked
+  for geometry-only content without external references, event handlers or scripts.
+- Ruff lint/format, Bandit and Git whitespace checks passed.
+- Final Gitleaks source scan and Trivy source/dependency/configuration scan passed
+  (including development dependencies; HIGH/CRITICAL blocking severity). The scan used
+  an isolated nonignored-file copy, excluding secrets and local runtime artifacts.
+
+Repeat the repository checks with the existing protected local test database configuration:
+
+```sh
+docker start campground-test-db-hardened
+TEST_DATABASE_PORT=55433 sh scripts/test.sh -q --assert=plain --tb=no --show-capture=no --cov --cov-fail-under=85
+.venv/bin/ruff check apps config scripts tests manage.py gunicorn.conf.py
+.venv/bin/ruff format --check apps config scripts tests manage.py gunicorn.conf.py
+.venv/bin/bandit -r apps config scripts manage.py gunicorn.conf.py -q
+git diff --check
+docker stop campground-test-db-hardened
+```
+
+Private sanitized preview artifacts are in the ignored `.runtime/ui-review/` directory;
+they are not application fixtures or committed tests. See `interface-design.md` for the
+browser review checklist. No new mutation campaign, pip-audit, container build/image scan,
+deployment check on AWS, interactive Google acceptance, additional browser-engine or
+screen-reader acceptance was performed for this presentation-only change. Repeat image
+and dependency release gates before publishing, as documented in `container-publishing.md`;
+the bounded mutation command remains
+`.venv/bin/python scripts/mutation_test.py --port 55433 --timeout 900` with its synthetic DB running.
+
+No images published, remote push or AWS deployment performed. Next: review the visual design,
+complete wider accessibility/browser acceptance, then build and scan a new release before
+updating the test deployment with the required exact remote transcript. Existing production
+recovery, operational review and Google human acceptance work remain outstanding.
+The isolated review browser and synthetic test database were stopped after validation;
+existing database volumes and private sanitized screenshots were retained.

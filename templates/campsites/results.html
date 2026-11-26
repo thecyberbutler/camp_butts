@@ -1,8 +1,8 @@
 {% if form.errors %}<div role="alert">{{ form.errors }}</div>{% endif %}
 <div class="row g-4 mt-2">
-{% for site in page_obj %}<article class="col-md-6 col-lg-4"><div class="site-card h-100"><p class="eyebrow">{{ site.site_type }}</p>
-<h2 class="h4"><a href="{% url 'campsite_detail' site.pk %}">{{ site.name }}</a></h2><p>{{ site.description|truncatechars:180 }}</p>
-<p>Up to {{ site.max_occupancy }} guests · {% if site.pets_allowed %}Pets welcome{% else %}No pets{% endif %}</p>
-<a class="btn btn-outline-primary" href="{% url 'book' site.pk %}?start={{ form.start.value|default:''|urlencode }}&amp;end={{ form.end.value|default:''|urlencode }}">Plan this stay</a></div></article>
-{% empty %}<p>No campsites match your search. Try different dates or filters.</p>{% endfor %}</div>
+{% for site in page_obj %}<article class="col-md-6 col-lg-4"><div class="site-card h-100 d-flex flex-column"><p class="eyebrow">{{ site.site_type }}</p>
+<h2 class="h4"><a href="{% url 'campsite_detail' site.pk %}">{{ site.name }}</a></h2><p class="card-copy">{{ site.description|truncatechars:180 }}</p>
+<p><span class="status-pill">Up to {{ site.max_occupancy }} guests</span> <span class="status-pill">{% if site.pets_allowed %}Pets welcome{% else %}No pets{% endif %}</span></p>
+<a class="btn btn-outline-primary mt-auto align-self-start" href="{% url 'book' site.pk %}?start={{ form.start.value|default:''|urlencode }}&amp;end={{ form.end.value|default:''|urlencode }}">Plan this stay <span aria-hidden="true">→</span></a></div></article>
+{% empty %}<div class="col-12"><div class="empty-state"><h2>No campsites to show just yet.</h2><p>No campsites match your search. Try different dates or filters, or contact the campground for more information.</p></div></div>{% endfor %}</div>
 {% include 'pagination.html' %}

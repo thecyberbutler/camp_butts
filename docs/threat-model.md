@@ -163,3 +163,13 @@ Residual: Google/provider outage or compromise, destination abuse within the two
 hosts, allauth private-hook compatibility, shared runtime/host compromise, OAuth test-audience
 restrictions and unverified live human consent/token exchange until explicitly exercised.
 The host-local encrypted pre-upgrade snapshot is not off-host disaster recovery.
+
+## Presentation review — 2026-11-25
+
+The shared visual update adds no trust boundary. Reviewed risks are accidental disclosure
+through preview artifacts, lost warning/focus visibility, unsafe dynamic style/SVG insertion,
+and altered auth form behavior. Previews use synthetic isolated data with hidden form secrets
+removed; warnings/focus remain prominent; artwork/styles are static local assets; escaped
+tenant content and framework form attributes/CSRF are preserved. Existing account, tenant,
+CSRF, XSS and banner regressions remain required. No new untrusted SVG/upload capability.
+Manual screen-reader/cross-browser acceptance and the existing release gates remain open.

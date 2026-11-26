@@ -1,1 +1,9 @@
 {% extends 'base.html' %}
+{% load static %}
+{% block title %}{% block head_title %}Your account{% endblock %} · {{ campground.name }}{% endblock %}
+{% block content_layout %}
+<section class="account-shell">
+  <aside class="account-intro">{% include 'components/brand_mark.html' %}<h2>More time for<br>the good outdoors.</h2><p>Plan your next stay, manage your reservations, and make yourself at home.</p><p class="eyebrow">{{ campground.name }}</p><img class="hero-art" src="{% static 'images/camp-landscape.svg' %}" width="520" height="440" alt="" aria-hidden="true"></aside>
+  <div class="account-panel">{% block content %}{% endblock %}</div>
+</section>
+{% endblock %}

@@ -1,17 +1,29 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block content %}
-<section class="hero"><p class="eyebrow">Your next stay, a little closer to nature</p><h1>Welcome to {{ campground.name }}</h1>
-<p class="lead">{{ campground.welcome|default:"Find your campsite, plan your stay, and enjoy time outside." }}</p>
-{% if campground.booking_enabled %}<a class="btn btn-primary btn-lg" href="{% url 'campsites' %}">Explore campsites</a>
-{% else %}<p>Online reservations are not open. Contact the campground office to arrange your stay.</p>{% endif %}
-{% if campground.contact_phone %}<p>Campground office: {{ campground.contact_phone }}</p>{% endif %}
-{% if campground.address %}<div class="plain-text">{{ campground.address }}</div>{% endif %}
-{% if campground.website_url %}<p><a href="{{ campground.website_url }}" rel="noreferrer">Official campground information</a></p>{% endif %}
-{% if campground.map_url %}<p><a href="{{ campground.map_url }}" rel="noreferrer">Official campground map</a></p>{% endif %}
+<section class="hero hero-grid">
+  <div><span class="hero-note">A little closer to nature</span><h1>Welcome to {{ campground.name }}</h1>
+    <p class="lead">{{ campground.welcome|default:"Find your campsite, plan your stay, and enjoy time outside." }}</p>
+    <div class="hero-actions">
+      {% if campground.booking_enabled %}<a class="btn btn-primary btn-lg" href="{% url 'campsites' %}">Explore campsites <span aria-hidden="true">↗</span></a>
+      {% else %}<a class="btn btn-primary btn-lg" href="#visit-details">Plan your visit <span aria-hidden="true">↓</span></a>{% endif %}
+      {% if campground.map_url %}<a href="{{ campground.map_url }}" rel="noreferrer">Official campground map <span aria-hidden="true">↗</span></a>{% endif %}
+    </div>
+  </div>
+  <img class="hero-art" src="{% static 'images/camp-landscape.svg' %}" width="520" height="440" alt="" aria-hidden="true">
 </section>
-{% if campground.rate_information %}<section class="mt-4"><h2>Published rates</h2><div class="plain-text">{{ campground.rate_information }}</div></section>{% endif %}
-<div class="row g-5 mt-4"><section class="col-md-6"><h2>Campground rules</h2><div class="plain-text">{{ campground.rules|default:"Contact the campground for current rules before booking." }}</div></section>
-<section class="col-md-6"><h2>Reservation policies</h2><div class="plain-text">{{ campground.reservation_policy }}</div>
-{% if campground.booking_enabled %}<p>Stays of {{ campground.min_nights }}–{{ campground.max_nights }} nights. Book up to {{ campground.advance_days }} days ahead, with {{ campground.notice_days }} days' notice.</p>
-<p>Cancellations require {{ campground.cancellation_days }} days' notice.</p>{% endif %}</section></div>
+{% if not campground.booking_enabled %}<aside class="booking-notice"><strong>Online reservations are not open.</strong><p>Contact the campground office to arrange your stay.</p></aside>{% endif %}
+<div class="section-heading" id="visit-details"><p class="eyebrow">Before you head out</p><h2>Make yourself at home.</h2><p>A few useful details for planning your visit.</p></div>
+<div class="info-grid">
+  <section class="surface-panel"><h2 class="h4">Your campground, at a glance</h2><dl class="visit-details mt-4">
+    {% if campground.address %}<div><dt>Find us</dt><dd class="plain-text">{{ campground.address }}</dd></div>{% endif %}
+    {% if campground.contact_phone %}<div><dt>Campground office</dt><dd>{{ campground.contact_phone }}</dd></div>{% endif %}
+  </dl>{% if campground.website_url %}<a class="card-footer-link" href="{{ campground.website_url }}" rel="noreferrer">Official campground information <span aria-hidden="true">↗</span></a>{% endif %}
+  {% if not campground.address and not campground.contact_phone %}<p class="text-muted">Contact the campground for arrival details and local information.</p>{% endif %}</section>
+  <section class="surface-panel"><h2 class="h4">Reservation policies</h2><p class="card-copy mt-3">Know what to expect before you arrive.</p><details class="reference-details"><summary>Read reservation policies</summary><div class="plain-text">{{ campground.reservation_policy }}</div></details>
+    {% if campground.booking_enabled %}<p class="mt-3">Stays of {{ campground.min_nights }}–{{ campground.max_nights }} nights. Book up to {{ campground.advance_days }} days ahead, with {{ campground.notice_days }} days' notice.</p><p>Cancellations require {{ campground.cancellation_days }} days' notice.</p>{% endif %}
+  </section>
+  {% if campground.rate_information %}<section class="surface-panel"><p class="eyebrow">Plan ahead</p><h2 class="h4">Published rates</h2><details class="reference-details mt-3"><summary>View reference rates</summary><div class="plain-text">{{ campground.rate_information }}</div></details></section>{% endif %}
+  <section class="surface-panel"><p class="eyebrow">A great stay for everyone</p><h2 class="h4">Campground rules</h2><details class="reference-details mt-3"><summary>Read campground rules</summary><div class="plain-text">{{ campground.rules|default:"Contact the campground for current rules before booking." }}</div></details></section>
+</div>
 {% endblock %}

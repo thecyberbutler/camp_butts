@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
-{% block content %}<p class="eyebrow">{{ site.site_type }}</p><h1>{{ site.name }}</h1>
-<p class="lead">{{ site.description }}</p><dl><dt>Guest capacity</dt><dd>{{ site.max_occupancy }}</dd><dt>Maximum RV length</dt><dd>{{ site.max_rv_length }} feet</dd>
-<dt>Accessibility</dt><dd>{{ site.accessibility|default:"Contact the campground for details." }}</dd></dl>
-<h2>Amenities</h2><ul>{% for amenity in site.amenities.all %}<li>{{ amenity }}</li>{% empty %}<li>Contact the campground for details.</li>{% endfor %}</ul>
-<a class="btn btn-primary" href="{% url 'book' site.pk %}">Choose dates</a>{% endblock %}
+{% block content %}
+<div class="page-heading"><div><p class="eyebrow">{{ site.site_type }}</p><h1>{{ site.name }}</h1></div><a href="{% url 'campsites' %}">Back to campsites</a></div>
+<p class="lead">{{ site.description }}</p>
+<div class="info-grid mt-4"><section class="surface-panel"><h2 class="h4">Room to settle in</h2><dl class="reservation-meta"><div><dt>Guest capacity</dt><dd>{{ site.max_occupancy }}</dd></div><div><dt>Maximum RV length</dt><dd>{{ site.max_rv_length }} feet</dd></div></dl><h3 class="h6">Accessibility</h3><p>{{ site.accessibility|default:"Contact the campground for details." }}</p></section>
+<section class="surface-panel"><h2 class="h4">Amenities</h2><ul class="mt-3">{% for amenity in site.amenities.all %}<li>{{ amenity }}</li>{% empty %}<li>Contact the campground for details.</li>{% endfor %}</ul><a class="btn btn-primary mt-3" href="{% url 'book' site.pk %}">Choose dates <span aria-hidden="true">→</span></a></section></div>
+{% endblock %}

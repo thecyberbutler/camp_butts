@@ -3360,3 +3360,11 @@ Gunicorn and verified public HTTPS; the development label is presentation only. 
 reuse the existing document banner. Non-HTML responses and proxy transport failures are
 outside this document-rendering requirement. The owner authorized a test deployment at
 camp-butts-test.thecyberbutler.io and requires exact remote transcripts before execution.
+
+### Owner-requested interface modernization — 2026-11-25
+
+Modernize the existing pages with softer transitions, rounded surfaces, shading and richer
+color interaction while preserving accessible contrast, keyboard use, reduced-motion
+preferences, locally served assets and all existing security controls. Retain the mandatory
+stack and prominent test-instance banner. This is presentation work, not approval to relax
+CSP, change authentication, enable bookings or introduce external frontend services.

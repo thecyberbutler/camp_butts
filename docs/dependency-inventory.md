@@ -227,3 +227,8 @@ Squid is GPL-2.0-or-later; retain package notices and corresponding-source/distr
 obligations. No modifications to Squid source are made. Full legal release review remains
 open. Existing three approved public repositories are reused: the egress image is a
 separate `google-egress-<release>` tag in `campground-proxy`.
+
+Interface refresh, 2026-11-25: no new runtime, development or frontend package. Uses existing
+Bootstrap/HTMX, system fonts, local CSS and newly authored fixed SVG geometry. No remote font
+or artwork license dependency. The allauth button template retains its upstream structure
+with presentation classes; allauth's existing MIT notice/license obligations still apply.
