@@ -652,7 +652,6 @@ Use Django AbstractUser as the foundation.
 Include:
 
 - Unique user identifier.
-- Username.
 - Email address.
 - First name.
 - Last name.
@@ -666,7 +665,9 @@ Include:
 
 Use django-allauth's supported email verification mechanisms without creating conflicting sources of verification state.
 
-Enforce appropriate case-insensitive uniqueness for usernames and email addresses at the database level.
+Use email as the sole account login identifier (owner request, 2026-11-25). Retain immutable
+UUIDs internally and enforce case-insensitive email uniqueness per campground in PostgreSQL.
+Do not create user-selectable or hidden surrogate usernames.
 
 Never store plaintext passwords.
 
@@ -678,7 +679,6 @@ Registration fields should include:
 
 - First name.
 - Last name.
-- Username.
 - Email address.
 - Phone number.
 - Password.
@@ -2557,7 +2557,7 @@ Do not substitute SQLite for PostgreSQL-specific tests.
 Test:
 
 - Successful registration.
-- Duplicate usernames.
+- Rejected username login and ignored username signup input.
 - Duplicate email addresses.
 - Case-insensitive identity uniqueness.
 - Invalid registration data.
@@ -3164,7 +3164,7 @@ The application is considered complete only when the following applicable requir
 - Docker Compose deployment works.
 - Users can create their own accounts.
 - Registration modes are configurable.
-- Local username and password authentication works.
+- Local email and password authentication works.
 - Campers can search campsite availability.
 - Campers can create reservations.
 - Campers can manage their own reservations.

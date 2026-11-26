@@ -240,7 +240,6 @@ def test_same_email_does_not_link_or_log_in_existing_user(google, camper, monkey
         client,
         response.url,
         {
-            "username": camper.username,
             "email": "tampered@example.test",
             "first_name": "Test",
             "last_name": "Camper",
@@ -277,7 +276,6 @@ def test_google_registration_preserves_policy_and_never_auto_logs_in(
     assert not pending.get("token")
     assert pending["account"]["extra_data"] == {"email": "newcamper@gmail.com"}
     payload = {
-        "username": "newcamper",
         "email": "tampered@example.test",
         "first_name": "Test",
         "last_name": "Camper",
@@ -288,10 +286,12 @@ def test_google_registration_preserves_policy_and_never_auto_logs_in(
         "is_staff": True,
     }
     missing = post(client, response.url, {**payload, "rules_agreed": False})
-    assert missing.status_code == 200 and not User.objects.filter(username="newcamper").exists()
+    assert (
+        missing.status_code == 200 and not User.objects.filter(email="newcamper@gmail.com").exists()
+    )
     result = post(client, response.url, payload)
     assert result.status_code == 302 and result.url.endswith("/registration-received/")
-    user = User.objects.get(username="newcamper")
+    user = User.objects.get(email="newcamper@gmail.com")
     assert user.approved == (mode in {"open", "invitation"})
     assert not user.is_staff and not user.is_superuser and not user.has_usable_password()
     assert user.groups.filter(name="Camper").exists() and user.policy_accepted_at
@@ -319,7 +319,7 @@ def test_connect_requires_password_assurance_and_revokes_sessions(
 def test_disconnect_requires_password_assurance_and_revokes_sessions(google, camper, password):
     account = SocialAccount.objects.create(user=camper, provider="google", uid="synthetic")
     client = Client(enforce_csrf_checks=True)
-    post(client, PREFIX + "login/", {"login": camper.username, "password": password})
+    post(client, PREFIX + "login/", {"login": camper.email, "password": password})
     post(client, PREFIX + "reauthenticate/", {"password": password})
     assert post(client, PREFIX + "3rdparty/", {"account": account.pk}).status_code == 302
     assert not SocialAccount.objects.exists()
@@ -451,7 +451,7 @@ def test_axes_lockout_cannot_be_bypassed_with_google(google, camper, monkeypatch
     for _ in range(5):
         client.post(
             PREFIX + "login/",
-            {"login": camper.username, "password": secrets.token_urlsafe(32)},
+            {"login": camper.email, "password": secrets.token_urlsafe(32)},
             secure=True,
         )
     SocialAccount.objects.create(user=camper, provider="google", uid="12345678901234567890")

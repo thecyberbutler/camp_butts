@@ -233,3 +233,40 @@ are retained; compatible rollback restores previous image references and collect
 never database contents, constraints or secrets. The exact transcript is disclosed before
 remote execution. No new security reduction or exception is requested. Existing host-local
 backup limitations and all production gates remain; status is recorded in implementation progress.
+
+## SD-029: Google name and optional phone import — 2026-11-25
+
+The owner requested profile names/phone and explicitly approved after scope/egress disclosure:
+“I approve name and phone import. If there are settings I need to update on the oauth client
+please let me know.” This authorizes `profile`, `user.phonenumbers.read` and restricted HTTPS
+to `people.googleapis.com` for the signed-in user's own phone numbers only. It does not
+approve contacts access, token persistence, automatic email linking, verified-phone status,
+MFA/recovery changes, unrestricted egress or other profile data retention.
+
+Affected controls: minimum OAuth scopes/data collection and the two-host egress allowlist.
+Risks: additional personal data and provider consent, transient access-token use at another
+Google endpoint, and abuse of the permitted destination by a compromised runtime. Mitigate
+with a fixed self-profile endpoint/field mask, TLS/redirect/response bounds, the existing
+private non-root proxy and metadata denial, transient tokens, bounded validated fields,
+editable signup confirmation, and no overwrite of existing account details. Missing/denied
+phone access uses optional manual entry and does not grant identity assurance. Names-only
+or fully manual entry preserve narrower data access; owner selected both imports.
+
+Duration: while optional Google integration is enabled; review before production and by
+2026-12-25. Rollback removes added scopes/People route and revokes the provider grant if
+needed; keep local email/password authentication and existing MFA. Google Cloud People API
+and consent Data Access configuration are operator prerequisites. No new client secret,
+callback URL or JavaScript origin is required. Production scope verification remains a gate.
+
+## SD-030: email-only account identification — 2026-11-25
+
+Owner explicitly requested eliminating usernames and identifying accounts by email. Retain
+immutable internal UUIDs and case-insensitive database email uniqueness per campground;
+remove the obsolete user-name field/constraint only as part of that requested model change.
+No account merging, mailbox verification assumption, role change or automatic Google linking.
+Migration must fail closed on invalid/colliding stored emails, preserve existing brute-force
+protection and invalidate old sessions/pending authentication. Historical migrations and
+third-party Axes protocol field names are retained for compatibility, not selectable usernames.
+The schema change requires a stopped-web, encrypted-backup deployment and is not compatible
+with blindly restarting the previous username-based image. No live deployment is part of
+this implementation task. Existing security controls and release gates remain mandatory.

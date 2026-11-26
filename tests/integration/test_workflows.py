@@ -79,15 +79,18 @@ def test_signup_duplicate_generic_response(client, camper, password):
         "email": "fresh@example.test",
     }
     first = client.post("/c/default/accounts/signup/", payload, secure=True)
-    duplicate_username = client.post(
+    different_email = client.post(
         "/c/default/accounts/signup/", {**payload, "email": "second@example.test"}, secure=True
     )
     duplicate_email = client.post(
-        "/c/default/accounts/signup/", {**payload, "username": "second"}, secure=True
+        "/c/default/accounts/signup/",
+        {**payload, "username": "second", "email": "FRESH@example.test"},
+        secure=True,
     )
-    assert first.status_code == duplicate_username.status_code == duplicate_email.status_code == 302
-    assert first.url == duplicate_username.url == duplicate_email.url
+    assert first.status_code == different_email.status_code == duplicate_email.status_code == 302
+    assert first.url == different_email.url == duplicate_email.url
     assert "_auth_user_id" not in client.session
+    assert User.objects.filter(email__in=["fresh@example.test", "second@example.test"]).count() == 2
 
 
 def test_role_setup_and_protected_operator_authorization(camper):
@@ -95,7 +98,7 @@ def test_role_setup_and_protected_operator_authorization(camper):
     call_command("setup_roles", stdout=output)
     call_command(
         "authorize_account",
-        camper.username,
+        camper.email,
         role="Administrator",
         attest_identity_checked=True,
         stdout=output,
@@ -127,7 +130,7 @@ def test_invitation_secret_file_and_audit(staff, tmp_path):
     tmp_path.chmod(0o700)
     path = tmp_path / "invitation"
     output = StringIO()
-    call_command("create_invitation", actor=staff.username, output=path, stdout=output)
+    call_command("create_invitation", actor=staff.email, output=path, stdout=output)
     assert path.stat().st_mode & 0o077 == 0
     token = path.read_text()
     secret_not_output = token not in output.getvalue()

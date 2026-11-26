@@ -18,7 +18,7 @@ class Command(BaseCommand):
     )
 
     def add_arguments(self, parser):
-        parser.add_argument("--actor", required=True)
+        parser.add_argument("--actor", required=True, help="Account email address")
         parser.add_argument("--output", type=Path, required=True)
         parser.add_argument("--uses", type=int, default=1)
         parser.add_argument("--days", type=int, default=7)
@@ -26,7 +26,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         if not 1 <= options["uses"] <= 100 or not 1 <= options["days"] <= 30:
             raise CommandError("Use limits 1–100 and expiry 1–30 days are required.")
-        user = User.objects.get(username__iexact=options["actor"], is_active=True, approved=True)
+        user = User.objects.get(email__iexact=options["actor"], is_active=True, approved=True)
         if not user.has_perm("accounts.approve_camper"):
             raise CommandError("Actor lacks account administration permission.")
         path = options["output"]

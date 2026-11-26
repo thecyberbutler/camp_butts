@@ -36,9 +36,7 @@ def second_tenant(password):
         call_command("migrate", interactive=False, verbosity=0, stdout=StringIO())
         call_command("setup_roles", stdout=StringIO())
         Campground.objects.filter(pk=1).update(name=tenant.name)
-        User.objects.create_user(
-            username="camper", email="camper@example.test", password=password, approved=True
-        )
+        User.objects.create_user(email="camper@example.test", password=password, approved=True)
         with connection.cursor() as cursor:
             cursor.execute("SET CONSTRAINTS ALL IMMEDIATE")
         protect_schema(connection.connection, tenant.id, tenant.schema, grant=False)
@@ -70,19 +68,23 @@ def test_accounts_with_same_identifiers_are_separate_and_sessions_do_not_cross(
 ):
     client = Client()
     response = client.post(
-        "/c/default/accounts/login/", {"login": "camper", "password": password}, secure=True
+        "/c/default/accounts/login/",
+        {"login": "camper@example.test", "password": password},
+        secure=True,
     )
     assert response.status_code == 302 and response.url == "/c/default/dashboard/"
     assert client.get("/c/default/dashboard/", secure=True).status_code == 200
     assert client.get("/c/second/dashboard/", secure=True).status_code == 302
     response = client.post(
-        "/c/second/accounts/login/", {"login": "camper", "password": password}, secure=True
+        "/c/second/accounts/login/",
+        {"login": "camper@example.test", "password": password},
+        secure=True,
     )
     assert response.status_code == 302 and response.url == "/c/second/dashboard/"
     assert client.get("/c/second/dashboard/", secure=True).status_code == 200
     assert client.get("/c/default/dashboard/", secure=True).status_code == 302
     with tenant_scope(second_tenant):
-        assert User.objects.get(username="camper").pk != camper.pk
+        assert User.objects.get(email="camper@example.test").pk != camper.pk
 
 
 def test_qualified_cross_schema_reads_and_writes_fail_closed(camper, second_tenant):
@@ -113,7 +115,7 @@ def test_absent_database_tenant_context_denies_even_schema_owner(camper):
         cursor.execute("SELECT set_config('app.tenant','',true)")
         assert User.objects.count() == 0
         with pytest.raises(DatabaseError), transaction.atomic():
-            User.objects.create_user(username="unscoped", email="none@example.test")
+            User.objects.create_user(email="none@example.test")
         transaction.set_rollback(True)
     assert User.objects.filter(pk=camper.pk).exists()
 
@@ -134,13 +136,15 @@ def test_reservations_notifications_and_staff_do_not_cross(
     with tenant_scope(second_tenant):
         assert not Occupancy.objects.exists()
         assert not Notification.objects.exists()
-        user = User.objects.get(username="camper")
+        user = User.objects.get(email="camper@example.test")
         assert not user.has_perm("reservations.operate_reservations")
     assert browser.get(f"/c/second/reservations/{booking.pk}/", secure=True).status_code == 302
     assert browser.get("/c/second/operations/", secure=True).status_code == 302
     second_browser = Client()
     response = second_browser.post(
-        "/c/second/accounts/login/", {"login": "camper", "password": password}, secure=True
+        "/c/second/accounts/login/",
+        {"login": "camper@example.test", "password": password},
+        secure=True,
     )
     assert response.status_code == 302
     assert (
@@ -186,7 +190,7 @@ def test_booking_same_site_identifier_and_dates_is_independent(camper, site, dat
     with tenant_scope(second_tenant):
         kind = CampsiteType.objects.create(name="Tent")
         Campsite.objects.create(id=site.pk, name=site.name, site_type=kind)
-        user = User.objects.get(username="camper")
+        user = User.objects.get(email="camper@example.test")
         second = book(
             actor=user,
             campsite_id=site.pk,
@@ -225,7 +229,7 @@ def test_simultaneous_tenants_keep_connections_and_inventory_separate(
         close_old_connections()
         try:
             with tenant_scope(tenant):
-                user = User.objects.get(username="camper")
+                user = User.objects.get(email="camper@example.test")
                 barrier.wait(timeout=10)
                 item = book(
                     actor=user,
@@ -277,7 +281,7 @@ def test_email_confirmation_tokens_are_bound_to_campground(camper, second_tenant
     address = EmailAddress.objects.create(pk=501, user=camper, email=camper.email)
     token = EmailConfirmationHMAC(address).key
     with tenant_scope(second_tenant):
-        user = User.objects.get(username="camper")
+        user = User.objects.get(email="camper@example.test")
         EmailAddress.objects.create(pk=501, user=user, email=user.email)
         rejected = EmailConfirmationHMAC.from_key(token) is None
         assert rejected
@@ -295,7 +299,6 @@ def test_password_reset_tokens_are_bound_even_for_identical_restored_accounts(
         User.objects.all().delete()
         cloned = User.objects.create(
             pk=camper.pk,
-            username=camper.username,
             email=camper.email,
             password=camper.password,
             last_login=camper.last_login,
@@ -335,11 +338,13 @@ def test_failed_logins_do_not_lock_other_campgrounds(camper, second_tenant, pass
     for _ in range(5):
         client.post(
             "/c/default/accounts/login/",
-            {"login": "camper", "password": secrets.token_urlsafe(32)},
+            {"login": "camper@example.test", "password": secrets.token_urlsafe(32)},
             secure=True,
         )
     response = client.post(
-        "/c/second/accounts/login/", {"login": "camper", "password": password}, secure=True
+        "/c/second/accounts/login/",
+        {"login": "camper@example.test", "password": password},
+        secure=True,
     )
     assert response.status_code == 302 and response.url == "/c/second/dashboard/"
 
@@ -364,7 +369,6 @@ def test_invitation_from_another_campground_is_not_accepted(camper, second_tenan
     response = Client().post(
         "/c/second/accounts/signup/",
         {
-            "username": "newcamper",
             "email": "newcamper@example.test",
             "password1": password,
             "password2": password,
@@ -380,5 +384,5 @@ def test_invitation_from_another_campground_is_not_accepted(camper, second_tenan
     # Uniform signup responses may hide why signup failed; the DB is authoritative.
     assert response.status_code == 302
     with tenant_scope(second_tenant):
-        assert not User.objects.filter(username="newcamper").exists()
+        assert not User.objects.filter(email="newcamper@example.test").exists()
     assert Invitation.objects.get(created_by=camper).uses == 0

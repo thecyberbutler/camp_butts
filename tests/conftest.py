@@ -36,22 +36,17 @@ def password():
 
 @pytest.fixture
 def camper(db, password):
-    return User.objects.create_user(
-        username="camper", email="camper@example.test", password=password, approved=True
-    )
+    return User.objects.create_user(email="camper@example.test", password=password, approved=True)
 
 
 @pytest.fixture
 def other(db, password):
-    return User.objects.create_user(
-        username="other", email="other@example.test", password=password, approved=True
-    )
+    return User.objects.create_user(email="other@example.test", password=password, approved=True)
 
 
 @pytest.fixture
 def staff(db, password):
     user = User.objects.create_user(
-        username="staff",
         email="staff@example.test",
         password=password,
         approved=True,

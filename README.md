@@ -18,7 +18,7 @@ database services.
 
 Open `/?campground=pine-grove` to select a registered campground; the application redirects
 to `/c/pine-grove/`. The root directory lists active campgrounds. Accounts are separate:
-the same email/username can belong to different campground accounts. Campground staff
+the same email can belong to different campground accounts. Campground staff
 permissions never grant platform provisioning rights. The first implementation supports
 one active campground login per browser cookie jar; sign in again when switching.
 

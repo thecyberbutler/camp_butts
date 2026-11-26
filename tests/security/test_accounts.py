@@ -17,7 +17,6 @@ pytestmark = pytest.mark.django_db
 
 def registration(password, **overrides):
     return {
-        "username": "newcamper",
         "email": "new@example.test",
         "first_name": "New",
         "last_name": "Camper",
@@ -37,7 +36,7 @@ def test_signup_cannot_escalate(client, password):
         secure=True,
     )
     assert response.status_code == 302
-    user = User.objects.get(username="newcamper")
+    user = User.objects.get(email="new@example.test")
     assert not user.is_staff and not user.is_superuser and not user.approved
     assert user.groups.filter(name="Camper").exists()
     assert user.password.startswith("argon2$")
@@ -49,28 +48,26 @@ def test_registration_modes(client, password, policy):
     policy.save()
     response = client.post("/c/default/accounts/signup/", registration(password), secure=True)
     assert response.status_code == 200
-    assert not User.objects.filter(username="newcamper").exists()
+    assert not User.objects.filter(email="new@example.test").exists()
     policy.registration_mode = "open"
     policy.save()
     assert (
         client.post("/c/default/accounts/signup/", registration(password), secure=True).status_code
         == 302
     )
-    assert User.objects.get(username="newcamper").approved
+    assert User.objects.get(email="new@example.test").approved
 
 
 def test_case_insensitive_uniqueness(camper):
     with pytest.raises(IntegrityError), transaction.atomic():
-        User.objects.create(username=camper.username.upper(), email="different@example.test")
-    with pytest.raises(IntegrityError), transaction.atomic():
-        User.objects.create(username="different", email=camper.email.upper())
+        User.objects.create(email=camper.email.upper())
 
 
 def test_login_logout_and_secure_session(client, camper, password):
     assert (
         client.post(
             "/c/default/accounts/login/",
-            {"login": camper.username, "password": password},
+            {"login": camper.email, "password": password},
             secure=True,
         ).status_code
         == 302
@@ -88,11 +85,11 @@ def test_login_rate_limiting_and_case_normalization(client, camper, password):
     for _ in range(5):
         client.post(
             "/c/default/accounts/login/",
-            {"login": camper.username.upper(), "password": secrets.token_urlsafe(24)},
+            {"login": camper.email.upper(), "password": secrets.token_urlsafe(24)},
             secure=True,
         )
     response = client.post(
-        "/c/default/accounts/login/", {"login": camper.username, "password": password}, secure=True
+        "/c/default/accounts/login/", {"login": camper.email, "password": password}, secure=True
     )
     assert response.status_code == 200
     assert response.context["form"].non_field_errors()
@@ -119,7 +116,7 @@ def test_actual_staff_login_requires_totp(staff, password):
     EmailAddress.objects.create(user=staff, email=staff.email, verified=True, primary=True)
     client = Client()
     response = client.post(
-        "/c/default/accounts/login/", {"login": staff.username, "password": password}, secure=True
+        "/c/default/accounts/login/", {"login": staff.email, "password": password}, secure=True
     )
     assert response.status_code == 302
     assert "_auth_user_id" not in client.session

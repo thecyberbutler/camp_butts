@@ -4,8 +4,14 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models.functions import Lower
 
+from .managers import UserManager
+
 
 class User(AbstractUser):
+    username = None
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = []
+    objects = UserManager()
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     email = models.EmailField(unique=True)
     phone = models.CharField(max_length=32, blank=True)
@@ -16,7 +22,7 @@ class User(AbstractUser):
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(Lower("username"), name="username_case_unique"),
+            models.CheckConstraint(condition=~models.Q(email=""), name="email_not_empty"),
             models.UniqueConstraint(Lower("email"), name="email_case_unique"),
         ]
         permissions = [

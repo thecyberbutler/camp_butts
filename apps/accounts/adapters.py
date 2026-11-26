@@ -19,6 +19,9 @@ from .security import client_ip, privileged
 
 
 class AccountAdapter(DefaultAccountAdapter):
+    def clean_email(self, email):
+        return super().clean_email(email).strip().casefold()
+
     def get_login_redirect_url(self, request):
         from django.urls import reverse
 
@@ -62,7 +65,6 @@ class AccountAdapter(DefaultAccountAdapter):
                     invite.save(update_fields=["uses"])
                 user = super().save_user(request, user, form, commit=False)
                 user.email = user.email.casefold()
-                user.username = user.username.casefold()
                 user.phone = form.cleaned_data["phone"]
                 user.is_staff = user.is_superuser = False
                 user.approved = policy.registration_mode in {"open", "invitation"}

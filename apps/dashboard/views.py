@@ -112,7 +112,7 @@ def accounts(request):
 def camper_accounts(request):
     require_staff(request, "accounts.manage_camper")
     campers = User.objects.filter(is_staff=False, is_superuser=False, user_permissions__isnull=True)
-    campers = campers.exclude(groups__permissions__isnull=False).distinct().order_by("username")
+    campers = campers.exclude(groups__permissions__isnull=False).distinct().order_by("email")
     page = Paginator(campers, 30).get_page(request.GET.get("page"))
     return render(request, "dashboard/campers.html", {"page_obj": page})
 
@@ -137,7 +137,7 @@ def account_state(request, user_id):
         "reservations/form.html",
         {
             "form": form,
-            "title": f"Manage account: {target.username}",
+            "title": f"Manage account: {target.email}",
             "submit": "Confirm account change",
         },
     )

@@ -24,7 +24,7 @@ def account_admin(staff, password):
     EmailAddress.objects.create(user=staff, email=staff.email, primary=True, verified=True)
     client = Client()
     client.post(
-        "/c/default/accounts/login/", {"login": staff.username, "password": password}, secure=True
+        "/c/default/accounts/login/", {"login": staff.email, "password": password}, secure=True
     )
     code = format_hotp_value(hotp_value(secret, int(time.time()) // 30))
     client.post("/c/default/accounts/2fa/authenticate/", {"code": code}, secure=True)

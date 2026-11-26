@@ -7,7 +7,7 @@ unprivileged pending account. On the protected host, after independently verifyi
 identity, run `tenant_command --campground SLUG setup_roles`, then:
 
 ```sh
-docker compose exec web python manage.py tenant_command --campground SLUG authorize_account USERNAME \
+docker compose exec web python manage.py tenant_command --campground SLUG authorize_account EMAIL \
   --role Administrator --attest-identity-checked
 ```
 
@@ -47,7 +47,7 @@ occupy inventory until resolved or expired. Registration mode defaults to approv
 model/service support open, invitation and disabled modes, but a dedicated mode-management
 interface is still required. Do not change security settings through incidental forms.
 
-`tenant_command --campground SLUG create_invitation --actor USERNAME --output /protected/new-file --uses 1 --days 7`
+`tenant_command --campground SLUG create_invitation --actor EMAIL --output /protected/new-file --uses 1 --days 7`
 writes a generated invitation to a new 0600 file in a 0700 directory. Store only its
 digest in the database. Deliver the secret through an approved private channel. The
 application does not log or display it. Expiry and use counts are enforced transactionally.
@@ -70,7 +70,7 @@ disk exhaustion and certificate renewal failures. Do not dump request bodies for
 ## Recovery
 
 Without SMTP, self-service reset is denied. A protected operator may use Django's
-interactive `tenant_command --campground SLUG changepassword USERNAME` only after independent identity verification;
+interactive `tenant_command --campground SLUG changepassword EMAIL` only after independent identity verification;
 the password is entered without echo and never sent by email. For privileged users,
 password recovery does not remove TOTP. Lost MFA requires an owner-controlled, audited
 recovery procedure; there is no web bypass or universal recovery credential. The complete
@@ -83,7 +83,7 @@ is still pending. Never enable that command in production to simplify setup.
 
 ## Campground and platform roles
 
-Every account belongs to exactly one campground schema. The same username/email at two
+Every account belongs to exactly one campground schema. The same email at two
 campgrounds represents two independent accounts, passwords, MFA enrollments and approvals.
 TOTP issuer labels include the campground slug. Signing into another campground replaces
 the active browser session cookie; separate browser profiles can maintain independent logins.
@@ -124,3 +124,8 @@ recent password reauthentication, plus application MFA for privileged accounts. 
 user must establish a permitted recovery/password path before disconnecting; do not add an
 authentication bypass. Keep app MFA independently enrolled for privileged users. See
 [Google operations](google-oauth.md) for credential rotation and disabling the integration.
+
+Email-only releases use the account email in `authorize_account EMAIL` and
+`create_invitation --actor EMAIL`, within the explicitly selected campground. Complete the
+migration in `email-identity.md` before using those commands with a new image. Existing
+privileged accounts still require independently verified identity/email and enrolled MFA.

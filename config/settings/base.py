@@ -117,11 +117,16 @@ ALLAUTH_SETTING_GETTER = "apps.tenancy.allauth.setting"
 # Bandit B105 reviewed: this is allauth's import path, never a password/token value.
 ACCOUNT_PASSWORD_RESET_TOKEN_GENERATOR = "apps.accounts.tokens.TenantPasswordResetTokenGenerator"  # nosec B105
 ACCOUNT_ADAPTER = "apps.accounts.adapters.AccountAdapter"
-ACCOUNT_FORMS = {"signup": "apps.accounts.forms.SignupForm"}
-ACCOUNT_LOGIN_METHODS = {"username"}
-ACCOUNT_SIGNUP_FIELDS = ["username*", "email*", "password1*", "password2*"]
+ACCOUNT_FORMS = {
+    "signup": "apps.accounts.forms.SignupForm",
+    "login": "apps.accounts.forms.LoginForm",
+}
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+ACCOUNT_LOGIN_METHODS = {"email"}
+ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
 ACCOUNT_PREVENT_ENUMERATION = "strict"
 ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_MAX_EMAIL_ADDRESSES = 1
 ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = False
 ACCOUNT_LOGOUT_ON_GET = False
 ACCOUNT_SESSION_REMEMBER = False

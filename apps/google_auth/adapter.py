@@ -84,7 +84,7 @@ class GoogleAccountAdapter(DefaultSocialAccountAdapter):
             if (
                 not sociallogin.user.is_active
                 or not sociallogin.user.approved
-                or not AxesProxyHandler.is_allowed(request, {"username": sociallogin.user.username})
+                or not AxesProxyHandler.is_allowed(request, {"email": sociallogin.user.email})
             ):
                 raise ImmediateHttpResponse(
                     HttpResponseForbidden("Sign-in could not be completed.")

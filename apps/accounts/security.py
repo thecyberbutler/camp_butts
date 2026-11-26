@@ -10,7 +10,14 @@ def client_ip(request):
 
 
 def axes_username(request, credentials=None):
-    return str((credentials or {}).get("username") or request.POST.get("login", "")).casefold()
+    credentials = credentials or {}
+    return (
+        str(
+            credentials.get("email") or credentials.get("username") or request.POST.get("login", "")
+        )
+        .strip()
+        .casefold()
+    )
 
 
 def privileged(user):

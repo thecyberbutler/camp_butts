@@ -1126,3 +1126,41 @@ The optional bounded mutation command remains
 running. Host-local authenticated snapshot decryption is not a complete restore rehearsal.
 Recommended next steps: review the live UI, complete human Google acceptance and recovery/
 operational review, then satisfy all production release gates before accepting real camper data.
+
+## Email-only accounts — 2026-11-25
+
+Owner requested no usernames and email-only identification. Implemented local account model,
+manager, signup/login, staff displays, Google lockout lookup and operator-command changes;
+case-insensitive email uniqueness remains per campground, UUIDs and permissions unchanged.
+Migration `accounts.0003_email_identity` validates legacy email, retires sessions and carries
+recent username failure counts into email lockouts before removing the obsolete column.
+No new dependency, account merge, email attestation, MFA bypass or weaker control. Google
+profile/phone expansion is explicitly approved in SD-029 and is a separate feature below.
+
+Targeted PostgreSQL email/migration/tenant/workflow checks: 31 passed. Full suite/scans are
+pending completion. Initial tenant test failures were obsolete hardcoded username logins;
+updated those inputs to email while retaining isolation assertions. Existing concurrency
+teardown reported live test connections once; a subsequent isolated run completed normally.
+No failure was suppressed or claimed passed. No live deployment or image publication performed.
+See `email-identity.md` for irreversible migration, backup, stopped-writer and rollback limits.
+
+Email feature validation completed: full PostgreSQL suite **242 passed, 92.29% coverage**;
+then **10 targeted migration/concurrency checks passed**, including two added legacy-data
+refusal cases and a simultaneous case-variant signup case. Corrected the new test module's
+name collision and expected completion URL before the successful run. Ruff lint/format,
+Bandit, Gitleaks and Trivy source/dependency/configuration gates passed. No dependency/image
+build, new mutation campaign or live schema migration is claimed by this feature commit.
+
+Files: account manager/model/forms/adapters/security/operator commands and migration 0003;
+Google adapter/signup username compatibility; base settings; staff views/templates; existing
+account/Google/tenant/workflow/invitation tests and new email identity/migration/concurrency
+tests; PROJECT_SPEC, README, administration/architecture/deployment/security/threat-model/
+decision/progress docs and the new `docs/email-identity.md`. Existing mandatory controls
+remain. No new vulnerability identified, prior vulnerability declared resolved or security
+approval pending for email identity; approved Google profile work follows separately.
+
+Repeat with the protected synthetic PostgreSQL running:
+`TEST_DATABASE_PORT=55433 sh scripts/test.sh -q --assert=plain --tb=no --show-capture=no --cov --cov-fail-under=85`.
+The targeted commands use `tests/security/test_email_identity.py` and
+`tests/concurrency/test_email_registration.py`. Deployment requires migration review and a
+new scanned release; the running AWS test instance is unchanged.

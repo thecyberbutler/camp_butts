@@ -173,3 +173,13 @@ removed; warnings/focus remain prominent; artwork/styles are static local assets
 tenant content and framework form attributes/CSRF are preserved. Existing account, tenant,
 CSRF, XSS and banner regressions remain required. No new untrusted SVG/upload capability.
 Manual screen-reader/cross-browser acceptance and the existing release gates remain open.
+
+## Email identity migration — 2026-11-25
+
+Threats include case-variant duplicate identities, accidental merging, username-based lockout
+loss, stale authentication state and unsafe rollback. Database email uniqueness, normalization,
+fail-closed legacy-email validation, immutable UUIDs, carried-forward recent Axes counters,
+unchanged IP attempt history and session retirement mitigate them. Staff/operator lookup is
+email-based without a public account directory. Existing Google-subject binding and no-email-
+auto-linking controls remain. Destructive schema rollback is not automatic; migration requires
+stopped writers, encrypted backup and reviewed per-tenant execution.

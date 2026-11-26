@@ -17,7 +17,7 @@ def staff_browser(staff, password):
     EmailAddress.objects.create(user=staff, email=staff.email, verified=True, primary=True)
     client = Client()
     client.post(
-        "/c/default/accounts/login/", {"login": staff.username, "password": password}, secure=True
+        "/c/default/accounts/login/", {"login": staff.email, "password": password}, secure=True
     )
     code = format_hotp_value(hotp_value(secret, int(time.time()) // 30))
     client.post("/c/default/accounts/2fa/authenticate/", {"code": code}, secure=True)
@@ -128,7 +128,7 @@ def test_admin_configuration_and_export_require_distinct_permissions(staff, pass
     EmailAddress.objects.create(user=staff, email=staff.email, verified=True, primary=True)
     client = Client()
     client.post(
-        "/c/default/accounts/login/", {"login": staff.username, "password": password}, secure=True
+        "/c/default/accounts/login/", {"login": staff.email, "password": password}, secure=True
     )
     client.post(
         "/c/default/accounts/2fa/authenticate/",

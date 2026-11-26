@@ -86,9 +86,6 @@ class GoogleSignupForm(SocialSignupForm):
             self.fields[name] = copy.deepcopy(LocalSignupForm.base_fields[name])
         self.fields["email"].disabled = True
 
-    def clean_username(self):
-        return LocalSignupForm.clean_username(self)
-
 
 class GoogleSignupView(SignupView):
     def dispatch(self, request, *args, **kwargs):

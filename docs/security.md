@@ -4,7 +4,7 @@ See the threat model and decision register. This implementation is not productio
 
 ## Authentication and authorization
 
-Allauth owns username/password authentication, verified email state, recovery, TOTP
+Allauth owns email/password authentication, verified email state, recovery, TOTP
 and recovery codes. Argon2id uses Django's default 102400 KiB memory, 2 iterations,
 8 parallelism; no weaker hash fallback is configured. Passwords accept 15–256
 characters, with common-password and user-similarity checks. Axes tracks account

@@ -106,3 +106,10 @@ new script dependency. System fonts and fixed local vector artwork keep the exis
 boundary. Shared allauth layouts/buttons inherit normal authentication forms and controls.
 No views, models, authorization logic, database/network boundaries or deployment configuration
 change. See `interface-design.md` and SD-028.
+
+Email-only identity (owner request, 2026-11-25) removes the custom user's username column;
+UUIDs remain immutable, and email uniqueness remains scoped to each tenant schema. Allauth's
+supported email-only settings and a custom Django manager provide local authentication.
+Migration validation, session retirement and carried-forward lockouts preserve account
+security during cutover. See `email-identity.md`; no automatic account merge or cross-tenant
+identity is introduced, and old images are not compatible with the migrated schema.

@@ -33,7 +33,6 @@ def test_last_invitation_use_cannot_be_redeemed_twice(staff, policy, password):
             response = Client().post(
                 "/c/default/accounts/signup/",
                 {
-                    "username": f"invited{n}",
                     "email": f"invited{n}@example.test",
                     "first_name": "Invited",
                     "last_name": "Camper",
@@ -54,4 +53,4 @@ def test_last_invitation_use_cannot_be_redeemed_twice(staff, policy, password):
     assert statuses == [302, 302]  # Generic responses do not disclose invitation validity.
     invite.refresh_from_db()
     assert invite.uses == 1
-    assert User.objects.filter(username__startswith="invited").count() == 1
+    assert User.objects.filter(email__startswith="invited").count() == 1

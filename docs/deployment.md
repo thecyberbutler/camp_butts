@@ -295,3 +295,8 @@ static assets, and recreated services using verified image digests. Infrastructu
 layers and runtime configuration are unchanged; health/security/public acceptance passed.
 Do not rerun the historical fresh-install, Google-first-enable or UI upgrade scripts on this
 already upgraded host. Prepare a new exact baseline/transcript for any subsequent upgrade.
+
+The pending email-only schema change requires the separate migration/cutover procedure in
+`email-identity.md`. The historical presentation-only upgrade script must not be used for it;
+its automatic old-image rollback is incompatible with a removed username column. No live
+schema upgrade is claimed by the email-only implementation task.

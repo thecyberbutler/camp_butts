@@ -15,7 +15,7 @@ class Command(BaseCommand):
     )
 
     def add_arguments(self, parser):
-        parser.add_argument("username")
+        parser.add_argument("email")
         parser.add_argument(
             "--role", choices=["Camper", "Staff", "Administrator"], default="Camper"
         )
@@ -28,7 +28,7 @@ class Command(BaseCommand):
             raise CommandError("Independent identity verification required.")
         Campground.current(lock=True)
         try:
-            user = User.objects.select_for_update().get(username__iexact=options["username"])
+            user = User.objects.select_for_update().get(email__iexact=options["email"])
         except User.DoesNotExist:
             raise CommandError("Account not found.") from None
         if user.is_superuser:

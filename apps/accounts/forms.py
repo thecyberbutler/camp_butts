@@ -1,4 +1,4 @@
-from allauth.account.adapter import get_adapter
+from allauth.account.forms import LoginForm as AllauthLoginForm
 from allauth.account.forms import SignupForm as AllauthSignupForm
 from django import forms
 
@@ -16,6 +16,7 @@ class SignupForm(AllauthSignupForm):
         self.fields["password1"].max_length = 256
         self.fields["password2"].max_length = 256
 
-    def clean_username(self):
-        # Validate syntax without disclosing whether this identity exists.
-        return get_adapter().clean_username(self.cleaned_data["username"], shallow=True).casefold()
+
+class LoginForm(AllauthLoginForm):
+    def clean_login(self):
+        return super().clean_login().casefold()
