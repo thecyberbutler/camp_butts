@@ -158,7 +158,7 @@ to display the red **THIS IS A TEST INSTANCE** banner while retaining all securi
 `test` also displays it; `production` hides it; other values are rejected. See
 [the AWS test deployment procedure](docs/deployment.md#aws-public-development-instance).
 
-Google sign-in is deployed on the AWS test instance in prerelease
+Google sign-in was introduced on the AWS test instance in prerelease
 `0.1.0-alpha.20261125-3386d5caf5b3`. Automated public/runtime checks passed; real human
 Google consent and approved-user login remain pending. See [Google setup](docs/google-oauth.md)
 and the [executed upgrade transcript](docs/aws-google-deployment-transcript.md).
@@ -167,3 +167,9 @@ The shared interface uses rounded cards and forms, warm colors, subtle interacti
 responsive navigation with reduced-motion support. All styles and illustrations are local.
 See [interface design](docs/interface-design.md) for behavior, accessibility checks and
 deployment status. Completed features are recorded in separate validated Git commits.
+
+The reviewed interface is deployed on the test instance in prerelease
+[`0.1.0-alpha.20261125-5815b9993895`](releases/0.1.0-alpha.20261125-5815b9993895/README.md).
+Source/image scans, PostgreSQL regression tests, runtime boundary and public acceptance checks
+passed; see the [executed interface upgrade transcript](docs/aws-ui-deployment-transcript.md).
+This remains a development deployment with booking closed, not a production release.

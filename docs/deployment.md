@@ -284,3 +284,14 @@ The first-enable upgrade was executed successfully on 2026-11-25 using
 `0.1.0-alpha.20261124-935cbb3b3a29` deployment. See the
 [executed transcript](aws-google-deployment-transcript.md) for exact commands and evidence.
 Public/runtime checks passed; interactive real Google completion remains pending.
+
+## Interface release update — 2026-11-25
+
+The AWS test host now runs `0.1.0-alpha.20261125-5815b9993895`. See
+[the exact executed upgrade transcript](aws-ui-deployment-transcript.md). No Compose,
+secret, schema or grant changes were needed. The update verified baseline digests/config,
+checked model/migration consistency, retained an encrypted pre-upgrade snapshot, collected
+static assets, and recreated services using verified image digests. Infrastructure filesystem
+layers and runtime configuration are unchanged; health/security/public acceptance passed.
+Do not rerun the historical fresh-install, Google-first-enable or UI upgrade scripts on this
+already upgraded host. Prepare a new exact baseline/transcript for any subsequent upgrade.

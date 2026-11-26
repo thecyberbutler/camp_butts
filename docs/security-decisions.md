@@ -220,3 +220,16 @@ or additional approval is proposed. Residual risks are unreviewed browser/screen
 combinations and existing application/release findings; this is not security certification.
 Review before production. Rollback is a normal reviewed revert of the presentation commit,
 without database, credential or permission changes. No live deployment is part of this task.
+
+### SD-028 deployment follow-up — 2026-11-25
+
+After visual review the owner explicitly requested “lets scan and deploy”. The resulting
+interface prerelease uses the already approved public registry/test host/Google boundaries.
+Both-architecture scans and source tests precede publication; verified immutable digests
+are the only deployment image inputs. Prior/new infrastructure filesystem layers and runtime
+configuration are compared before cutover. No migration/grant change is applied; consistency
+checks fail closed. A directly encrypted pre-upgrade snapshot and separately protected key
+are retained; compatible rollback restores previous image references and collected assets,
+never database contents, constraints or secrets. The exact transcript is disclosed before
+remote execution. No new security reduction or exception is requested. Existing host-local
+backup limitations and all production gates remain; status is recorded in implementation progress.

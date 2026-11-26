@@ -1047,3 +1047,82 @@ updating the test deployment with the required exact remote transcript. Existing
 recovery, operational review and Google human acceptance work remain outstanding.
 The isolated review browser and synthetic test database were stopped after validation;
 existing database volumes and private sanitized screenshots were retained.
+
+## Scanned interface release and test deployment — 2026-11-25
+
+The owner reviewed the design and requested “lets scan and deploy”. Scope: the existing
+public AWS development instance, retaining production Django security settings and the
+red test banner. No production promotion, dependency, schema, credential, grant or network
+change is authorized or needed. The existing SD-025/026/027 scopes remain unchanged.
+
+Release `0.1.0-alpha.20261125-5815b9993895` was built and published to the approved public
+repositories; each remote manifest digest was independently verified. Source snapshot
+`5815b99938950eb13960fd456a2c809f3725f6b61d39bc4230c490875ad08a60` includes the committed
+interface feature `f562aba`. Both build and publication passed 235 PostgreSQL tests, the
+85% coverage gate, Ruff/format/Bandit, Gitleaks, Trivy source/lock/configuration and all
+four images' AMD64/ARM64 vulnerability/secret gates. Non-root/fail-closed startup checks
+and the disposable Google restricted-egress checks passed on both release invocations.
+Poetry lock validation passed with existing metadata deprecation warnings; pip-audit found
+no known vulnerabilities. The initially attempted `.venv/bin/poetry` path was absent; the
+installed `poetry` command completed the check successfully. No check was bypassed.
+
+The two releases have identical DB/proxy/egress filesystem layers on both architectures;
+image runtime configurations differ only in release labels. No database migration is
+introduced. A strict-host-key SSH preflight, disclosed before connecting, confirmed the
+expected live release, unchanged Compose checksums, healthy services and adequate disk.
+The complete upgrade transcript and transferred contents were provided before execution;
+the deployment bundle passed Gitleaks and shell/Python syntax checks.
+
+Deployment completed successfully. The baseline/configuration checks matched; model and
+migration consistency checks passed without schema/grant changes. Web was stopped for a
+bounded, directly encrypted DB snapshot; authenticated decryption was verified. Previous
+images, snapshots, all data/TLS volumes and protected secrets were preserved. The new image
+lock was installed, assets collected and services recreated. No rollback was needed.
+
+All four services are running, with web/DB/egress healthy. Actual image identities, non-root/
+read-only/capability/network/public-port boundaries, Django deployment checks, denied runtime
+DB operations/forced social-account RLS, closed booking/inactive inventory and Google TLS
+passed. Public HTTPS, red banner, local assets, headers, CSRF, host/SNI/body-size boundaries,
+Google start/PKCE/nonce/invalid-callback/disabled-token-route and exact CSS/artwork hash checks
+passed. No real user consent/token exchange was performed or claimed. The local synthetic
+PostgreSQL container was stopped with its volume retained. No Git remote push was performed.
+
+Files added/updated: `README.md`, `docs/implementation-progress.md`, `docs/security-decisions.md`,
+`docs/security-findings.md`, `docs/interface-design.md`, `docs/deployment.md`,
+`docs/backup-and-restore.md`, `docs/container-publishing.md`, `docs/aws-ui-deployment-transcript.md`,
+and `releases/0.1.0-alpha.20261125-5815b9993895/{README.md,manifest.json,images.env}`.
+Private transfer/probe files remain in ignored `.runtime/`; no application source changed
+in this deployment task. No dependencies or migrations added. No security regression or
+new vulnerability identified by the executed checks; no vulnerability newly resolved, no
+suppression/waiver and no pending security approval for this release. Existing findings,
+shared-host/provider residual risks and unfinished production gates remain.
+
+### Executed validation and release commands
+
+```sh
+poetry check --lock
+.venv/bin/pip-audit --progress-spinner off
+docker start campground-test-db-hardened
+TEST_DATABASE_PORT=55433 .venv/bin/python scripts/release_images.py build --namespace thecyberbutler --version 0.1.0-alpha.20261125
+SSL_CERT_FILE=/etc/ssl/cert.pem TEST_DATABASE_PORT=55433 .venv/bin/python scripts/release_images.py publish .runtime/releases/candidate-morlqouq/manifest.json --public-approved
+SSL_CERT_FILE=/etc/ssl/cert.pem .venv/bin/python scripts/check_public_test.py
+.venv/bin/python scripts/check_public_google.py
+.venv/bin/python .runtime/aws-ui-upgrade-5815b9993895/check_public_ui.py
+docker stop campground-test-db-hardened
+git diff --check
+```
+
+The build/publish commands each execute Ruff/format, Bandit, PostgreSQL tests/coverage,
+Gitleaks, Trivy and image/egress checks; see the release guide for their full gates. Build
+creates a new private candidate path; do not assume its name or overwrite an existing tag.
+Exact remote commands, transferred scripts, digest lock, snapshot and rollback behavior are
+recorded in `aws-ui-deployment-transcript.md`; do not rerun its completed one-time upgrade.
+
+Remaining/unexecuted: a new mutmut campaign, interactive Google login, broader browser and
+screen-reader acceptance, full encrypted/off-host recovery, certificate renewal/alerts,
+AWS storage/firewall/IAM review, SMTP delivery, capacity tests and production acceptance.
+The optional bounded mutation command remains
+`.venv/bin/python scripts/mutation_test.py --port 55433 --timeout 900` with its synthetic DB
+running. Host-local authenticated snapshot decryption is not a complete restore rehearsal.
+Recommended next steps: review the live UI, complete human Google acceptance and recovery/
+operational review, then satisfy all production release gates before accepting real camper data.

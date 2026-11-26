@@ -50,7 +50,9 @@ home, directory, login/signup, account security, Google connections, reservation
 camper dashboard, operations/calendar and generic error pages. Check keyboard focus and
 reduced-motion preference before publishing a changed design.
 
-This feature is committed locally. No new image was published and the AWS test deployment
-was not changed by this task. Follow the normal scanned, digest-locked release process and
-disclose the exact remote transcript before any subsequent test deployment. Production
-release gates and existing unverified Google human acceptance/recovery work remain in force.
+The initial design task committed the feature locally. After owner review and a separate
+“scan and deploy” request, release `0.1.0-alpha.20261125-5815b9993895` was scanned, published
+and deployed on the AWS test instance. Public checks confirmed exact CSS/artwork hashes,
+modern home/login pages, Google sign-in entry controls, test banner and booking closure.
+See `aws-ui-deployment-transcript.md` for the disclosed, executed transcript and validation.
+Production gates and unverified Google human acceptance/recovery work remain in force.

@@ -357,3 +357,12 @@ release gates remain unverified until separately recorded. The test banner is no
 The approved Google/provider/egress trust impact is SD-027. No additional security exception
 is pending. The previously documented upstream-published network credential is still an
 external unresolved finding; its value is not copied into this repository.
+
+## Interface release scan — 2026-11-25
+
+Release `0.1.0-alpha.20261125-5815b9993895`: source and both-architecture web/DB/Traefik/egress
+scans passed the HIGH/CRITICAL vulnerability gate and secret scans at build and publication.
+Gitleaks source/deployment-bundle checks, Bandit and pip-audit passed. No new finding was
+identified by these executed checks and no finding was suppressed or security waiver added.
+No prior vulnerability is newly declared resolved by this presentation update. Lower-severity,
+host, manual and remaining production acceptance reviews are not implied by this scan result.

@@ -126,3 +126,16 @@ secret files require independent protected recovery. Preserve the new Google cre
 without including it in ordinary deployment bundles. Never dump/print keys to recover. A
 restore must target a separately reviewed isolated database and preserve original tenant
 identities and constraints; destructive live replacement requires owner authorization.
+
+## Interface upgrade recovery snapshot — 2026-11-25
+
+The interface deployment created `/opt/camp-butts-test/pre-ui-5815b9993895/database.dump.fernet`
+and `/root/camp-butts-ui-recovery-5815b9993895/snapshot.key`, using the same bounded streaming
+encryption and authenticated-decryption validation as the Google upgrade. The previous image
+lock is retained with the ciphertext; earlier snapshots, all live volumes and secret files
+are preserved. Web writes were stopped during the snapshot. No plaintext dump was persisted.
+
+No schema change or database restore occurred. The compatible rollback handler can restore
+the prior reviewed image lock/static assets without restoring stale DB state; it was not
+needed during this successful upgrade. A full isolated restore, off-host key escrow and
+recovery drill remain outstanding. These host-local artifacts do not satisfy those gates.

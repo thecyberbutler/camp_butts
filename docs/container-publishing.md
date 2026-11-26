@@ -138,3 +138,11 @@ A real disposable Docker network test verifies permitted Google TLS, unapproved 
 private/metadata addresses including mapped IPv6, wrong peers/ports/methods and lack of direct
 Internet access. Publication repeats all gates and refuses mutable tag collisions. Runtime
 Google credentials are never part of the source snapshot, build context or image.
+
+## Latest evaluated interface release
+
+`0.1.0-alpha.20261125-5815b9993895` is published for AMD64/ARM64 and deployed on the authorized
+AWS test instance. The committed release manifest and digest lock are under its `releases/`
+directory. Both build and publication repeated the source/image/test/egress gates; public
+acceptance and runtime boundary checks passed. This is still a prerelease with the existing
+production gates. See `aws-ui-deployment-transcript.md`; no stable or latest tag was created.

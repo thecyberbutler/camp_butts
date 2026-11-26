@@ -1,0 +1,28 @@
+{
+  "namespace": "thecyberbutler",
+  "version": "0.1.0-alpha.20261125",
+  "tag": "0.1.0-alpha.20261125-5815b9993895",
+  "source_sha256": "5815b99938950eb13960fd456a2c809f3725f6b61d39bc4230c490875ad08a60",
+  "platforms": [
+    "linux/amd64",
+    "linux/arm64"
+  ],
+  "images": {
+    "web": {
+      "tag": "docker.io/thecyberbutler/campground-web:0.1.0-alpha.20261125-5815b9993895",
+      "digest": "sha256:6fa9602c897b2a1117fb9b1a7d529c346113200bafb6d12cdb8f5988e485f6fe"
+    },
+    "db": {
+      "tag": "docker.io/thecyberbutler/campground-db:0.1.0-alpha.20261125-5815b9993895",
+      "digest": "sha256:776e71237ac4137d7d8ff8388776d402d4c17b7300c9ef1e9dffbd90ae7cbaf4"
+    },
+    "proxy": {
+      "tag": "docker.io/thecyberbutler/campground-proxy:0.1.0-alpha.20261125-5815b9993895",
+      "digest": "sha256:0b77b6b27699d5ea9ba1313739b8a9999e3c1dd1d00afed592435b5ba5975a3c"
+    },
+    "egress": {
+      "tag": "docker.io/thecyberbutler/campground-proxy:google-egress-0.1.0-alpha.20261125-5815b9993895",
+      "digest": "sha256:45dab032e5a04ee9c1bc3f6d5574ea9254d1bf58db5b9469a2c1284d44a7ee9f"
+    }
+  }
+}
