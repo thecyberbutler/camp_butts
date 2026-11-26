@@ -364,3 +364,15 @@ Current onboarding limitation: Google-only accounts without existing MFA cannot 
 the installed framework's MFA-enrollment reauthentication through Google. Use the protected
 interactive local-password establishment procedure; do not disable reauthentication or
 fabricate MFA assurance. Actual owner enrollment remains pending.
+
+## Proposed Codex Cloud build-host access — 2026-11-26
+
+The owner reported a PostgreSQL image build blocked by denied access to
+dl-cdn.alpinelinux.org. Proposed adding only that host to the existing restricted development
+environment allowlist to obtain signed Alpine security updates over verified HTTPS. This
+expands development egress/supply-chain exposure. Retaining the denial is the secure
+alternative with incomplete setup; unrestricted networking or removing the libxml2 update
+is not recommended. Keep digest pins, package verification, proxy controls and isolated
+synthetic data. No application runtime/Google egress change is proposed. Remove the addition
+to roll back; rebuilds may need it again. Approval/save is pending; no access change was
+implemented here. See codex-cloud-setup.md for concrete validation and scope.

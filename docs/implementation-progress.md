@@ -1600,3 +1600,27 @@ Private operator/tests remain ignored under .runtime/admin-promotion-20261126/.
 Next: owner sets a unique test password privately, enrolls TOTP, stores recovery codes and
 checks operations access. Full recovery/host/manual security and remaining specification
 gates are still required before production. No production-readiness claim.
+
+## Codex Cloud setup network diagnosis — 2026-11-26
+
+Separate requested check: owner supplied setup report showing Alpine package-host denial
+blocking PostgreSQL image build. Reviewed Dockerfile.db and Cloud runtime skill; retain its
+libxml2 security upgrade and all TLS/package/runtime controls. The saved camp_butts environment
+is listed ready/runnable, but this desktop chat has no attached Cloud executor/network editor.
+That listing is not evidence that database tests or app startup passed. Prior Cloud lint,
+formatting, Bandit, audit, Compose and Django successes are owner-reported only.
+
+Prepared docs/codex-cloud-setup.md with narrow allowlist remediation, risks, rollback, setup
+resume instructions and PostgreSQL/startup validation. Requested specific owner approval for
+adding only dl-cdn.alpinelinux.org to existing restricted development access. Approval and
+saving the setting remain pending; no Cloud network configuration or application egress has
+been changed. The skill explicitly requires owner review of access changes, and AGENTS.md
+requires approval for security-affecting access expansion. No unrestricted-egress, signature,
+TLS, pinned-image or libxml2 workaround was implemented. No new dependency or migration.
+
+Local documentation/source Gitleaks and git diff whitespace validation passed. Cloud build,
+PostgreSQL security/concurrency tests, app startup/deployment checks, publication and a fresh
+published-environment task remain unexecuted/unverified here. No vulnerability newly found or
+resolved; the network denial is a setup blocker. Next: approve/save the single-host rule in
+the original setup environment, resume its existing commands and publish only after actual
+validation. Files: docs/codex-cloud-setup.md, docs/security-decisions.md and this progress record.
